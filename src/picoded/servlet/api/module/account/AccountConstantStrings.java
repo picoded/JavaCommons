@@ -42,6 +42,7 @@ public class AccountConstantStrings {
 	public static final String TOKEN = "token";
 	public static final String LOGINNAME = "loginName";
 	public static final String LOGINNAMELIST = "loginNameList";
+	public static final String USER_ID = "userID";
 
 	// Rancher VARS
 	public static final String EMAIL = "email";

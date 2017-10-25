@@ -638,11 +638,7 @@ public class JSql_Mssql extends JSql_Base {
 			queryBuilder.append(" THEN UPDATE SET ");
 			queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
 		}
-		System.out.println(">> MSSQL QUERY");
-		System.out.println(queryBuilder.toString());
 		
-
-
 		queryBuilder.append(" WHEN NOT MATCHED ");
 		queryBuilder.append(" THEN INSERT (");
 		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));

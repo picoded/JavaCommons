@@ -85,7 +85,6 @@ public abstract class JSql {
 		return new picoded.dstack.jsql.connector.db.JSql_Mysql(connectionUrl, connectionProps);
 	}
 
-
 	/**
 	* Mssql static constructor, returns picoded.JSql.JSql_Mssql
 	**/

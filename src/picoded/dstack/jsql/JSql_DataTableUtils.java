@@ -186,13 +186,13 @@ public class JSql_DataTableUtils {
 				value = new Double(((Number)value).doubleValue());
 			}
 			return valueTypeSet(type, (Number) value, shortenStringValue(value), value.toString(),
-				null);
+				EmptyArray.BYTE);
 		}
 
 		// String type support
 		if (value instanceof String) {
 			return valueTypeSet(MetaType.STRING.getValue(), null, shortenStringValue(value),
-				value.toString(), null);
+				value.toString(), EmptyArray.BYTE);
 		}
 
 		// Binary type support
@@ -202,7 +202,7 @@ public class JSql_DataTableUtils {
 
 		// Fallback JSON support
 		String jsonString = ConvertJSON.fromObject(value);
-		return valueTypeSet(MetaType.JSON.getValue(), null, null, jsonString.toString(), null);
+		return valueTypeSet(MetaType.JSON.getValue(), null, null, jsonString.toString(), EmptyArray.BYTE);
 	}
 
 	/**

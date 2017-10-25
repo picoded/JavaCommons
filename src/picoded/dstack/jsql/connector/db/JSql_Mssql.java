@@ -261,6 +261,12 @@ public class JSql_Mssql extends JSql_Base {
 			if (prefixQuery != null) {
 				qString = prefixQuery + offsetQuery + limitQuery;
 			}
+
+			// Replace ORDER BY RANDOM() 
+			// with ORDER BY NEWID()
+			// https://stackoverflow.com/questions/19412/how-to-request-a-random-row-in-sql
+			qString = qString.replaceAll("ORDER BY RANDOM\\(\\)", "ORDER BY NEWID()").replaceAll("ORDER BY RAND\\(\\)", "ORDER BY NEWID()");
+
 		} else if (upperCaseStr.startsWith(deleteFrom)) {
 			prefixOffset = deleteFrom.length() + 1;
 
@@ -342,8 +348,34 @@ public class JSql_Mssql extends JSql_Base {
 
 	/// Collumn type correction from mysql to ms sql
 	private static String _simpleMysqlToMssql_collumnSubstitude(String qString) {
-		return qString
-			.replaceAll("(?i)BLOB", "VARBINARY(MAX)");
+		qString = qString.replaceAll("(?i)BLOB", "VARBINARY(MAX)");
+
+		// Work around default table value quotes
+		// sadly variable arguments are NOT allowed in create table statements
+		// 
+		// LIKE WHY?????
+		// java.sql.SQLException: Variables are not allowed in the CREATE TABLE statement.
+		
+		// // @TODO : Properly fix default statement (does not seem to work)
+		// int lastCheckedIdx = 0;
+		// int defaultTxtIdx = 0;
+		// while( (defaultTxtIdx = qString.indexOf("DEFAULT", lastCheckedIdx)) > 0 ) {
+		// 	int defaultTxtIdxEnd = defaultTxtIdx + "DEFAULT".length();
+
+		// 	// Replace double quote with literal string 
+		// 	String beforeDefaultStatement = qString.substring(0, defaultTxtIdx);
+		// 	String afterDefaultStatement = qString.substring(defaultTxtIdxEnd);
+		// 	afterDefaultStatement = afterDefaultStatement.replaceFirst("\\s+\"", "('").replaceFirst("\"", "')");
+
+		// 	// Upate the string correctly
+		// 	qString = beforeDefaultStatement + "CONSTRAINT D_"+defaultTxtIdx+" DEFAULT";
+		// 	qString = qString.replaceAll("DEFAULT\\s+\\(", "DEFAULT(");
+		// 	lastCheckedIdx = qString.length();
+		// 	qString = qString + afterDefaultStatement;
+		// 	return qString;
+		// }
+		
+		return qString;
 	}
 
 	/// Executes the argumented query, and returns the result object *without*
@@ -638,7 +670,7 @@ public class JSql_Mssql extends JSql_Base {
 			queryBuilder.append(" THEN UPDATE SET ");
 			queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
 		}
-		
+
 		queryBuilder.append(" WHEN NOT MATCHED ");
 		queryBuilder.append(" THEN INSERT (");
 		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));

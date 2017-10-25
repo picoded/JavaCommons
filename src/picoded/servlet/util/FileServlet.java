@@ -202,6 +202,12 @@ public class FileServlet extends HttpServlet {
 		//-------------------------------------------
 		File file = new File(basePath, requestPath);
 		
+		// Index.html support for directory request
+		//-------------------------------------------
+		if( file.isDirectory() ) {
+			file = new File(file, "index.html");
+		}
+
 		// Validate the file and output it
 		processRequest(servletRequest, servletResponse, headersOnly, file);
 	}

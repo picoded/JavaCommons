@@ -511,6 +511,40 @@ public class FileUtil extends FileUtilBase {
 	
 	//------------------------------------------------------------------------------------------------------------------
 	//
+	// Parent child relationship handling
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Naively check if a given folder is a parent of a folder / file
+	 * 
+	 * @param parent directory to check if child is in
+	 * @param possibleChild directory or file to check using
+	 * 
+	 * @return true, if parent contains possibleChild
+	 */
+	public static boolean isParent(File parent, File possibleChild) {
+
+		// Quick isDirectory check of parent
+		if( !parent.isDirectory() ) {
+			return false;
+		}
+
+		// Recursively iterate the child upward, to validate parent child relation
+		File possibleParent = possibleChild.getParentFile();
+		while ( possibleParent != null ) {
+			if ( parent.equals( possibleParent ) ) {
+				return true;
+			}
+			possibleParent = possibleParent.getParentFile();
+		}
+
+		// All checks failed, abort
+		return false;
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	//
 	// Recursive permission nuke
 	//
 	//------------------------------------------------------------------------------------------------------------------

@@ -343,7 +343,7 @@ public class JSql_Mssql extends JSql_Base {
 	/// Collumn type correction from mysql to ms sql
 	private static String _simpleMysqlToMssql_collumnSubstitude(String qString) {
 		return qString
-			.replaceAll("(?i)BLOB", "varchar(MAX)");
+			.replaceAll("(?i)BLOB", "VARBINARY(MAX)");
 	}
 
 	/// Executes the argumented query, and returns the result object *without*
@@ -424,14 +424,14 @@ public class JSql_Mssql extends JSql_Base {
 	) throws JSqlException {
 
 		if (tableName.length() > 30) {
-			// logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
+			//logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
-
+		
 		/// Checks that unique collumn and values length to be aligned
 		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
 			throw new JSqlException("Upsert query requires unique column and values to be equal length");
 		}
-
+		
 		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
 		ArrayList<Object> innerSelectArgs = new ArrayList<Object>();
 		StringBuilder innerSelectSB = new StringBuilder(" FROM ");
@@ -445,23 +445,23 @@ public class JSql_Mssql extends JSql_Base {
 			innerSelectArgs.add(uniqueValues[a]);
 		}
 		innerSelectSB.append(")");
-
+		
 		String innerSelectPrefix = "(SELECT ";
 		String innerSelectSuffix = innerSelectSB.toString();
-
+		
 		String equalSign = "=";
 		String targetTableAlias = "target";
 		String sourceTableAlias = "source";
 		String statementTerminator = ";";
-
+		
 		/// Building the query for INSERT OR REPLACE
 		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS " + targetTableAlias);
-
+		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		ArrayList<Object> insertQueryArgs = new ArrayList<Object>();
 		ArrayList<Object> updateQueryArgs = new ArrayList<Object>();
 		ArrayList<Object> selectQueryArgs = new ArrayList<Object>();
-
+		
 		/// Building the query for both sides of '(...columns...) VALUE (...vars...)' clauses in upsert
 		/// Note that the final trailing ", " seperator will be removed prior to final query conversion
 		StringBuilder selectColumnNames = new StringBuilder();
@@ -470,7 +470,7 @@ public class JSql_Mssql extends JSql_Base {
 		StringBuilder insertColumnValues = new StringBuilder();
 		StringBuilder condition = new StringBuilder();
 		String columnSeperator = ", ";
-
+		
 		/// Setting up unique values
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			// dual select
@@ -478,9 +478,9 @@ public class JSql_Mssql extends JSql_Base {
 			selectColumnNames.append(" AS ");
 			selectColumnNames.append(uniqueColumns[a]);
 			selectColumnNames.append(columnSeperator);
-
+			
 			selectQueryArgs.add(uniqueValues[a]);
-
+			
 			// insert column list
 			insertColumnNames.append(uniqueColumns[a]);
 			insertColumnNames.append(columnSeperator);
@@ -490,7 +490,7 @@ public class JSql_Mssql extends JSql_Base {
 			//
 			insertQueryArgs.add(uniqueValues[a]);
 		}
-
+		
 		/// Inserting updated values
 		if (insertColumns != null) {
 			for (int a = 0; a < insertColumns.length; ++a) {
@@ -499,47 +499,47 @@ public class JSql_Mssql extends JSql_Base {
 				updateColumnNames.append(equalSign);
 				updateColumnNames.append("?");
 				updateColumnNames.append(columnSeperator);
-
-				 updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
-
+				
+				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
 				// select dual
 				selectColumnNames.append("?");
 				selectColumnNames.append(" AS ");
 				selectColumnNames.append(insertColumns[a]);
 				selectColumnNames.append(columnSeperator);
-
-					selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]: null);
-
+				
+				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
 				// insert column
 				insertColumnNames.append(insertColumns[a]);
 				insertColumnNames.append(columnSeperator);
-
+				
 				insertColumnValues.append("?");
 				insertColumnValues.append(columnSeperator);
-
-					insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				
+				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
 			}
 		}
-
+		
 		/// Handling default values
 		if (defaultColumns != null) {
 			for (int a = 0; a < defaultColumns.length; ++a) {
 				// insert column
 				insertColumnNames.append(defaultColumns[a]);
 				insertColumnNames.append(columnSeperator);
-
+				
 				insertColumnValues.append("COALESCE(");
 				insertColumnValues.append(innerSelectPrefix);
 				insertColumnValues.append(defaultColumns[a]);
 				insertColumnValues.append(innerSelectSuffix);
-
+				
 				insertQueryArgs.addAll(innerSelectArgs);
-
+				
 				insertColumnValues.append(", ?)");
 				insertColumnValues.append(columnSeperator);
-
+				
 				insertQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
-
+				
 				// update column
 				updateColumnNames.append(defaultColumns[a]);
 				updateColumnNames.append(equalSign);
@@ -547,13 +547,13 @@ public class JSql_Mssql extends JSql_Base {
 				updateColumnNames.append(innerSelectPrefix);
 				updateColumnNames.append(defaultColumns[a]);
 				updateColumnNames.append(innerSelectSuffix);
-
+				
 				updateQueryArgs.addAll(innerSelectArgs);
-
+				
 				updateColumnNames.append(", ?)");
 				updateColumnNames.append(columnSeperator);
 				updateQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
-
+				
 				// select dual
 				// COALESCE((SELECT col3 from t where a=?), ?) as col3
 				selectColumnNames.append("COALESCE(");
@@ -561,29 +561,29 @@ public class JSql_Mssql extends JSql_Base {
 				selectColumnNames.append(defaultColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);
 				selectColumnNames.append(", ?)");
-
+				
 				selectQueryArgs.addAll(innerSelectArgs);
-
+				
 				selectColumnNames.append(" AS " + defaultColumns[a] + columnSeperator);
 				selectQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 			}
 		}
-
+		
 		/// Handling Misc values
 		if (miscColumns != null) {
 			for (int a = 0; a < miscColumns.length; ++a) {
 				// insert column
 				insertColumnNames.append(miscColumns[a]);
 				insertColumnNames.append(columnSeperator);
-
+				
 				insertColumnValues.append(innerSelectPrefix);
 				insertColumnValues.append(miscColumns[a]);
 				insertColumnValues.append(innerSelectSuffix);
-
+				
 				insertQueryArgs.addAll(innerSelectArgs);
-
+				
 				insertColumnValues.append(columnSeperator);
-
+				
 				// updtae column
 				updateColumnNames.append(miscColumns[a]);
 				updateColumnNames.append(equalSign);
@@ -591,23 +591,23 @@ public class JSql_Mssql extends JSql_Base {
 				updateColumnNames.append(miscColumns[a]);
 				updateColumnNames.append(innerSelectSuffix);
 				updateColumnNames.append(columnSeperator);
-
+				
 				updateQueryArgs.addAll(innerSelectArgs);
-
+				
 				// select dual
 				selectColumnNames.append(innerSelectPrefix);
 				selectColumnNames.append(miscColumns[a]);
 				selectColumnNames.append(innerSelectSuffix);
-
+				
 				selectColumnNames.append(" AS ");
 				selectColumnNames.append(miscColumns[a]);
 				selectColumnNames.append(columnSeperator);
-
+				
 				selectQueryArgs.addAll(innerSelectArgs);
-
+				
 			}
 		}
-
+		
 		/// Setting up the condition
 		for (int a = 0; a < uniqueColumns.length; ++a) {
 			if (a > 0) {
@@ -619,12 +619,11 @@ public class JSql_Mssql extends JSql_Base {
 			condition.append(equalSign);
 			condition.append(sourceTableAlias);
 			condition.append(".");
-
+			
 			condition.append(uniqueColumns[a]);
 		}
-
+		
 		/// Building the final query
-
 		queryBuilder.append(" USING (SELECT ");
 		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length() - columnSeperator.length()));
 		queryBuilder.append(")");
@@ -633,9 +632,17 @@ public class JSql_Mssql extends JSql_Base {
 		queryBuilder.append(" ON ( ");
 		queryBuilder.append(condition.toString());
 		queryBuilder.append(" ) ");
-		queryBuilder.append(" WHEN MATCHED ");
-		queryBuilder.append(" THEN UPDATE SET ");
-		queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
+
+		if( updateColumnNames.length() > 0 ) {
+			queryBuilder.append(" WHEN MATCHED ");
+			queryBuilder.append(" THEN UPDATE SET ");
+			queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
+		}
+		System.out.println(">> MSSQL QUERY");
+		System.out.println(queryBuilder.toString());
+		
+
+
 		queryBuilder.append(" WHEN NOT MATCHED ");
 		queryBuilder.append(" THEN INSERT (");
 		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));
@@ -643,11 +650,11 @@ public class JSql_Mssql extends JSql_Base {
 		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length() - columnSeperator.length()));
 		queryBuilder.append(")");
 		queryBuilder.append(statementTerminator);
-
+		
 		queryArgs.addAll(selectQueryArgs);
 		queryArgs.addAll(updateQueryArgs);
 		queryArgs.addAll(insertQueryArgs);
-
+		
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
 

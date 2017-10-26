@@ -136,7 +136,7 @@ public class CoreApiPage extends CorePage {
 
 		// Create a new object, and set it up
 		_apiBuilderObj = new ApiBuilder();
-		_apiBuilderObj._apiNamespace = apiNamespace;
+		_apiBuilderObj._apiNamespace = getContextURI()+"/"+apiNamespace;
 		apiSetup(_apiBuilderObj);
 
 		// Return the result
@@ -171,7 +171,7 @@ public class CoreApiPage extends CorePage {
 		apiNamespace = namespace;
 
 		if( _apiBuilderObj != null ) {
-			_apiBuilderObj._apiNamespace = apiNamespace;
+			_apiBuilderObj._apiNamespace = getContextURI()+"/"+apiNamespace;
 		}
 	}
 

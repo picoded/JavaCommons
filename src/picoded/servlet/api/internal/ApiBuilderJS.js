@@ -64,7 +64,23 @@ apicore.apiKey = function apiKey(inKey) {
 ///
 /// @return  nothing
 apicore.persistentSession = function persistentSession(booleanValue){
-	apicore.persistentSession = booleanValue;
+	if(apicore.isNodeJS()){
+		apicore.persistentSession = booleanValue;
+	} else {
+		throw "You are not in NodeJS environment.";
+	}
+}
+
+/// Function: api._core.addCookie
+/// @param    Takes in a tough-cookie
+///
+/// @return  nothing
+apicore.setCookieJar = function setCookieJar(cookieJar){
+	if(apicore.isNodeJS()){
+		apicore.cookieJar = cookieJar;
+	} else {
+		throw "You are not in NodeJS environment.";
+	}
 }
 
 //---------------------------------------------------------------------------------------
@@ -87,17 +103,13 @@ if(apicore.isNodeJS()) {
 	var url = require('url');
 	var FormData = require('form-data');
 	var request = require('request-promise');
-  // Initialize a cookie jar
-  var jar = request.jar();
-  // Set default persistency to be true
-  api._core.persistentSession = api._core.persistentSession || true;
+	// Set default persistency to be true
+	apicore.persistentSession = apicore.persistentSession || true;
 
 	// Does the node JS implementation
 	apicore.rawPostRequest = function rawPostRequest(reqURI, paramObj, callback) {
-
-		// if(apiconfig.apiKey == null) {
-		// 	throw "IMPORTANT, when using node.js an API key is a requirement";
-		// }
+		// Grab existing cookieJar or initialize a cookie jar
+		var jar = apicore.cookieJar || request.jar();
 
 		// Generate the formdata object where applicable
 		var formData = new FormData();
@@ -112,27 +124,19 @@ if(apicore.isNodeJS()) {
 				}
 			}
 		}
-    // Enable persistentSession for users by passing in cookie jar
-    if (api._core.persistentSession){
-      jar = jar || api._core.cookies;
-    } else {
-      jar = api._core.cookies || request.jar();
-    }
-
-    // Declare options for POST request
+		// Declare options for POST request
 		var options = {
 			method: 'POST',
 			uri: apicore.baseURL()+reqURI,
 			formData: paramObj,
-      jar
+			jar : jar
 		};
-
+		// Make the request
 		var ret = request(options);
-
-    // Retain server's cookie response and store in jar if persistency is true
-    if(api._core.persistentSession){
-      api._core.cookies = jar;
-    }
+		// Retain server's cookie response and store in jar if persistency is true
+		if(apicore.persistentSession){
+			apicore.cookieJar = jar;
+		}
 		// Attach callback
 		if( callback != null ) {
 			ret.then(callback);

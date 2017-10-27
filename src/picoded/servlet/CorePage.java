@@ -454,7 +454,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	/**
 	 * Spawn and instance of the current class
 	 **/
-	public final CorePage spawnInstance() throws ServletException { //, OutputStream outStream
+	public CorePage spawnInstance() throws ServletException { //, OutputStream outStream
 		try {
 			Class<? extends CorePage> pageClass = this.getClass();
 			CorePage ret = pageClass.newInstance();

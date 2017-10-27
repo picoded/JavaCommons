@@ -2,16 +2,15 @@ package picoded.util.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ini4j.Ini;
 
-import picoded.core.conv.GenericConvert;
-import picoded.core.struct.GenericConvertMap;
+import picoded.core.conv.*;
+import picoded.core.struct.*;
 
 //import com.hazelcast.com.eclipsesource.json.JsonObject;
 
@@ -43,11 +42,14 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	/**
 	 * The actual inner map storage
 	 **/
+
+	// If this file is an INI file
 	Ini iniMap = null;
+
+	// If its a json file
 	GenericConvertMap<String, Object> jsonMap = null;
 	
-	boolean jsonMode = false;
-	
+	// The config file name
 	String fileName = "";
 	
 	/**
@@ -58,14 +60,14 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	}
 	
 	/**
-	 * Constructor, which takes in an INI file object and stores it
+	 * Constructor, which takes in an file object and stores it
 	 **/
 	public ConfigFile(File fileObj) {
 		innerConstructor(fileObj);
 	}
 	
 	/**
-	 * Constructor, which takes in an INI file path and stores it
+	 * Constructor, which takes in an file path and stores it
 	 **/
 	public ConfigFile(String filePath) {
 		innerConstructor(new File(filePath));
@@ -75,12 +77,17 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		try {
 			fileName = inFile.getName();
 			if (fileName.endsWith(".js") || fileName.endsWith(".json")) {
-				jsonMode = true;
 				String jsString = FileUtils.readFileToString(inFile);
 				jsonMap = GenericConvert.toGenericConvertStringMap(jsString,
 					new HashMap<String, Object>());
-			} else {
+			} else if(fileName.endsWith(".ini")) {
 				iniMap = new Ini(inFile);
+			} else if(fileName.endsWith(".html")) {
+				String jsString = FileUtils.readFileToString(inFile);
+				jsonMap = new GenericConvertHashMap<String,Object>();
+				jsonMap.put("html", jsString);
+			} else {
+				throw new RuntimeException("Unsupported file type : "+fileName);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -96,19 +103,19 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	 **/
 	public Object get(Object key) {
 		String keyString = key.toString();
-		if (jsonMode) {
+		if (jsonMap != null) {
 			return jsonMap.getNestedObject(keyString);
 		} else {
 			// read from ini
 			String[] splitKeyString = keyString.split("\\.");
-			
 			String section = StringUtils.join(
 				ArrayUtils.subarray(splitKeyString, 0, splitKeyString.length - 1), "."); // name
+			
 			// [keys] in brackets are considered a section
 			String sectionKey = splitKeyString[splitKeyString.length - 1];
-			
 			Ini.Section iniSection = iniMap.get(section);
 			
+			// Ini section handling
 			return (iniSection == null) ? null : iniSection.get(sectionKey);
 		}
 	}
@@ -117,7 +124,7 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	 * Top layer keySet fetching
 	 **/
 	public Set<String> keySet() {
-		if (jsonMode) {
+		if (jsonMap != null) {
 			return jsonMap.keySet();
 		} else {
 			return iniMap.keySet();

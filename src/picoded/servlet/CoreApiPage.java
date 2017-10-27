@@ -116,6 +116,22 @@ public class CoreApiPage extends CorePage {
 
 	/////////////////////////////////////////////
 	//
+	// Spawn instance with shared fileConfig object
+	//
+	/////////////////////////////////////////////
+
+	/**
+	 * Spawn and instance of the current class
+	 * With fileConfig attached (shared)
+	 **/
+	public CorePage spawnInstance() throws ServletException { //, OutputStream outStream
+		CoreApiPage page = (CoreApiPage)(super.spawnInstance());
+		page._fileConfig = fileConfig();
+		return page; 
+	}
+
+	/////////////////////////////////////////////
+	//
 	// ApiBuilder handling
 	//
 	/////////////////////////////////////////////

@@ -59,6 +59,14 @@ apicore.apiKey = function apiKey(inKey) {
 	}
 }
 
+/// Function: api._core.persistentSession
+/// @param    True or False value to set the persistency of the request session
+///
+/// @return  nothing
+apicore.persistentSession = function persistentSession(booleanValue){
+	apicore.persistentSession = booleanValue;
+}
+
 //---------------------------------------------------------------------------------------
 //
 //  API rawPostRequest
@@ -77,13 +85,60 @@ if(apicore.isNodeJS()) {
 	var http = require('http');
 	var net = require('net');
 	var url = require('url');
+	var FormData = require('form-data');
+	var request = require('request-promise');
+  // Initialize a cookie jar
+  var jar = request.jar();
+  // Set default persistency to be true
+  api._core.persistentSession = api._core.persistentSession || true;
 
 	// Does the node JS implementation
-	apicore.rawPostRequest = function rawPostRequest() {
+	apicore.rawPostRequest = function rawPostRequest(reqURI, paramObj, callback) {
+
 		// if(apiconfig.apiKey == null) {
 		// 	throw "IMPORTANT, when using node.js an API key is a requirement";
 		// }
-		throw "node.js support is not yet implemented.";
+
+		// Generate the formdata object where applicable
+		var formData = new FormData();
+		if( paramObj != null ) {
+			for (var name in paramObj) {
+				if (paramObj.hasOwnProperty(name)) {
+					var val = paramObj[name];
+					if( val instanceof Array || val instanceof Object ) {
+						val = JSON.stringify(val)
+					}
+					formData.append(name, val);
+				}
+			}
+		}
+    // Enable persistentSession for users by passing in cookie jar
+    if (api._core.persistentSession){
+      jar = jar || api._core.cookies;
+    } else {
+      jar = api._core.cookies || request.jar();
+    }
+
+    // Declare options for POST request
+		var options = {
+			method: 'POST',
+			uri: apicore.baseURL()+reqURI,
+			formData: paramObj,
+      jar
+		};
+
+		var ret = request(options);
+
+    // Retain server's cookie response and store in jar if persistency is true
+    if(api._core.persistentSession){
+      api._core.cookies = jar;
+    }
+		// Attach callback
+		if( callback != null ) {
+			ret.then(callback);
+		}
+		// Return the promise
+		return ret;
 	}
 } else {
 	// Does the browser xhttprequest
@@ -110,7 +165,7 @@ if(apicore.isNodeJS()) {
 
 		// Enable cookies on CORS
 		// See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
-		request.withCredentials = true; 
+		request.withCredentials = true;
 
 		// Return promise object
 		var ret = new Promise(function(good,bad) {

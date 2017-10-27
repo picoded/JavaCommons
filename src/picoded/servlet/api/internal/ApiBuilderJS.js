@@ -71,8 +71,8 @@ apicore.persistentSession = function persistentSession(booleanValue){
 	}
 }
 
-/// Function: api._core.addCookie
-/// @param    Takes in a tough-cookie
+/// Function: api._core.setCookieJar
+/// @param    Takes in a cookieJar to use for the request
 ///
 /// @return  nothing
 apicore.setCookieJar = function setCookieJar(cookieJar){

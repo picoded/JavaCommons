@@ -64,7 +64,7 @@ public class MapProxyApi extends CommonApiModule {
 			return false;
 		}
 
-		String[] blacklistPrefix = config.getStringArray("blacklistPrefix");
+		String[] blacklistPrefix = config.getStringArray("blacklistPrefix", "[]");
 		for(String item : blacklistPrefix) {
 			if(key.startsWith(item)) {
 				return false;

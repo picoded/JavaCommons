@@ -254,8 +254,11 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			return _subMapCache.get(prefix);
 		}
 		
-		_subMapCache.put(prefix, createSubMapInternal(prefix, null));
-		return _subMapCache.get(prefix);
+		ConfigFileSet cacheObj = createSubMapInternal(prefix, null);
+		if( cacheObj != null ) {
+			_subMapCache.put(prefix, cacheObj);
+		}
+		return cacheObj;
 	}
 	
 	//-----------------------------------------------------------------------------------

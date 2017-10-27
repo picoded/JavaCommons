@@ -52,7 +52,12 @@ public class ApiBuilderJS {
 		generateJSScript += "\t\t\"\" : []\n";
 		// System.out.println(generateJSScript+"\n\n it is completed here "+index);
 		// generateJSScript = generateJSScript.substring(0, index) + "\n";
-		generateJSScript += "\t});\n" + "\treturn api;\n" + "})();\n";
+		generateJSScript += "\t});\n" + "\treturn api;\n" + "})();\n\n";
+
+		// Ensure module export for NodeJS environment
+		generateJSScript += "if(api._core.isNodeJS()){\n";
+		generateJSScript += "\tmodule.exports=api;\n";
+		generateJSScript += "}";
 		return generateJSScript;
 	}
 }

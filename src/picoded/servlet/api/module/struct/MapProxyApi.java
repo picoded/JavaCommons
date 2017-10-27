@@ -38,7 +38,7 @@ public class MapProxyApi extends CommonApiModule {
 	 * @param  DataTable  the data table object for the API to build on
 	 */
 	public MapProxyApi(Map<String,Object> inMap) {
-		dataMap = inTable;
+		dataMap = inMap;
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class MapProxyApi extends CommonApiModule {
 		}
 
 		String[] blacklistPrefix = config.getStringArray("blacklistPrefix");
-		for(String item : blackListPrefix) {
+		for(String item : blacklistPrefix) {
 			if(key.startsWith(item)) {
 				return false;
 			}
@@ -121,7 +121,7 @@ public class MapProxyApi extends CommonApiModule {
 			// Validate key and get result map
 			for(String key : keyList) {
 				if(validateKeyname(key)) {
-					resMap.put( dataMap.get(key) );
+					resMap.put( key, dataMap.get(key) );
 				}
 			}
 	

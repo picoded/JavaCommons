@@ -1,4 +1,4 @@
-package picoded.file;
+package picoded.util.file;
 
 //
 import java.io.File;

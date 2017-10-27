@@ -35,12 +35,12 @@ public class ApiBuilderJS {
 	/**
 	 * Method to generate the entire Javascript API file contents
 	 */
-	public static String generateApiJs(ApiBuilder builder, String hostpath) {
+	public static String generateApiJs(ApiBuilder builder, String hostpath, String apiNamespace) {
 		String versionStr = builder.versionStr();
 
 		String generateJSScript = "var api = (function() {\n";
 		generateJSScript += getJsLib();
-		generateJSScript += "\tapicore.baseURL(\"//" + hostpath + "/" + versionStr + "/\");\n"
+		generateJSScript += "\tapicore.baseURL(\"//"+(hostpath+"/" + apiNamespace + "/" + versionStr + "/").replaceAll("//","/")+"\");\n"
 			+ "\tapicore.setEndpointMap({\n";
 
 		// Generating endpoints

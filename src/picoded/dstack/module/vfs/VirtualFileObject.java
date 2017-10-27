@@ -3,7 +3,7 @@ package picoded.dstack.module.vfs;
 import java.util.*;
 
 import picoded.dstack.*;
-import picoded.file.FileUtil;
+import picoded.util.file.FileUtil;
 
 import picoded.core.conv.*;
 

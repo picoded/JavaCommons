@@ -35,4 +35,10 @@ public class JSqlTest {
 		return JSql.mysql(TestConfig.MYSQL_CONN(), TestConfig.MYSQL_DATA(), TestConfig.MYSQL_USER(),
 			TestConfig.MYSQL_PASS());
 	}
+
+	/// MSSQL connection
+	public static JSql mssql() {
+		return JSql.mssql(TestConfig.MSSQL_CONN(), TestConfig.MSSQL_NAME(), TestConfig.MSSQL_USER(),
+			TestConfig.MSSQL_PASS());
+	}
 }

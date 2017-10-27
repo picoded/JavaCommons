@@ -26,7 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 
 // JavaCommons library used
 import picoded.core.conv.ConvertJSON;
-import picoded.file.FileUtil;
+import picoded.util.file.FileUtil;
 import picoded.core.common.HttpRequestType;
 import picoded.core.common.EmptyArray;
 import picoded.core.struct.HashMapList;
@@ -546,9 +546,12 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	protected String _contextURI = null;
 
 	/**
-	 * Returns the servlet contextual path : needed for base URI for page redirects / etc
+	 * Returns the whole server application contextual path : needed for base URI for page redirects / etc
+	 * 
+	 * For root this is "" blank, however for example
+	 * if deployed under "edge", it would be "/edge"
 	 *
-	 * This represents the URL path used in HTTP
+	 * This represents part of the URL path used in HTTP
 	 **/
 	public String getContextURI() {
 		if (_contextURI != null) {
@@ -574,6 +577,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 	/**
 	 * Returns the servlet contextual path : needed for base URI for page redirects / etc
+	 * Note that this refers specifically to the current servlet request
 	 **/
 	public String getServletContextURI() {
 		if (httpRequest != null) {

@@ -773,8 +773,19 @@ public class ApiBuilder implements
 	// API JS Handling
 	//
 	//-------------------------------------------------------------------
+
+	/**
+	 * [Internal use only] API namespace to assume for server when building the JS
+	 *
+	 * This is currently modified by servlet
+	 */
+	public String _apiNamespace = "api";
+	
+	/**
+	 * Gets and return the API js
+	 */
 	protected String getApiJS(String apiURL) {
-		return ApiBuilderJS.generateApiJs(this, apiURL);
+		return ApiBuilderJS.generateApiJs(this, apiURL, _apiNamespace);
 	}
 
 	//-------------------------------------------------------------------

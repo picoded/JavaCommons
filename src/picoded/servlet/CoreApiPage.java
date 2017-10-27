@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 
 // javacommons stuff
 import picoded.servlet.api.*;
-import picoded.file.ConfigFileSet;
+import picoded.util.file.ConfigFileSet;
 
 /**
  * Extends the core API page, to support API's
@@ -136,6 +136,7 @@ public class CoreApiPage extends CorePage {
 
 		// Create a new object, and set it up
 		_apiBuilderObj = new ApiBuilder();
+		_apiBuilderObj._apiNamespace = getContextURI()+"/"+apiNamespace;
 		apiSetup(_apiBuilderObj);
 
 		// Return the result
@@ -168,6 +169,10 @@ public class CoreApiPage extends CorePage {
 
 	public void setApiNameSpace(String namespace) {
 		apiNamespace = namespace;
+
+		if( _apiBuilderObj != null ) {
+			_apiBuilderObj._apiNamespace = getContextURI()+"/"+apiNamespace;
+		}
 	}
 
 	/**

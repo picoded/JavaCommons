@@ -1,6 +1,6 @@
 package picoded.dstack;
 
-import picoded.file.ConfigFileSet;
+import picoded.util.file.ConfigFileSet;
 
 public class DConfig extends ConfigFileSet {
 	public DConfig() {

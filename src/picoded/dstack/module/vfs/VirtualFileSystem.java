@@ -1,7 +1,7 @@
 package picoded.dstack.module.vfs;
 
 import picoded.dstack.*;
-import picoded.file.FileUtil;
+import picoded.util.file.FileUtil;
 
 import java.util.*;
 

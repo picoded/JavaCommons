@@ -3,6 +3,7 @@ package picoded.util.file;
 //
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +32,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	 * <related <main-include.text, hi>>
 	 * <jsonFileName <jsonKey, jsonValue>>
 	 **/
-	protected Map<String, ConfigFile> configFileMap = new HashMap<String, ConfigFile>();
+	protected Map<String, ConfigFile> configFileMap = new ConcurrentHashMap<String, ConfigFile>();
 	
 	//-----------------------------------------------------------------------------------
 	//
@@ -112,10 +113,9 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			
 			// Only accept ini or json files
 			if (extension.equalsIgnoreCase("ini") || extension.equalsIgnoreCase("json")
-				|| extension.equalsIgnoreCase("js")) {
+				|| extension.equalsIgnoreCase("js") || extension.equalsIgnoreCase("html") ) {
 				
 				ConfigFile cFile = new ConfigFile(inFile);
-				
 				fileName = fileName.substring(0, fileName.lastIndexOf('.'));
 				String prefix = "";
 				if (!rootPrefix.isEmpty()) {
@@ -244,7 +244,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 	/**
 	 * Memoizer cache for getCachedSubMap()
 	 **/
-	protected Map<String, ConfigFileSet> _subMapCache = new HashMap<String, ConfigFileSet>();
+	protected Map<String, ConfigFileSet> _subMapCache = new ConcurrentHashMap<String, ConfigFileSet>();
 	
 	/**
 	 * Gets an internally cached submap (with prefix)
@@ -254,8 +254,11 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			return _subMapCache.get(prefix);
 		}
 		
-		_subMapCache.put(prefix, createSubMapInternal(prefix, null));
-		return _subMapCache.get(prefix);
+		ConfigFileSet cacheObj = createSubMapInternal(prefix, null);
+		if( cacheObj != null ) {
+			_subMapCache.put(prefix, cacheObj);
+		}
+		return cacheObj;
 	}
 	
 	//-----------------------------------------------------------------------------------

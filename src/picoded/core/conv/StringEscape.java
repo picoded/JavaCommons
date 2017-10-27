@@ -170,13 +170,16 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	 * @return Sanatized Map
 	 **/
 	public static Map<String,Object> commonHtmlEscapeCharacters(Map<String,Object> input) {
+		// Result map
+		Map<String,Object> res = new HashMap<String,Object>();
+
 		// Iterate and update
 		for (String k : input.keySet()) {
-			input.put(k, commonHtmlEscapeCharacters_generic( input.get(k) ));
+			res.put(k, commonHtmlEscapeCharacters_generic( input.get(k) ));
 		}
 
 		// Return modified input values
-		return input;
+		return res;
 	}
 
 	/**
@@ -188,12 +191,15 @@ public class StringEscape extends org.apache.commons.lang3.StringEscapeUtils {
 	 * @return Sanatized List
 	 **/
 	public static List<Object> commonHtmlEscapeCharacters(List<Object> input) {
+		// Result list
+		List<Object> res = new ArrayList<Object>();
+
 		// Iterate and update
 		for (int i = 0; i < input.size(); i++) {
-			input.set(i, commonHtmlEscapeCharacters_generic( input.get(i) ));
+			res.add( commonHtmlEscapeCharacters_generic( input.get(i) ));
 		}
 
 		// Return modified input values
-		return input;
+		return res;
 	}
 }

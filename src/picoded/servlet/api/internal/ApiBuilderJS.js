@@ -150,7 +150,7 @@ if(apicore.isNodeJS()) {
 	apicore.rawPostRequest = function rawPostRequest(reqURI, paramObj, callback) {
 
 		// Generate the formdata object where applicable
-		var formData = new FormData();
+		var formData = new FormData(null);
 		if( paramObj != null ) {
 			for (var name in paramObj) {
 				if (paramObj.hasOwnProperty(name)) {

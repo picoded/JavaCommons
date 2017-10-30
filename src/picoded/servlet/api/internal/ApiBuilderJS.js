@@ -101,7 +101,7 @@ if(apicore.isNodeJS()) {
 	var http = require('http');
 	var net = require('net');
 	var url = require('url');
-	var FormData = require('form-data');
+	var NodeFormData = require('form-data');
 	var request = require('request-promise');
 	// Set default persistency to be true
 	apicore.persistentSession = apicore.persistentSession || true;
@@ -112,7 +112,7 @@ if(apicore.isNodeJS()) {
 		var jar = apicore.cookieJar || request.jar();
 
 		// Generate the formdata object where applicable
-		var formData = new FormData();
+		var formData = new NodeFormData();
 		if( paramObj != null ) {
 			for (var name in paramObj) {
 				if (paramObj.hasOwnProperty(name)) {
@@ -150,7 +150,7 @@ if(apicore.isNodeJS()) {
 	apicore.rawPostRequest = function rawPostRequest(reqURI, paramObj, callback) {
 
 		// Generate the formdata object where applicable
-		var formData = new FormData(null);
+		var formData = new FormData();
 		if( paramObj != null ) {
 			for (var name in paramObj) {
 				if (paramObj.hasOwnProperty(name)) {

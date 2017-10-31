@@ -133,6 +133,8 @@ public class AccountTableApi extends CommonApiModule {
 				AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
 				if (firstAdmin != null) // Set the creator as the admin
 					newAccount.setMember(firstAdmin, "admin");
+			}else{
+				newAccount.setGroupStatus(false);
 			}
 			// Attach all of the login names in loginNameList to account
 			for(String name : loginNameList){

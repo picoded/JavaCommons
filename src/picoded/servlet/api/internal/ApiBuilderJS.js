@@ -83,6 +83,18 @@ apicore.setCookieJar = function setCookieJar(cookieJar){
 	}
 }
 
+/**
+ * Function: api._core.getCookieJar
+ * @return {cookieJar}
+ */
+apicore.getCookieJar = function getCookieJar(){
+    if(apicore.isNodeJS()){
+        return apicore.cookieJar;
+    } else {
+        throw "You are not in NodeJS environment.";
+    }
+}
+
 //---------------------------------------------------------------------------------------
 //
 //  API rawPostRequest
@@ -137,6 +149,7 @@ if(apicore.isNodeJS()) {
 		if(apicore.persistentSession){
 			apicore.cookieJar = jar;
 		}
+		apicore.setCookieJar(jar);
 		// Attach callback
 		if( callback != null ) {
 			ret.then(callback);

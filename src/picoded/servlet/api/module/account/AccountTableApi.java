@@ -1079,14 +1079,13 @@ public class AccountTableApi extends CommonApiModule {
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 **/
 	public ApiFunction delete_user_account = (req, res) -> {
-		String userID = req.getString(OID, "");
-
+		String userID = req.getString(ACCOUNT_ID, "");
 		if (userID.isEmpty()){
 			res.put(RESULT, false);
 			res.put(INFO, "No oid is supplied.");
 			return res;
 		}
-
+		req.put(OID, userID);
 		return dataTableApi.get.apply(req, res);
 	};
 

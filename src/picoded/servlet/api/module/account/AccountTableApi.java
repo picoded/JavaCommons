@@ -1065,8 +1065,7 @@ public class AccountTableApi extends CommonApiModule {
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type          | Description                                                                |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	 * | loginName          | String  (Either OR) | username of the user/current user to retrieve                              |
-	 * | accountID          | String  			    | ID of the user/current user to retrieve                                    |
+	 * | oid          | String  			    | ID of the user/current user to retrieve                                    |
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 *
 	 * ## JSON Object Output Parameters
@@ -1080,19 +1079,15 @@ public class AccountTableApi extends CommonApiModule {
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 **/
 	public ApiFunction delete_user_account = (req, res) -> {
-		String userID = req.getString(ACCOUNT_ID, "");
-		AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(
-			req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
+		String userID = req.getString(OID, "");
+
+		if (userID.isEmpty()){
+			res.put(RESULT, false);
+			res.put(INFO, "No oid is supplied.");
 			return res;
 		}
-		if (userID.isEmpty()) { // logout any current session if it is the current user
-			accountLoginApi.logout.apply(req, res);
-		}
-		table.remove(ao);
-		res.put(RESULT, true);
-		return res;
+
+		return dataTableApi.get.apply(req, res);
 	};
 
 	// /**
@@ -1339,6 +1334,7 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + "account/info/set", info_set);
 		builder.put(path + "account/info/list", info_list);
 		builder.put(path + "account/info/list/datatables", info_list_datatables);
+		builder.put(path + "account/admin/remove", delete_user_account);
 
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
 		builder.put(path + "account/changePassword", changePassword); // Tested

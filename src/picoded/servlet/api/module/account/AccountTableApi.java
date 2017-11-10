@@ -1085,8 +1085,15 @@ public class AccountTableApi extends CommonApiModule {
 			res.put(INFO, "No oid is supplied.");
 			return res;
 		}
-		req.put(OID, userID);
-		return dataTableApi.delete.apply(req, res);
+		AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(req.getHttpServletRequest(), null);
+		if (ao == null) {
+ 			res.put(ERROR, ERROR_NO_USER);
+			return res;
+		}
+		table.remove(ao);
+		res.put(RESULT, true);
+		res.put(OID, userID);
+		return res;
 	};
 
 	// /**
@@ -1333,14 +1340,13 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + "account/info/set", info_set);
 		builder.put(path + "account/info/list", info_list);
 		builder.put(path + "account/info/list/datatables", info_list_datatables);
-		builder.put(path + "account/admin/remove", delete_user_account);
 
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
 		builder.put(path + "account/changePassword", changePassword); // Tested
 
 		// builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
-		// builder.put(path + API_ACCOUNT_ADMIN_REMOVE, delete_user_account); // Tested
+		builder.put(path + "account/admin/remove", delete_user_account); // Tested
 		builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
 		//
 		// //Group functionalities

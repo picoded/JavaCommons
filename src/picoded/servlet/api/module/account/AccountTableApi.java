@@ -1086,7 +1086,7 @@ public class AccountTableApi extends CommonApiModule {
 			return res;
 		}
 		req.put(OID, userID);
-		return dataTableApi.get.apply(req, res);
+		return dataTableApi.delete.apply(req, res);
 	};
 
 	// /**

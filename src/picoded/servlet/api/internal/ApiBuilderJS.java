@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 import picoded.servlet.api.ApiBuilder;
 
 public class ApiBuilderJS {
-
+	
 	public static String getJsLib() {
 		Scanner scanner = null;
 		StringBuilder fileContents = new StringBuilder();
@@ -31,18 +31,19 @@ public class ApiBuilderJS {
 		}
 		return (fileContents == null) ? "" : fileContents.toString();
 	}
-
+	
 	/**
 	 * Method to generate the entire Javascript API file contents
 	 */
 	public static String generateApiJs(ApiBuilder builder, String hostpath, String apiNamespace) {
 		String versionStr = builder.versionStr();
-
+		
 		String generateJSScript = "var api = (function() {\n";
 		generateJSScript += getJsLib();
-		generateJSScript += "\tapicore.baseURL(\"//"+(hostpath+"/" + apiNamespace + "/" + versionStr + "/").replaceAll("//","/")+"\");\n"
-			+ "\tapicore.setEndpointMap({\n";
-
+		generateJSScript += "\tapicore.baseURL(\"//"
+			+ (hostpath + "/" + apiNamespace + "/" + versionStr + "/").replaceAll("//", "/")
+			+ "\");\n" + "\tapicore.setEndpointMap({\n";
+		
 		// Generating endpoints
 		for (String endpoint : builder.keySet()) {
 			endpoint = endpoint.replaceAll("/", "\\.");
@@ -53,7 +54,7 @@ public class ApiBuilderJS {
 		// System.out.println(generateJSScript+"\n\n it is completed here "+index);
 		// generateJSScript = generateJSScript.substring(0, index) + "\n";
 		generateJSScript += "\t});\n" + "\treturn api;\n" + "})();\n\n";
-
+		
 		// Ensure module export for NodeJS environment
 		generateJSScript += "if(api._core.isNodeJS()){\n";
 		generateJSScript += "\tmodule.exports=api;\n";

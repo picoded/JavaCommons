@@ -24,13 +24,13 @@ import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
 /// Test the AccountTable API specifically
 public class AccountFilterApi_test extends ApiModule_test {
-
+	
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test setup
 	//
 	//----------------------------------------------------------------------------------------
-
+	
 	/// The test servlet to use
 	public static class AccountFilterApiTestServlet extends ApiModuleTestServlet {
 		@Override
@@ -41,7 +41,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 				AccountObject ao = table.newEntry(SUPERUSERNAME);
 				ao.setPassword(VALIDPASSWORD);
 				// Add to superUserGrp
-
+				
 				AccountObject superUserGrp = table.newEntry(table.getSuperUserGroupName());
 				superUserGrp.setMembershipRoles(table.defaultMembershipRoles());
 				DataObject mo = superUserGrp.addMember(ao, "admin");
@@ -49,21 +49,21 @@ public class AccountFilterApi_test extends ApiModule_test {
 			return ret;
 		}
 	}
-
+	
 	/// Variables
 	public static final String VALIDPASSWORD = "Password123";
 	public static final String SUPERUSERNAME = "laughing-man@mailawer.com";
-
+	
 	public CorePage setupServlet() {
 		return new AccountFilterApiTestServlet();
 	}
-
+	
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test running
 	//
 	//----------------------------------------------------------------------------------------
-
+	
 	// @Test
 	// public void loginProcessFlow() {
 	// 	GenericConvertMap<String, Object> res = null;
@@ -1574,14 +1574,14 @@ public class AccountFilterApi_test extends ApiModule_test {
 	// 	ts = new TestSet(null, API_ACCOUNT_LIST, expectedResult, DATA);
 	// 	ts.executeTrueTestCase();
 	// }
-
+	
 	class TestSet {
 		private Map<String, Object> params = null;
 		private String url = "";
 		private Object expectedResult = "";
 		private String resultToGetFrom = "";
 		private GenericConvertMap<String, Object> res = null;
-
+		
 		public TestSet(Map<String, Object> params, String url, Object expectedResult,
 			String resultToGetFrom) {
 			this.params = params;
@@ -1589,53 +1589,53 @@ public class AccountFilterApi_test extends ApiModule_test {
 			this.expectedResult = expectedResult;
 			this.resultToGetFrom = resultToGetFrom;
 		}
-
+		
 		public Map<String, Object> getParams() {
 			return params;
 		}
-
+		
 		public void setURL(String url) {
 			this.url = url;
 		}
-
+		
 		public String getURL() {
 			return url;
 		}
-
+		
 		public Object getExpectedResult() {
 			return expectedResult;
 		}
-
+		
 		public String getResultToGetFrom() {
 			return resultToGetFrom;
 		}
-
+		
 		public GenericConvertMap<String, Object> getRes() {
 			return res;
 		}
-
+		
 		public void executeGenericSpecifyProp(String prop) {
 			res = requestJSON(url, params);
 			assertEquals(expectedResult, res.getStringMap(resultToGetFrom).get(prop));
 		}
-
+		
 		public void executeGenericTestCase() {
 			res = requestJSON(url, params);
 			assertEquals(expectedResult, res.get(resultToGetFrom));
 		}
-
+		
 		public void executeListTestCase(String errorMsg) {
 			res = requestJSON(url, params);
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(expectedResult));
 			assertThat(errorMsg, res.getList(resultToGetFrom), containsInAnyOrder(result.toArray()));
 		}
-
+		
 		public void executeTrueTestCase() {
 			res = requestJSON(url, params);
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(res.get(DATA)));
 			assertTrue(result.size() > 0);
 		}
-
+		
 		public void setAndExecuteGSP(Map<String, Object> params, Object expectedResult,
 			String resultToGetFrom, String prop) {
 			this.params = params;
@@ -1643,7 +1643,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 			this.resultToGetFrom = resultToGetFrom;
 			executeGenericSpecifyProp(prop);
 		}
-
+		
 		public void setAndExecuteGTC(Map<String, Object> params, Object expectedResult,
 			String resultToGetFrom) {
 			this.params = params;
@@ -1651,7 +1651,7 @@ public class AccountFilterApi_test extends ApiModule_test {
 			this.resultToGetFrom = resultToGetFrom;
 			executeGenericTestCase();
 		}
-
+		
 		public void setAndExecuteLTC(Map<String, Object> params, Object expectedResult,
 			String resultToGetFrom, String errorMsg) {
 			this.params = params;
@@ -1659,19 +1659,19 @@ public class AccountFilterApi_test extends ApiModule_test {
 			this.resultToGetFrom = resultToGetFrom;
 			executeListTestCase(errorMsg);
 		}
-
+		
 		public void loginUser(String name, String pass) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put(LOGINNAME, name);
 			params.put(PASSWORD, pass);
 			assertNull(requestJSON("account/login", params).get(ERROR));
 		}
-
+		
 		public void logout() {
 			assertEquals(Boolean.TRUE, requestJSON("account/logout", null).get(RETURN));
 		}
 	}
-
+	
 	// @Test
 	// public void getListOfMemberObjectOfGroup(){
 	// 	GenericConvertMap<String,Object> res = null;

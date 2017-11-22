@@ -18,30 +18,31 @@ import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
  *
  **/
 abstract public class CommonApiModule extends AbstractApiModule {
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//  apiSetup functionality
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Does the setup of the StringEscape filter, and AccessFilter config.
 	 *
 	 * This functionality can be refined via the config object
 	 */
-	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
-		if( config.getBoolean(STRING_ESCAPE_AFTER_FILTER, true) ) {
-			api.after(prefixPath+"/*", stringEscapeAfterFilter);
+	protected void apiSetup(ApiBuilder api, String prefixPath,
+		GenericConvertMap<String, Object> config) {
+		if (config.getBoolean(STRING_ESCAPE_AFTER_FILTER, true)) {
+			api.after(prefixPath + "/*", stringEscapeAfterFilter);
 		}
 	}
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//  StringEscape function filter
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * StringEscape filter module, that sanitizes the output for common "html injections"
 	 *
@@ -67,12 +68,12 @@ abstract public class CommonApiModule extends AbstractApiModule {
 	public ApiFunction stringEscapeAfterFilter = (req, res) -> {
 		// Get the desired chosen mode
 		boolean stringEscape = req.getBoolean(STRING_ESCAPE, true);
-
+		
 		// Apply string escape if needed
-		if( stringEscape ) {
+		if (stringEscape) {
 			StringEscape.commonHtmlEscapeCharacters(res);
 		}
-
+		
 		// Output the chosen mode, and result
 		res.put(STRING_ESCAPE, stringEscape);
 		return res;

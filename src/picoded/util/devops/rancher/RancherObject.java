@@ -21,12 +21,13 @@ import io.rancher.*;
 import io.rancher.service.*;
 import io.rancher.type.*;
 import retrofit2.Response;
+
 /**
  * The setup and methods implemented in this class is specifically for Uilicious's Rancher
  * it can be extended and overwritten to cater for any other rancher setup.
  */
 public class RancherObject {
-
+	
 	protected String accessKey = "";
 	protected String secretKey = "";
 	protected String baseURL = "";
@@ -39,13 +40,13 @@ public class RancherObject {
 	protected String catalog_version = "";
 	Rancher rancher = null;
 	protected GenericConvertMap<String, Object> masterRancherConfig = null;
-
+	
 	/**
 	 * Constructor for RancherObject
 	 */
 	public RancherObject() {
 	}
-
+	
 	// public void rancherLibrary(){
 	// 	try{
 	// 		Rancher.Config config =  new Rancher.Config(new URL(baseURL), accessKey, secretKey);
@@ -72,7 +73,7 @@ public class RancherObject {
 	// 		e.printStackTrace();
 	// 	}
 	// }
-
+	
 	/**
 	 * Configure the Rancher set up to be used
 	 * @param take in the rancher configuration to be set
@@ -101,7 +102,7 @@ public class RancherObject {
 		basicAuth = "Basic " + new String(Base64.getEncoder().encodeToString(userpass.getBytes()));
 		masterRancherConfig = rancherConfig;
 	}
-
+	
 	/**
 	 * Obtain the template variables in the configuration file and set them into the
 	 * environment
@@ -109,14 +110,14 @@ public class RancherObject {
 	 *
 	 * @return environment of the stack with the variables set
 	 */
-	protected Map<String, Object> setupInternalTemplateConfig(Map<String, Object> environment){
+	protected Map<String, Object> setupInternalTemplateConfig(Map<String, Object> environment) {
 		Map<String, String> templateVariables = masterRancherConfig.getStringMap("templateVariables");
 		for (String variable : templateVariables.keySet()) {
 			environment.put(variable, templateVariables.get(variable));
 		}
 		return environment;
 	}
-
+	
 	/**
 	 * Initialize a URL connection with the URL
 	 * @param the path to the url to be connected
@@ -138,7 +139,7 @@ public class RancherObject {
 		}
 		return uc;
 	}
-
+	
 	/**
 	 * Retrieves the catalog template as specified in the rancherConfig.json file
 	 *
@@ -163,7 +164,7 @@ public class RancherObject {
 		}
 		return catalogMap;
 	}
-
+	
 	/**
 	 * Override this class
 	 * Generate the data to be transmitted to the Rancher API stack endpoint call
@@ -176,7 +177,7 @@ public class RancherObject {
 		// returns null unless overwritten
 		return null;
 	}
-
+	
 	/**
 	 * Create a new stack for the user specified
 	 * @param take in the stack configuration in form of Map Object
@@ -189,7 +190,7 @@ public class RancherObject {
 		byte[] dataBytes = stackConfig.toString().getBytes();
 		return setAndSendRequest(url, "POST", dataBytes);
 	}
-
+	
 	/**
 	 * Delete the specified stack using its stackID
 	 * @param take in the ID of the stack that needed to be deleted
@@ -201,7 +202,7 @@ public class RancherObject {
 			+ stackID;
 		return setAndSendRequest(url, "DELETE", null);
 	}
-
+	
 	/**
 	 * Stop the specified stack using its stackID
 	 * @param take in the ID of the stack that needed to be stopped
@@ -213,25 +214,25 @@ public class RancherObject {
 			+ stackID + "?action=deactivateservices";
 		return setAndSendRequest(url, "POST", null);
 	}
-
+	
 	public GenericConvertMap<String, Object> getStack(String stackID) {
 		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks/"
 			+ stackID;
 		return setAndSendRequest(url, "GET", null);
 	}
-
-	public GenericConvertMap<String,Object> getStackViaName(String stackName){
+	
+	public GenericConvertMap<String, Object> getStackViaName(String stackName) {
 		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks"
 			+ "?name=" + stackName;
 		return setAndSendRequest(url, "GET", null);
 	}
-
+	
 	public GenericConvertMap<String, Object> getService(String serviceID) {
 		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/services/"
 			+ serviceID;
 		return setAndSendRequest(url, "GET", null);
 	}
-
+	
 	/**
 	 * Create the general procedure when connecting to rancher
 	 * @param take in the full url of the endpoint to connect to
@@ -255,7 +256,7 @@ public class RancherObject {
 			// Generally, all rancher's API endpoint requests can be application/json
 			uc.setRequestProperty("Content-Type", "application/json");
 			uc.setRequestProperty("Accept", "application/json");
-
+			
 			if (dataBytes != null) {
 				// Writing data to the URL
 				OutputStream os = uc.getOutputStream();
@@ -264,7 +265,7 @@ public class RancherObject {
 			}
 			// Connects if it has not been connected
 			uc.connect();
-
+			
 			// Getting response back
 			responseCode = uc.getResponseCode();
 			InputStream is = null;
@@ -275,7 +276,7 @@ public class RancherObject {
 				// Get the error
 				is = uc.getErrorStream();
 			}
-
+			
 			// Output the response
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			String inputLine = "";
@@ -295,6 +296,6 @@ public class RancherObject {
 		}
 		// return as a GenericConvertMap
 		return GenericConvert.toGenericConvertStringMap(result);
-
+		
 	}
 }

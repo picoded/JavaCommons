@@ -524,25 +524,25 @@ public class FileUtil extends FileUtilBase {
 	 * @return true, if parent contains possibleChild
 	 */
 	public static boolean isParent(File parent, File possibleChild) {
-
+		
 		// Quick isDirectory check of parent
-		if( !parent.isDirectory() ) {
+		if (!parent.isDirectory()) {
 			return false;
 		}
-
+		
 		// Recursively iterate the child upward, to validate parent child relation
 		File possibleParent = possibleChild.getParentFile();
-		while ( possibleParent != null ) {
-			if ( parent.equals( possibleParent ) ) {
+		while (possibleParent != null) {
+			if (parent.equals(possibleParent)) {
 				return true;
 			}
 			possibleParent = possibleParent.getParentFile();
 		}
-
+		
 		// All checks failed, abort
 		return false;
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// Recursive permission nuke

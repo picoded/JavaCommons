@@ -24,13 +24,13 @@ import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
 /// Test the AccountTable API specifically
 public class AccountTableApi_test extends ApiModule_test {
-
+	
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test setup
 	//
 	//----------------------------------------------------------------------------------------
-
+	
 	/// The test servlet to use
 	public static class AccountTableApiTestServlet extends ApiModuleTestServlet {
 		@Override
@@ -46,45 +46,45 @@ public class AccountTableApi_test extends ApiModule_test {
 				ao.put(PROPERTIES_EMAIL, "laughing-man@testlalala.com");
 				ao.setPassword("The Catcher in the Rye");
 			}
-
+			
 			return ret;
 		}
 	}
-
+	
 	public CorePage setupServlet() {
 		return new AccountTableApiTestServlet();
 	}
-
+	
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test running
 	//
 	//----------------------------------------------------------------------------------------
-
+	
 	@Test
 	public void loginProcessFlow() {
 		// reuse result map
 		Map<String, Object> res = null;
-
+		
 		// Check for invalid login
 		assertEquals(Boolean.FALSE, requestJSON(API_ACCOUNT_LOGIN, null).get(RESULT));
-
+		
 		// Does a failed login
 		Map<String, Object> loginParams = new HashMap<String, Object>();
 		loginParams.put(LOGINNAME, "laughing-man");
 		loginParams.put(PASSWORD, "Is the enemy");
 		res = requestJSON(API_ACCOUNT_LOGIN, loginParams);
-
+		
 		assertEquals(Boolean.FALSE, res.get(RESULT));
 		assertEquals(ERROR_FAIL_LOGIN, res.get(ERROR));
-
+		
 		// Check for invalid login
 		assertEquals(Boolean.FALSE, requestJSON(API_ACCOUNT_LOGIN, null).get(RESULT));
-
+		
 		// Does the actual login
 		loginParams.put(LOGINNAME, "laughing-man");
 		loginParams.put(PASSWORD, "The Catcher in the Rye");
-
+		
 		// Request and check result
 		res = requestJSON(API_ACCOUNT_LOGIN, loginParams);
 		assertNull(res.get(ERROR));
@@ -93,15 +93,15 @@ public class AccountTableApi_test extends ApiModule_test {
 		// Validate that login is valid
 		res = requestJSON(API_ACCOUNT_LOGIN, null);
 		assertEquals(Boolean.TRUE, res.get(RESULT));
-
+		
 		// Log out current user
 		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals(Boolean.TRUE, res.get(RESULT));
-
+		
 		// Validate that logout is valid
 		res = requestJSON(API_ACCOUNT_LOGIN, null);
 		assertEquals(Boolean.FALSE, res.get(RESULT));
-
+		
 		// Login using email address
 		loginParams.put(LOGINNAME, "laughing-man");
 		loginParams.put(PASSWORD, "The Catcher in the Rye");
@@ -113,6 +113,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON(API_ACCOUNT_LOGOUT, null);
 		assertEquals(Boolean.TRUE, res.get(RESULT));
 	}
+	
 	//
 	// @Test
 	// public void loginLockingIncrement() {
@@ -158,7 +159,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		// createDetails
 		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals(ERROR_NO_LOGINNAME, res.get(ERROR));
-
+		
 		createDetails.put(LOGINNAME, "little-boy");
 		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals(ERROR_NO_PASSWORD, res.get(ERROR));
@@ -167,15 +168,15 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertNotNull(res.get(DATA));
 		assertNull(res.get(ERROR));
-
+		
 		String accountID = res.get(ACCOUNT_ID).toString();
-
+		
 		//Create same user again
 		res = requestJSON(API_ACCOUNT_NEW, createDetails);
 		assertEquals("Object already exists in account Table", res.get(ERROR));
 		assertEquals(accountID, res.get(ACCOUNT_ID));
 	}
-
+	
 	// @Test
 	// public void createNewGroup() {
 	// 	GenericConvertMap<String, Object> res = null;
@@ -1171,7 +1172,7 @@ public class AccountTableApi_test extends ApiModule_test {
 	// 	res = requestJSON(API_ACCOUNT_LOGOUT, null);
 	// 	assertEquals(Boolean.TRUE, res.get(RESULT));
 	// }
-
+	
 	@Test
 	public void passwordReset() {
 		GenericConvertMap<String, Object> res = null;
@@ -1187,7 +1188,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("passwordResetTest: Something wrong in adding user.", res.get(ERROR));
 		userID.add(res.getString(ACCOUNT_ID));
-
+		
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -1248,9 +1249,9 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(REPEAT_PASSWORD, "passwordnewnew");
 		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 	}
-
+	
 	@Test
-	public void setLoginNameTest(){
+	public void setLoginNameTest() {
 		GenericConvertMap<String, Object> res = null;
 		/// -----------------------------------------
 		/// Preparation before commencement of Test
@@ -1291,7 +1292,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.setAndExecuteGTC(params, true, RESULT);
 		ts.logout();
 	}
-
+	
 	@Test
 	public void getInfoByName() {
 		GenericConvertMap<String, Object> res = null;
@@ -1307,7 +1308,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getInfoByNameTest: Something wrong in adding user.", res.get(ERROR));
 		userID.add(res.getString(ACCOUNT_ID));
-
+		
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -1327,7 +1328,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.clear();
 		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 	}
-
+	
 	@Test
 	public void getInfoByID() {
 		GenericConvertMap<String, Object> res = null;
@@ -1343,7 +1344,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("getInfoByIDTest: Something wrong in adding user.", res.get(ERROR));
 		userID.add(res.getString(ACCOUNT_ID));
-
+		
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -1364,7 +1365,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 		ts.logout();
 	}
-
+	
 	@Test
 	public void updateUserInfo() {
 		GenericConvertMap<String, Object> res = null;
@@ -1380,7 +1381,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		res = requestJSON(API_ACCOUNT_NEW, params);
 		assertNull("updateUserInfoTest: Something wrong in adding user.", res.get(ERROR));
 		userID.add(res.getString(ACCOUNT_ID));
-
+		
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -1409,7 +1410,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		ts.setAndExecuteGTC(params, userID.get(0), ACCOUNT_ID);
 		ts.logout();
 	}
-
+	
 	//
 	// // builder.put(path+API_GROUP_GET_LIST_GRP_ID_MEM, getListOfGroupIDOfMember);
 	// @Test
@@ -1641,7 +1642,7 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(PASSWORD, "password");
 		ts.setAndExecuteGTC(params, ERROR_FAIL_LOGIN, ERROR);
 	}
-
+	
 	@Test
 	public void getUserOrGroupList() {
 		GenericConvertMap<String, Object> res = null;
@@ -1682,13 +1683,11 @@ public class AccountTableApi_test extends ApiModule_test {
 		params.put(GROUP_ID, groupID.get(0));
 		params.put(ROLE, "member");
 		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertNull("getUserOrGroupListTest: Something wrong in adding user to group",
-			res.get(ERROR));
-
+		assertNull("getUserOrGroupListTest: Something wrong in adding user to group", res.get(ERROR));
+		
 		params.put(GROUP_ID, groupID.get(1));
 		res = requestJSON(API_GROUP_ADMIN_ADD_REM_MEM, params);
-		assertNull("getUserOrGroupListTest: Something wrong in adding user to group",
-			res.get(ERROR));
+		assertNull("getUserOrGroupListTest: Something wrong in adding user to group", res.get(ERROR));
 		/// -----------------------------------------
 		/// End of Preparation before commencement of Test
 		/// -----------------------------------------
@@ -1699,14 +1698,14 @@ public class AccountTableApi_test extends ApiModule_test {
 		// params.clear();
 		// ts.setAndExecuteLTC(params, expectedResult, DATA, "The list has some problems");
 	}
-
+	
 	class TestSet {
 		private Map<String, Object> params = null;
 		private String url = "";
 		private Object expectedResult = "";
 		private String resultToGetFrom = "";
 		GenericConvertMap<String, Object> res = null;
-
+		
 		public TestSet(Map<String, Object> params, String url, Object expectedResult,
 			String resultToGetFrom) {
 			this.params = params;
@@ -1714,48 +1713,48 @@ public class AccountTableApi_test extends ApiModule_test {
 			this.expectedResult = expectedResult;
 			this.resultToGetFrom = resultToGetFrom;
 		}
-
+		
 		public Map<String, Object> getParams() {
 			return params;
 		}
-
+		
 		public void setURL(String url) {
 			this.url = url;
 		}
-
+		
 		public String getURL() {
 			return url;
 		}
-
+		
 		public Object getExpectedResult() {
 			return expectedResult;
 		}
-
+		
 		public String getResultToGetFrom() {
 			return resultToGetFrom;
 		}
-
-		public GenericConvertMap<String, Object> getRes(){
+		
+		public GenericConvertMap<String, Object> getRes() {
 			return res;
 		}
-
+		
 		public void executeGenericTestCase() {
 			res = requestJSON(url, params);
 			assertEquals(expectedResult, res.get(resultToGetFrom));
 		}
-
+		
 		public void executeListTestCase(String errorMsg) {
 			res = requestJSON(url, params);
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(expectedResult));
 			assertThat(errorMsg, res.getList(resultToGetFrom), containsInAnyOrder(result.toArray()));
 		}
-
+		
 		public void executeTrueTestCase() {
 			res = requestJSON(url, params);
 			List<Object> result = ConvertJSON.toList(ConvertJSON.fromObject(res.get(DATA)));
 			assertTrue(result.size() > 0);
 		}
-
+		
 		public void setAndExecuteGTC(Map<String, Object> params, Object expectedResult,
 			String resultToGetFrom) {
 			this.params = params;
@@ -1763,7 +1762,7 @@ public class AccountTableApi_test extends ApiModule_test {
 			this.resultToGetFrom = resultToGetFrom;
 			executeGenericTestCase();
 		}
-
+		
 		public void setAndExecuteLTC(Map<String, Object> params, Object expectedResult,
 			String resultToGetFrom, String errorMsg) {
 			this.params = params;
@@ -1771,14 +1770,14 @@ public class AccountTableApi_test extends ApiModule_test {
 			this.resultToGetFrom = resultToGetFrom;
 			executeListTestCase(errorMsg);
 		}
-
+		
 		public void loginUser(String name, String pass) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put(LOGINNAME, name);
 			params.put(PASSWORD, pass);
 			assertNull(requestJSON(API_ACCOUNT_LOGIN, params).get(ERROR));
 		}
-
+		
 		public void logout() {
 			assertEquals(Boolean.TRUE, requestJSON(API_ACCOUNT_LOGOUT, null).get(RESULT));
 		}

@@ -32,37 +32,39 @@ import picoded.core.conv.ConvertJSON;
 /// Support only for SQL Server 2012 and above version for the pagination query, the OFFSET / FETCH keywords
 /// are used which are faster and better in performance in comparison of old ROW_NUMBER()
 public class JSql_Mssql extends JSql_Base {
-
+	
 	/// Internal self used logger
 	// private static Logger logger = Logger.getLogger(JSql_Mssql.class.getName());
-
+	
 	/// Runs JSql with the JDBC sqlite engine
 	public JSql_Mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		// store database connection properties
 		setConnectionProperties(dbUrl, dbName, dbUser, dbPass, null);
-
+		
 		// call internal method to create the connection
 		setupConnection();
 	}
-
+	
 	/// Internal common reuse constructor
 	private void setupConnection() {
 		sqlType = JSqlType.MSSQL;
-
+		
 		String connectionUrl = "jdbc:jtds:sqlserver://" + (String) connectionProps.get("dbUrl");
-
-		if (connectionProps.get("dbName") != null && connectionProps.get("dbName").toString().trim().length() > 0) {
-			connectionUrl += ";DatabaseName=" + (String) connectionProps.get("dbName") + ";uselobs=false;"; //disable clobs
+		
+		if (connectionProps.get("dbName") != null
+			&& connectionProps.get("dbName").toString().trim().length() > 0) {
+			connectionUrl += ";DatabaseName=" + (String) connectionProps.get("dbName")
+				+ ";uselobs=false;"; //disable clobs
 		}
 		try {
 			Class.forName("net.sourceforge.jtds.jdbcx.JtdsDataSource"); //connection pooling
-			sqlConn = java.sql.DriverManager.getConnection(connectionUrl, (String) connectionProps.get("dbUser"),
-				(String) connectionProps.get("dbPass"));
+			sqlConn = java.sql.DriverManager.getConnection(connectionUrl,
+				(String) connectionProps.get("dbUser"), (String) connectionProps.get("dbPass"));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load mssql connection: ", e);
 		}
 	}
-
+	
 	/// As this is the base class varient, this funciton isnt suported
 	public void recreate(boolean force) {
 		if (force) {
@@ -71,71 +73,74 @@ public class JSql_Mssql extends JSql_Base {
 		// call internal method to create the connection
 		setupConnection();
 	}
-
+	
 	// Internal parser that converts some of the common sql statements to mssql
 	public String genericSqlParser(String inString) {
-		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("`", "\"").replaceAll("'", "\"")
-			.replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=").trim();
-
+		String fixedQuotes = inString.trim().replaceAll("(\\s){1}", " ").replaceAll("`", "\"")
+			.replaceAll("'", "\"").replaceAll("\\s+", " ").replaceAll(" =", "=").replaceAll("= ", "=")
+			.trim();
+		
 		String upperCaseStr = fixedQuotes.toUpperCase();
 		String qString = fixedQuotes;
-
+		
 		String qStringPrefix = "";
 		String qStringSuffix = "";
-
+		
 		final String ifExists = "IF EXISTS";
 		final String ifNotExists = "IF NOT EXISTS";
-
+		
 		final String create = "CREATE";
 		final String drop = "DROP";
 		final String table = "TABLE";
 		final String select = "SELECT";
 		final String update = "UPDATE";
-
+		
 		final String view = "VIEW";
-
+		
 		final String insertInto = "INSERT INTO";
 		final String deleteFrom = "DELETE FROM";
-
+		
 		final String[] indexTypeArr = { "UNIQUE", "FULLTEXT", "SPATIAL" };
 		final String index = "INDEX";
-
+		
 		String indexType;
 		String tmpStr;
 		int tmpIndx;
-
+		
 		Pattern createIndexType = Pattern.compile("((UNIQUE|FULLTEXT|SPATIAL) ){0,1}INDEX.*");
-
+		
 		int prefixOffset = 0;
 		if (upperCaseStr.startsWith(drop)) { //DROP
 			upperCaseStr = upperCaseStr.replaceAll(ifNotExists, ifExists);
 			fixedQuotes = fixedQuotes.replaceAll(ifNotExists, ifExists);
-
+			
 			prefixOffset = drop.length() + 1;
-
+			
 			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
 				prefixOffset += table.length() + 1;
-
+				
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
 					prefixOffset += ifExists.length() + 1;
-
-					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
-						+ "', 'U')" + " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
+					
+					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
+						+ fixedQuotes.substring(prefixOffset).toUpperCase() + "', 'U')"
+						+ " IS NOT NULL DROP TABLE " + fixedQuotes.substring(prefixOffset)
 						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "DROP TABLE ";
 				}
 				qString = qStringPrefix;
 			} else if (upperCaseStr.startsWith(index, prefixOffset)) { //INDEX
-
+			
 			} else if (upperCaseStr.startsWith(view, prefixOffset)) { //VIEW
 				prefixOffset += view.length() + 1;
-
+				
 				if (upperCaseStr.startsWith(ifExists, prefixOffset)) { //IF EXISTS
 					prefixOffset += ifExists.length() + 1;
-
-					qStringPrefix = "BEGIN TRY IF OBJECT_ID('" + fixedQuotes.substring(prefixOffset).toUpperCase()
-						+ "', 'V')" + " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
+					
+					qStringPrefix = "BEGIN TRY IF OBJECT_ID('"
+						+ fixedQuotes.substring(prefixOffset).toUpperCase() + "', 'V')"
+						+ " IS NOT NULL DROP VIEW " + fixedQuotes.substring(prefixOffset)
 						+ " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "DROP VIEW ";
@@ -143,16 +148,21 @@ public class JSql_Mssql extends JSql_Base {
 			}
 		} else if (upperCaseStr.startsWith(create)) { //CREATE
 			prefixOffset = create.length() + 1;
-
+			
 			if (upperCaseStr.startsWith(table, prefixOffset)) { //TABLE
 				prefixOffset += table.length() + 1;
-
+				
 				if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) { //IF NOT EXISTS
 					prefixOffset += ifNotExists.length() + 1;
 					//get the table name from incoming query
 					String tableName = getTableName(fixedQuotes.substring(prefixOffset));
-					qStringPrefix = "BEGIN TRY IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'" + tableName
-						+ "')" + " AND OBJECTPROPERTY(id, N'" + tableName + "')" + " = 1) CREATE TABLE ";
+					qStringPrefix = "BEGIN TRY IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'"
+						+ tableName
+						+ "')"
+						+ " AND OBJECTPROPERTY(id, N'"
+						+ tableName
+						+ "')"
+						+ " = 1) CREATE TABLE ";
 					qStringSuffix = " END TRY BEGIN CATCH END CATCH";
 				} else {
 					qStringPrefix = "CREATE TABLE ";
@@ -163,7 +173,7 @@ public class JSql_Mssql extends JSql_Base {
 				// logger.finer("Trying to matched INDEX : " + upperCaseStr.substring(prefixOffset));
 				if (createIndexType.matcher(upperCaseStr.substring(prefixOffset)).matches()) { //UNIQUE|FULLTEXT|SPATIAL|_ INDEX
 					// logger.finer("Matched INDEX : " + inString);
-
+					
 					//Find the index type
 					indexType = null;
 					for (int a = 0; a < indexTypeArr.length; ++a) {
@@ -173,60 +183,61 @@ public class JSql_Mssql extends JSql_Base {
 							break;
 						}
 					}
-
+					
 					//only bother if it matches (shd be right?)
 					if (upperCaseStr.startsWith(index, prefixOffset)) {
 						prefixOffset += index.length() + 1;
-
+						
 						//If not exists wrapper
 						if (upperCaseStr.startsWith(ifNotExists, prefixOffset)) {
 							prefixOffset += ifNotExists.length() + 1;
 							qStringPrefix = "";
 							qStringSuffix = "";
 						}
-
+						
 						tmpStr = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
 						tmpIndx = tmpStr.indexOf(" ON ");
-
+						
 						if (tmpIndx > 0) {
-							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "") + "INDEX "
-								+ tmpStr.substring(0, tmpIndx) + " ON "
+							qString = "BEGIN TRY CREATE " + ((indexType != null) ? indexType + " " : "")
+								+ "INDEX " + tmpStr.substring(0, tmpIndx) + " ON "
 								+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx + 4))
 								+ " END TRY BEGIN CATCH END CATCH";
 						}
-
+						
 					}
 				}
 			}
 		} else if (upperCaseStr.startsWith(insertInto)) { //INSERT INTO
 			prefixOffset = insertInto.length() + 1;
-
+			
 			tmpStr = _fixTableNameInMssqlSubQuery(fixedQuotes.substring(prefixOffset));
-
+			
 			qString = "INSERT INTO " + tmpStr;
 		} else if (upperCaseStr.startsWith(select)) { //SELECT
 			prefixOffset = select.length() + 1;
-
+			
 			tmpStr = qString.substring(prefixOffset);
 			tmpIndx = qString.toUpperCase().indexOf(" FROM ");
-
+			
 			if (tmpIndx > 0) {
 				qString = "SELECT " + tmpStr.substring(0, tmpIndx - 7)
 				//.replaceAll("\"", "'")
-					.replaceAll("`", "\"") + " FROM " + _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
+					.replaceAll("`", "\"") + " FROM "
+					+ _fixTableNameInMssqlSubQuery(tmpStr.substring(tmpIndx - 1));
 			} else {
 				qString = _fixTableNameInMssqlSubQuery(fixedQuotes);
 			}
-
+			
 			prefixOffset = 0;
 			//Fix the "AS" quotation
 			while ((tmpIndx = qString.indexOf(" AS ", prefixOffset)) > 0) {
 				prefixOffset = qString.indexOf(" ", tmpIndx + 4);
-
+				
 				if (prefixOffset > 0) {
 					qString = qString.substring(0, tmpIndx)
-						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"").replaceAll("'", "\"")
-						+ qString.substring(prefixOffset);
+						+ qString.substring(tmpIndx, prefixOffset).replaceAll("`", "\"")
+							.replaceAll("'", "\"") + qString.substring(prefixOffset);
 				} else {
 					break;
 				}
@@ -243,12 +254,12 @@ public class JSql_Mssql extends JSql_Base {
 			int limitIndex = qString.indexOf("LIMIT");
 			String limitQuery = "";
 			if (limitIndex != -1) {
-
+				
 				// Includes offset 0, if its missing (required for MSSQL)
 				if (offsetIndex == -1) {
 					offsetQuery = "OFFSET 0 ROWS ";
 				}
-
+				
 				prefixQuery = qString.substring(0, limitIndex);
 				if (offsetIndex != -1) {
 					limitQuery = qString.substring(limitIndex, offsetIndex);
@@ -261,21 +272,22 @@ public class JSql_Mssql extends JSql_Base {
 			if (prefixQuery != null) {
 				qString = prefixQuery + offsetQuery + limitQuery;
 			}
-
+			
 			// Replace ORDER BY RANDOM() 
 			// with ORDER BY NEWID()
 			// https://stackoverflow.com/questions/19412/how-to-request-a-random-row-in-sql
-			qString = qString.replaceAll("ORDER BY RANDOM\\(\\)", "ORDER BY NEWID()").replaceAll("ORDER BY RAND\\(\\)", "ORDER BY NEWID()");
-
+			qString = qString.replaceAll("ORDER BY RANDOM\\(\\)", "ORDER BY NEWID()").replaceAll(
+				"ORDER BY RAND\\(\\)", "ORDER BY NEWID()");
+			
 		} else if (upperCaseStr.startsWith(deleteFrom)) {
 			prefixOffset = deleteFrom.length() + 1;
-
+			
 			tmpStr = _fixTableNameInMssqlSubQuery(qString.substring(prefixOffset));
 			qString = deleteFrom + " " + tmpStr;
-
+			
 		} else if (upperCaseStr.startsWith(update)) { //UPDATE
 			prefixOffset = update.length() + 1;
-
+			
 			tmpStr = _fixTableNameInMssqlSubQuery(qString.substring(prefixOffset));
 			qString = update + " " + tmpStr;
 		}
@@ -285,24 +297,24 @@ public class JSql_Mssql extends JSql_Base {
 		} else {
 			qString = qStringPrefix + qString + qStringSuffix;
 		}
-
+		
 		if (qString.contains("CREATE TABLE")) {
 			// Replace PRIMARY KEY AUTOINCREMENT with IDENTITY
 			if (qString.contains("AUTOINCREMENT")) {
 				qString = qString.replaceAll("AUTOINCREMENT", "IDENTITY");
 			}
-
+			
 			//Convert MY-Sql NUMBER data type to NUMERIC data type for Ms-sql
 			if (qString.contains("NUMBER")) {
 				qString = qString.replaceAll("NUMBER", "NUMERIC");
 			}
 		}
-
+		
 		//remove ON DELETE FOR CLIENTSTATUSHISTORY---> this block needs to be refined for future.
 		if (qString.contains("ON DELETE")) { //qString.contains("CLIENTSTATUSHISTORY") &&
 			qString = qString.replaceAll("ON DELETE SET NULL", "");
 		}
-
+		
 		// Replace double quote (") with single quote (') for assignment values
 		StringBuilder sb = new StringBuilder(qString);
 		int endIndex = qString.indexOf("=");
@@ -324,7 +336,7 @@ public class JSql_Mssql extends JSql_Base {
 		qString = sb.toString();
 		return qString;
 	}
-
+	
 	//Method to return table name from incoming query string
 	private static String getTableName(String qString) {
 		qString = qString.trim();
@@ -332,24 +344,24 @@ public class JSql_Mssql extends JSql_Base {
 		String tableStr = qString.substring(0, indxPt).toUpperCase();
 		return tableStr; //retrun the table name
 	}
-
+	
 	private static String _fixTableNameInMssqlSubQuery(String qString) {
 		qString = qString.trim();
 		int indxPt = ((indxPt = qString.indexOf(' ')) <= -1) ? qString.length() : indxPt;
 		String tableStr = qString.substring(0, indxPt).toUpperCase();
-
+		
 		qString = tableStr + qString.substring(indxPt);
-
+		
 		while (qString.endsWith(";")) { //Remove uneeded trailing ";" semi collons
 			qString = qString.substring(0, qString.length() - 1);
 		}
 		return qString;
 	}
-
+	
 	/// Collumn type correction from mysql to ms sql
 	private static String _simpleMysqlToMssql_collumnSubstitude(String qString) {
 		qString = qString.replaceAll("(?i)BLOB", "VARBINARY(MAX)");
-
+		
 		// Work around default table value quotes
 		// sadly variable arguments are NOT allowed in create table statements
 		// 
@@ -361,12 +373,12 @@ public class JSql_Mssql extends JSql_Base {
 		// int defaultTxtIdx = 0;
 		// while( (defaultTxtIdx = qString.indexOf("DEFAULT", lastCheckedIdx)) > 0 ) {
 		// 	int defaultTxtIdxEnd = defaultTxtIdx + "DEFAULT".length();
-
+		
 		// 	// Replace double quote with literal string 
 		// 	String beforeDefaultStatement = qString.substring(0, defaultTxtIdx);
 		// 	String afterDefaultStatement = qString.substring(defaultTxtIdxEnd);
 		// 	afterDefaultStatement = afterDefaultStatement.replaceFirst("\\s+\"", "('").replaceFirst("\"", "')");
-
+		
 		// 	// Upate the string correctly
 		// 	qString = beforeDefaultStatement + "CONSTRAINT D_"+defaultTxtIdx+" DEFAULT";
 		// 	qString = qString.replaceAll("DEFAULT\\s+\\(", "DEFAULT(");
@@ -377,7 +389,7 @@ public class JSql_Mssql extends JSql_Base {
 		
 		return qString;
 	}
-
+	
 	/// Executes the argumented query, and returns the result object *without*
 	/// fetching the result data from the database. (not fetching may not apply to all implementations)
 	///
@@ -385,7 +397,7 @@ public class JSql_Mssql extends JSql_Base {
 	// public JSqlResult executeQuery(String qString, Object... values) throws JSqlException {
 	// 	return executeQuery_raw(genericSqlParser(qString), values);
 	// }
-
+	
 	/// Executes the argumented query, and immediately fetches the result from
 	/// the database into the result set.
 	///
@@ -393,14 +405,14 @@ public class JSql_Mssql extends JSql_Base {
 	public JSqlResult query(String qString, Object... values) throws JSqlException {
 		return query_raw(genericSqlParser(qString), values);
 	}
-
+	
 	/// Executes and dispose the sqliteResult object.
 	///
 	/// Returns false if no result is given by the execution call, else true on success
 	// public boolean execute(String qString, Object... values) throws JSqlException {
 	// 	return execute_raw(genericSqlParser(qString), values);
 	// }
-
+	
 	///
 	/// Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	/// syntax differances of UPSERT across the various SQL vendors.
@@ -454,14 +466,16 @@ public class JSql_Mssql extends JSql_Base {
 		// this is important as some SQL implementation will fallback to default table values, if not properly handled
 		String[] miscColumns //
 	) throws JSqlException {
-
+		
 		if (tableName.length() > 30) {
 			//logger.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
 		
 		/// Checks that unique collumn and values length to be aligned
-		if (uniqueColumns == null || uniqueValues == null || uniqueColumns.length != uniqueValues.length) {
-			throw new JSqlException("Upsert query requires unique column and values to be equal length");
+		if (uniqueColumns == null || uniqueValues == null
+			|| uniqueColumns.length != uniqueValues.length) {
+			throw new JSqlException(
+				"Upsert query requires unique column and values to be equal length");
 		}
 		
 		/// Preparing inner default select, this will be used repeatingly for COALESCE, DEFAULT and MISC values
@@ -487,7 +501,8 @@ public class JSql_Mssql extends JSql_Base {
 		String statementTerminator = ";";
 		
 		/// Building the query for INSERT OR REPLACE
-		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS " + targetTableAlias);
+		StringBuilder queryBuilder = new StringBuilder("MERGE INTO `" + tableName + "` AS "
+			+ targetTableAlias);
 		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		ArrayList<Object> insertQueryArgs = new ArrayList<Object>();
@@ -532,7 +547,8 @@ public class JSql_Mssql extends JSql_Base {
 				updateColumnNames.append("?");
 				updateColumnNames.append(columnSeperator);
 				
-				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				updateQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 				
 				// select dual
 				selectColumnNames.append("?");
@@ -540,7 +556,8 @@ public class JSql_Mssql extends JSql_Base {
 				selectColumnNames.append(insertColumns[a]);
 				selectColumnNames.append(columnSeperator);
 				
-				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				selectQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 				
 				// insert column
 				insertColumnNames.append(insertColumns[a]);
@@ -549,7 +566,8 @@ public class JSql_Mssql extends JSql_Base {
 				insertColumnValues.append("?");
 				insertColumnValues.append(columnSeperator);
 				
-				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a] : null);
+				insertQueryArgs.add((insertValues != null && insertValues.length > a) ? insertValues[a]
+					: null);
 			}
 		}
 		
@@ -570,7 +588,8 @@ public class JSql_Mssql extends JSql_Base {
 				insertColumnValues.append(", ?)");
 				insertColumnValues.append(columnSeperator);
 				
-				insertQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				insertQueryArgs
+					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 				
 				// update column
 				updateColumnNames.append(defaultColumns[a]);
@@ -584,7 +603,8 @@ public class JSql_Mssql extends JSql_Base {
 				
 				updateColumnNames.append(", ?)");
 				updateColumnNames.append(columnSeperator);
-				updateQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				updateQueryArgs
+					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 				
 				// select dual
 				// COALESCE((SELECT col3 from t where a=?), ?) as col3
@@ -597,7 +617,8 @@ public class JSql_Mssql extends JSql_Base {
 				selectQueryArgs.addAll(innerSelectArgs);
 				
 				selectColumnNames.append(" AS " + defaultColumns[a] + columnSeperator);
-				selectQueryArgs.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
+				selectQueryArgs
+					.add((defaultValues != null && defaultValues.length > a) ? defaultValues[a] : null);
 			}
 		}
 		
@@ -657,25 +678,29 @@ public class JSql_Mssql extends JSql_Base {
 		
 		/// Building the final query
 		queryBuilder.append(" USING (SELECT ");
-		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(selectColumnNames.substring(0, selectColumnNames.length()
+			- columnSeperator.length()));
 		queryBuilder.append(")");
 		queryBuilder.append(" AS ");
 		queryBuilder.append(sourceTableAlias);
 		queryBuilder.append(" ON ( ");
 		queryBuilder.append(condition.toString());
 		queryBuilder.append(" ) ");
-
-		if( updateColumnNames.length() > 0 ) {
+		
+		if (updateColumnNames.length() > 0) {
 			queryBuilder.append(" WHEN MATCHED ");
 			queryBuilder.append(" THEN UPDATE SET ");
-			queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length() - columnSeperator.length()));
+			queryBuilder.append(updateColumnNames.substring(0, updateColumnNames.length()
+				- columnSeperator.length()));
 		}
-
+		
 		queryBuilder.append(" WHEN NOT MATCHED ");
 		queryBuilder.append(" THEN INSERT (");
-		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length() - columnSeperator.length()));
+		queryBuilder.append(insertColumnNames.substring(0, insertColumnNames.length()
+			- columnSeperator.length()));
 		queryBuilder.append(") VALUES (");
-		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length() - columnSeperator.length()));
+		queryBuilder.append(insertColumnValues.substring(0, insertColumnValues.length()
+			- columnSeperator.length()));
 		queryBuilder.append(")");
 		queryBuilder.append(statementTerminator);
 		
@@ -685,7 +710,7 @@ public class JSql_Mssql extends JSql_Base {
 		
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
-
+	
 	// Helper varient, without default or misc fields
 	public JSqlPreparedStatement upsertStatement( //
 		String tableName, // Table name to upsert on
@@ -696,7 +721,8 @@ public class JSql_Mssql extends JSql_Base {
 		String[] insertColumns, // Columns names to update
 		Object[] insertValues // Values to update
 	) throws JSqlException {
-		return upsertStatement(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues, null, null, null);
+		return upsertStatement(tableName, uniqueColumns, uniqueValues, insertColumns, insertValues,
+			null, null, null);
 	}
-
+	
 }

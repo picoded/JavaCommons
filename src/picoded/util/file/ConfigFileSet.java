@@ -113,7 +113,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 			
 			// Only accept ini or json files
 			if (extension.equalsIgnoreCase("ini") || extension.equalsIgnoreCase("json")
-				|| extension.equalsIgnoreCase("js") || extension.equalsIgnoreCase("html") ) {
+				|| extension.equalsIgnoreCase("js") || extension.equalsIgnoreCase("html")) {
 				
 				ConfigFile cFile = new ConfigFile(inFile);
 				fileName = fileName.substring(0, fileName.lastIndexOf('.'));
@@ -255,7 +255,7 @@ public class ConfigFileSet extends ConfigFile implements GenericConvertMap<Strin
 		}
 		
 		ConfigFileSet cacheObj = createSubMapInternal(prefix, null);
-		if( cacheObj != null ) {
+		if (cacheObj != null) {
 			_subMapCache.put(prefix, cacheObj);
 		}
 		return cacheObj;

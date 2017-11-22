@@ -42,10 +42,10 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	/**
 	 * The actual inner map storage
 	 **/
-
+	
 	// If this file is an INI file
 	Ini iniMap = null;
-
+	
 	// If its a json file
 	GenericConvertMap<String, Object> jsonMap = null;
 	
@@ -80,14 +80,14 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 				String jsString = FileUtils.readFileToString(inFile);
 				jsonMap = GenericConvert.toGenericConvertStringMap(jsString,
 					new HashMap<String, Object>());
-			} else if(fileName.endsWith(".ini")) {
+			} else if (fileName.endsWith(".ini")) {
 				iniMap = new Ini(inFile);
-			} else if(fileName.endsWith(".html")) {
+			} else if (fileName.endsWith(".html")) {
 				String jsString = FileUtils.readFileToString(inFile);
-				jsonMap = new GenericConvertHashMap<String,Object>();
+				jsonMap = new GenericConvertHashMap<String, Object>();
 				jsonMap.put("html", jsString);
 			} else {
-				throw new RuntimeException("Unsupported file type : "+fileName);
+				throw new RuntimeException("Unsupported file type : " + fileName);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

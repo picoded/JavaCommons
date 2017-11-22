@@ -7,7 +7,7 @@ import picoded.core.common.SystemSetupInterface;
  * The ApiModule interface template, an extension of SystemSetupInterface
  **/
 public interface ApiModule extends SystemSetupInterface {
-
+	
 	/**
 	 * Setup the API module, with the given parameters. And register the relevant end points
 	 *
@@ -16,7 +16,7 @@ public interface ApiModule extends SystemSetupInterface {
 	 * @param  config      configuration object, assumed to be a map. use GenericConvert.toStringMap to preprocess the data
 	 */
 	public void apiSetup(ApiBuilder inApi, String inPrefixPath, Object inConfigMap);
-
+	
 	/**
 	 * Setup the API module, with the given parameters. And register the relevant end points
 	 *
@@ -27,7 +27,7 @@ public interface ApiModule extends SystemSetupInterface {
 		apiSetup(inApi, inPrefixPath, "{}");
 		return;
 	}
-
+	
 	/**
 	 * Setup the API module, with the given parameters. And register the relevant end points
 	 *

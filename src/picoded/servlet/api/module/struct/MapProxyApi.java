@@ -17,7 +17,7 @@ import java.util.*;
  * Simple API module, to proxy to an actual map object.
  * With additional configuration options.
  * 
- * NOTE: This only support GET commands for now
+ * NOTE: This only support GET commands for now (This will be the default behaviour)
  * 
  * 
  */

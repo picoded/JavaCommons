@@ -860,7 +860,7 @@ public class ApiBuilder implements
 				errorMsg = "Fatal Error";
 			}
 			res.put("ERROR", errorMsg.trim() );
-			res.put("INFO", org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e));
+			res.put("INFO", picoded.core.exception.ExceptionUtils.getStackTrace(e));
 		}
 		return res;
 	}

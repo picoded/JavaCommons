@@ -289,7 +289,7 @@ public abstract class JSql {
 	 * @return  TRUE, if the exception can be safely ignored
 	 **/
 	protected boolean sanatizeErrors(String originalQuery, String normalizedQuery, JSqlException e) {
-		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+		String stackTrace = picoded.core.exception.ExceptionUtils.getStackTrace(e);
 		return sanatizeErrors(originalQuery.toUpperCase(), normalizedQuery.toUpperCase(), stackTrace);
 	}
 

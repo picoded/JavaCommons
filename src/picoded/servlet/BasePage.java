@@ -1,6 +1,7 @@
 package picoded.servlet;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.io.IOException;
 import picoded.dstack.module.account.*;
 import picoded.servlet.api.module.account.*;
@@ -10,6 +11,29 @@ import picoded.dstack.*;
  * Extends DStackPage and cater the initialization of the AccountTable
  */
 public class BasePage extends DStackPage {
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// Reusable output logger
+	//
+	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Servlet logging interface
+	 * 
+	 * This is not a static class, so that the this object inherits
+	 * any extensions if needed
+	 **/
+	public Logger log() {
+		if( logObj != null ) {
+			return logObj;
+		}
+		logObj = Logger.getLogger(this.getClass().getName());
+		return logObj;
+	}
+
+	// Memoizer for log() function
+	protected Logger logObj = null;
 
 	////////////////////////////////////////////////////////////////////////////
 	//
@@ -164,6 +188,9 @@ public class BasePage extends DStackPage {
 		// Set up super user
 		AccountObject superUser = at.getFromLoginName(adminUser);
 		if (superUser == null) {
+			log().info("Missing superuser (possibly a first time setup)");
+			log().info("Creating superuser : "+adminUser);
+
 			superUser = at.newEntry(adminUser);
 			superUser.setPassword(adminPass);
 		} else if (resetPass) {
@@ -179,12 +206,16 @@ public class BasePage extends DStackPage {
 		// to be inside)
 		AccountObject superGrp = at.getFromLoginName(getSuperUserGroupName());
 		if (superGrp == null) {
+			log().info("Missing superuser group (possibly a first time setup)");
+			log().info("Creating superuser group : "+getSuperUserGroupName());
+
 			superGrp = at.newEntry(getSuperUserGroupName());
 			superGrp.setGroupStatus(true);
 			superGrp.setMembershipRoles(superGrpMemberRoles);
 			// Put superUser as the first admin of this group
 			superGrp.addMember(superUser, "admin");
 		}
+		
 		// Apply changes
 		superUser.saveDelta();
 		superGrp.saveDelta();

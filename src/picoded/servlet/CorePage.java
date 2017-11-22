@@ -1163,7 +1163,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	public boolean outputJSONException(Map<String, Object> outputData,
 		Map<String, Object> templateData, PrintWriter output, Exception e) throws Exception {
 		// Converts the stack trace to a string
-		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+		String stackTrace = picoded.core.exception.ExceptionUtils.getStackTrace(e);
 
 		// Performs a stack trace, and returns it in a JSON object
 		Map<String, String> ret = new HashMap<String, String>();

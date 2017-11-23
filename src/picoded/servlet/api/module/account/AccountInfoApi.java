@@ -10,22 +10,22 @@ import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 import picoded.core.common.SystemSetupInterface;
 
 public class AccountInfoApi extends CommonApiModule {
-
+	
 	/**
 	 * The AccountTable reference
 	 **/
 	protected AccountTable table = null;
-
-  /**
-   * The DataTableApi reference
-   **/
+	
+	/**
+	 * The DataTableApi reference
+	 **/
 	protected DataTableApi dataTableApi = null;
-
+	
 	/**
 	 * Static ERROR MESSAGES
 	 **/
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
-
+	
 	/**
 	 * Setup the account login API
 	 *
@@ -35,7 +35,7 @@ public class AccountInfoApi extends CommonApiModule {
 		table = inTable;
 		dataTableApi = new DataTableApi(inTable.accountDataTable());
 	}
-
+	
 	/**
 	 * Internal subsystem array, used to chain up setup commands
 	 *
@@ -44,36 +44,36 @@ public class AccountInfoApi extends CommonApiModule {
 	 * @return  Array containing the AccountTable used
 	 */
 	protected SystemSetupInterface[] internalSubsystemArray() {
-		return new SystemSetupInterface[] {  };
+		return new SystemSetupInterface[] {};
 	}
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//   DataTable info proxy
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Utility function used to set the current account as _oid, for the api request
 	 * IF _oid is not set
 	 */
 	protected void defaultsCurrentAccountAsOID(ApiRequest req, ApiResponse res) {
 		// Only works if _oid is null
-		if( req.getString("_oid") == null ) {
+		if (req.getString("_oid") == null) {
 			// Get the current user
 			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
-
+			
 			// If current user is null, halt and throw an error
-			if( currentUser == null ) {
+			if (currentUser == null) {
 				res.put(ERROR, ERROR_NO_USER);
 				return;
 			}
-
+			
 			// Put user._oid as _oid
 			req.put("_oid", currentUser._oid());
 		}
 	}
-
+	
 	/**
 	 * # $prefix/info/get
 	 *
@@ -94,24 +94,24 @@ public class AccountInfoApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used                                                   |
 	 * | result          | {Object}           | Data object, if found                                                         |
- 	 * | loginName       | String[]           | List of login names                                                           |
+	 * | loginName       | String[]           | List of login names                                                           |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 **/
 	protected ApiFunction info_get = (req, res) -> {
 		defaultsCurrentAccountAsOID(req, res);
-
+		
 		// Return a list of login names of the user if exists
 		String oid = req.getString(OID, null);
 		AccountObject ao = table.get(oid);
-		if(ao != null){
+		if (ao != null) {
 			res.put(LOGINNAMELIST, ao.getLoginNameSet());
 		}
-
+		
 		return dataTableApi.get.apply(req, res);
 	};
-
+	
 	/**
 	 * # $prefix/info/set
 	 *
@@ -143,7 +143,7 @@ public class AccountInfoApi extends CommonApiModule {
 		defaultsCurrentAccountAsOID(req, res);
 		return dataTableApi.set.apply(req, res);
 	};
-
+	
 	/**
 	 * # $prefix/info/list
 	 * See: DataTableApi.list
@@ -151,7 +151,7 @@ public class AccountInfoApi extends CommonApiModule {
 	protected ApiFunction info_list = (req, res) -> {
 		return dataTableApi.list.apply(req, res);
 	};
-
+	
 	/**
 	 * # $prefix/info/datatables
 	 * See: DataTableApi.list.datatables
@@ -159,7 +159,7 @@ public class AccountInfoApi extends CommonApiModule {
 	protected ApiFunction info_list_datatables = (req, res) -> {
 		return dataTableApi.datatables.apply(req, res);
 	};
-
+	
 	/**
 	 * Does the actual setup for the API
 	 * Given the API Builder, and the namespace prefix
@@ -168,7 +168,8 @@ public class AccountInfoApi extends CommonApiModule {
 	 * @param  prefixPath to assume
 	 * @param  config configuration map
 	 **/
-	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
+	protected void apiSetup(ApiBuilder api, String prefixPath,
+		GenericConvertMap<String, Object> config) {
 		// Account info get, set, list
 		api.put(prefixPath + "account/info/get", info_get);
 		api.put(prefixPath + "account/info/set", info_set);

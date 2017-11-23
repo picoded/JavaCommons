@@ -17,68 +17,68 @@ import java.util.*;
  * Simple API module, to proxy to an actual map object.
  * With additional configuration options.
  * 
- * NOTE: This only support GET commands for now
+ * NOTE: This only support GET commands for now (This will be the default behaviour)
  * 
  * 
  */
 public class MapProxyApi extends CommonApiModule {
-
+	
 	/////////////////////////////////////////////
 	//
 	// Constructor setup
 	//
 	/////////////////////////////////////////////
-
+	
 	// Internal data table object, set by constructor
-	protected Map<String,Object> dataMap = null;
-
+	protected Map<String, Object> dataMap = null;
+	
 	/**
 	 * Constructor for DataTableApi
 	 *
 	 * @param  DataTable  the data table object for the API to build on
 	 */
-	public MapProxyApi(Map<String,Object> inMap) {
+	public MapProxyApi(Map<String, Object> inMap) {
 		dataMap = inMap;
 	}
-
+	
 	/**
 	 * Array of internal subsystems : Currently only DataTable dstack module
 	 *
 	 * @return  Array of internal subsystems
 	 */
 	protected SystemSetupInterface[] internalSubsystemArray() {
-		return new SystemSetupInterface[] { };
+		return new SystemSetupInterface[] {};
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// Utility functionality
 	//
 	/////////////////////////////////////////////
-
+	
 	/**
 	 * Validates the given key name and check against the configured blacklist prefix
 	 */
 	public boolean validateKeyname(String key) {
-		if(key == null || key.length() == 0) {
+		if (key == null || key.length() == 0) {
 			return false;
 		}
-
+		
 		String[] blacklistPrefix = config.getStringArray("blacklistPrefix", "[]");
-		for(String item : blacklistPrefix) {
-			if(key.startsWith(item)) {
+		for (String item : blacklistPrefix) {
+			if (key.startsWith(item)) {
 				return false;
 			}
 		}
 		return true;
 	}
-
+	
 	/////////////////////////////////////////////
 	//
 	// API functionality
 	//
 	/////////////////////////////////////////////
-
+	
 	/**
 	 * # $prefix/get
 	 *
@@ -102,65 +102,66 @@ public class MapProxyApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | ERROR           | String (Optional)  | Errors encounted if any                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	*/
+	 */
 	public ApiFunction getEntry = (req, res) -> {
-
+		
 		//-------------------------------
 		// Key List logic
 		//-------------------------------
-
+		
 		// Get the key List
 		String[] keyList = req.getStringArray("keyList");
 		res.put("keyList", keyList);
-
+		
 		// Keylist found, uses it
-		if( keyList != null ) {
+		if (keyList != null) {
 			// The result data map
-			Map<String,Object> resMap = new HashMap<String,Object>();
-	
+			Map<String, Object> resMap = new HashMap<String, Object>();
+			
 			// Validate key and get result map
-			for(String key : keyList) {
-				if(validateKeyname(key)) {
-					resMap.put( key, dataMap.get(key) );
+			for (String key : keyList) {
+				if (validateKeyname(key)) {
+					resMap.put(key, dataMap.get(key));
 				}
 			}
-	
+			
 			// End and return result
 			res.put(RESULT, resMap);
 			return res;
 		}
-
+		
 		//-------------------------------
 		// Key String logic
 		//-------------------------------
-
+		
 		// Get the key
 		String key = req.getString("key");
 		res.put("key", key);
-
+		
 		// Validate key, and get result
-		if(validateKeyname(key)) {
+		if (validateKeyname(key)) {
 			res.put(RESULT, dataMap.get(key));
 		}
-
+		
 		// Return the res
 		return res;
 	};
-
+	
 	/////////////////////////////////////////////
 	//
 	// Actual API setup
 	//
 	/////////////////////////////////////////////
-
+	
 	/**
 	 * Does the setup of the StringEscape filter, and AccessFilter config.
 	 *
 	 * This functionality can be refined via the config object
 	 */
-	protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config) {
+	protected void apiSetup(ApiBuilder api, String prefixPath,
+		GenericConvertMap<String, Object> config) {
 		super.apiSetup(api, prefixPath, config);
-		api.endpoint(prefixPath+"/get", getEntry);
+		api.endpoint(prefixPath + "/get", getEntry);
 	}
-
+	
 }

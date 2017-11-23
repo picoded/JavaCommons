@@ -28,7 +28,7 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	
 	// Fallback if null, for native format
 	//---------------------------------------------------------------------------------------------------
-
+	
 	/**
 	 * Map get function, with fallback
 	 *
@@ -39,12 +39,12 @@ public interface GenericConvertMap<K, V> extends UnsupportedDefaultMap<K, V> {
 	 **/
 	default V get(K key, V fallbck) {
 		V res = get(key);
-		if( res == null ) {
+		if (res == null) {
 			return fallbck;
 		}
 		return res;
 	}
-
+	
 	// to string conversion
 	//---------------------------------------------------------------------------------------------------
 	

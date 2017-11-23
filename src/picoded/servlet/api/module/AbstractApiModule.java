@@ -39,27 +39,28 @@ abstract public class AbstractApiModule implements ApiModule {
 		
 		// Set the config
 		config = defaultConfig();
-		config.putAll( GenericConvert.toStringMap(inConfigMap, "{}") );
-
+		config.putAll(GenericConvert.toStringMap(inConfigMap, "{}"));
+		
 		subsystemList = internalSubsystemList();
-
+		
 		apiSetup(api, prefixPath, config);
 	}
-
+	
 	/**
 	 * [To Overwrite]
 	 * Defines the default config object, this is useful in extending modules, and adjusting default behaviours
 	 */
-	protected GenericConvertHashMap<String,Object> defaultConfig() {
-		return new GenericConvertHashMap<String,Object>();
+	protected GenericConvertHashMap<String, Object> defaultConfig() {
+		return new GenericConvertHashMap<String, Object>();
 	}
-
+	
 	/**
 	 * [To Overwrite]
 	 * Does the actual API backend setup logic, this is after standardised apiSetup initialization
 	 */
-	abstract protected void apiSetup(ApiBuilder api, String prefixPath, GenericConvertMap<String,Object> config);
-
+	abstract protected void apiSetup(ApiBuilder api, String prefixPath,
+		GenericConvertMap<String, Object> config);
+	
 	//-------------------------------------------------------------
 	// SystemSetup / Teardown chain helpers
 	//-------------------------------------------------------------
@@ -84,7 +85,7 @@ abstract public class AbstractApiModule implements ApiModule {
 	protected List<SystemSetupInterface> internalSubsystemList() {
 		return Arrays.asList(internalSubsystemArray());
 	}
-
+	
 	//----------------------------------------------------------------
 	//
 	//  Preloading of DStack structures, systemSetup/Teardown

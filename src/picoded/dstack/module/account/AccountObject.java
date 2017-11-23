@@ -14,18 +14,18 @@ import static picoded.servlet.api.module.account.AccountConstantStrings.*;
  * Represents a single group / user account.
  **/
 public class AccountObject extends Core_DataObject {
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor and setup
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * The original account table
 	 **/
 	protected AccountTable mainTable = null;
-
+	
 	/**
 	 * [INTERNAL USE ONLY]
 	 *
@@ -36,13 +36,13 @@ public class AccountObject extends Core_DataObject {
 		super((Core_DataTable) (accTable.accountDataTable), inOID);
 		mainTable = accTable;
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Getting and setting login ID's
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Checks if the current account has the provided LoginName
 	 *
@@ -53,7 +53,7 @@ public class AccountObject extends Core_DataObject {
 	public boolean hasLoginName(String name) {
 		return _oid.equals(mainTable.accountLoginNameMap.get(name));
 	}
-
+	
 	/**
 	 * Gets and return the various login "nice-name" (not UUID) for this account
 	 *
@@ -62,7 +62,7 @@ public class AccountObject extends Core_DataObject {
 	public Set<String> getLoginNameSet() {
 		return mainTable.accountLoginNameMap.keySet(_oid);
 	}
-
+	
 	/**
 	 * Sets the name for the account, returns true or false if it succed.
 	 *
@@ -74,25 +74,25 @@ public class AccountObject extends Core_DataObject {
 		if (name == null || name.length() <= 0) {
 			throw new RuntimeException("AccountObject loding ID cannot be blank");
 		}
-
+		
 		if (mainTable.hasLoginName(name)) {
 			return false;
 		}
-
+		
 		// ensure its own OID is registered
 		saveDelta();
-
+		
 		// Technically a race condition =X
 		//
 		// But name collision, if its an email collision should be a very rare event.
 		mainTable.accountLoginNameMap.put(name, _oid);
 		// Populate the name list
 		populateLoginNameList(name);
-
+		
 		// Success of failure
 		return hasLoginName(name);
 	}
-
+	
 	/**
 	 * Removes the old name from the database
 	 *
@@ -104,7 +104,7 @@ public class AccountObject extends Core_DataObject {
 			removeLoginNameFromList(name);
 		}
 	}
-
+	
 	/**
 	 * Sets the name as a unique value, delete all previous alias
 	 *
@@ -113,10 +113,10 @@ public class AccountObject extends Core_DataObject {
 	 * @return TRUE if login ID is configured to this account
 	 **/
 	public boolean setUniqueLoginName(String name) {
-
+		
 		// The old name list, to check if new name already is set
 		Set<String> oldNamesList = getLoginNameSet();
-
+		
 		// Check if name exist in list
 		if (Arrays.asList(oldNamesList).contains(name)) {
 			// Already exists in the list, does nothing
@@ -127,7 +127,7 @@ public class AccountObject extends Core_DataObject {
 				return false;
 			}
 		}
-
+		
 		// Iterate the names, delete uneeded ones
 		for (String oldName : oldNamesList) {
 			// Skip the unique name,
@@ -139,10 +139,10 @@ public class AccountObject extends Core_DataObject {
 			mainTable.accountLoginNameMap.remove(oldName);
 			removeLoginNameFromList(oldName);
 		}
-
+		
 		return true;
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Syncronysing login names from authentication table, to account info
@@ -150,21 +150,21 @@ public class AccountObject extends Core_DataObject {
 	// NOTE: This is not actually used for authentication, but for convienience
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	/**
-	* Add the login name list to the account info object
-	*
-	* @param Name to be added
-	*/
-	protected void populateLoginNameList(String name){
+	 * Add the login name list to the account info object
+	 *
+	 * @param Name to be added
+	 */
+	protected void populateLoginNameList(String name) {
 		if (name == null || name.length() <= 0) {
 			throw new RuntimeException("No Login Name to be set.");
 		}
-
+		
 		// Get the current list of login names
 		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
 		// Add if not exists
-		if (!loginNames.contains(name)){
+		if (!loginNames.contains(name)) {
 			loginNames.add(name);
 		}
 		// Put it back to the object
@@ -172,21 +172,21 @@ public class AccountObject extends Core_DataObject {
 		// Save the object
 		this.saveDelta();
 	}
-
+	
 	/**
-	* Remove the login name in the list of the account info object
-	*
-	* @param Name to be removed
-	*/
-	protected void removeLoginNameFromList(String name){
+	 * Remove the login name in the list of the account info object
+	 *
+	 * @param Name to be removed
+	 */
+	protected void removeLoginNameFromList(String name) {
 		if (name == null || name.length() <= 0) {
 			throw new RuntimeException("No Login Name to be remove.");
 		}
-
+		
 		// Get the current list of login names
 		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
 		// Add if not exists
-		if (!loginNames.contains(name)){
+		if (!loginNames.contains(name)) {
 			loginNames.remove(name);
 		}
 		// Put it back to the object
@@ -194,13 +194,13 @@ public class AccountObject extends Core_DataObject {
 		// Save the object
 		this.saveDelta();
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Password management
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Gets and returns the stored password hash,
 	 * Intentionally made protected to avoid accidental use externally
@@ -210,7 +210,7 @@ public class AccountObject extends Core_DataObject {
 	protected String getPasswordHash() {
 		return mainTable.accountAuthMap.get(_oid);
 	}
-
+	
 	/**
 	 * Indicates if the current account has a configured password, it is possible there is no password
 	 * if it functions as a group. Or is passwordless login
@@ -221,7 +221,7 @@ public class AccountObject extends Core_DataObject {
 		String h = getPasswordHash();
 		return (h != null && h.length() > 0);
 	}
-
+	
 	/**
 	 * Remove the account password
 	 * This should only be used for group type account objects
@@ -229,7 +229,7 @@ public class AccountObject extends Core_DataObject {
 	public void removePassword() {
 		mainTable.accountAuthMap.remove(_oid);
 	}
-
+	
 	/**
 	 * Validate if the given password is valid
 	 *
@@ -244,7 +244,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Set the account password
 	 *
@@ -253,7 +253,7 @@ public class AccountObject extends Core_DataObject {
 	public void setPassword(String pass) {
 		// ensure its own OID is registered
 		saveDelta();
-
+		
 		// Setup the password
 		if (pass == null) {
 			removePassword();
@@ -261,7 +261,7 @@ public class AccountObject extends Core_DataObject {
 			mainTable.accountAuthMap.put(_oid, NxtCrypt.getPassHash(pass));
 		}
 	}
-
+	
 	/**
 	 * Set the account password, after checking old password
 	 *
@@ -277,13 +277,13 @@ public class AccountObject extends Core_DataObject {
 		}
 		return false;
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Session management
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Checks if the current session is associated with the account
 	 *
@@ -294,7 +294,7 @@ public class AccountObject extends Core_DataObject {
 	public boolean hasSession(String sessionID) {
 		return sessionID != null && _oid.equals(mainTable.sessionLinkMap.get(sessionID));
 	}
-
+	
 	/**
 	 * List the various session ID's involved with this account
 	 *
@@ -303,7 +303,7 @@ public class AccountObject extends Core_DataObject {
 	public Set<String> getSessionSet() {
 		return mainTable.sessionLinkMap.keySet(_oid);
 	}
-
+	
 	/**
 	 * Get and return the session information meta
 	 *
@@ -316,11 +316,11 @@ public class AccountObject extends Core_DataObject {
 		if (!hasSession(sessionID)) {
 			return null;
 		}
-
+		
 		// Return the session information
 		return mainTable.sessionInfoMap.getStringMap(sessionID, null);
 	}
-
+	
 	/**
 	 * Generate a new session with the provided meta information
 	 *
@@ -339,33 +339,33 @@ public class AccountObject extends Core_DataObject {
 	 * @return  The session ID used
 	 **/
 	public String newSession(Map<String, Object> info) {
-
+		
 		// Normalize the info object map
 		if (info == null) {
 			info = new HashMap<String, Object>();
 		}
-
+		
 		// Set the session expirary time : 30 seconds (before tokens)
 		long expireTime = (System.currentTimeMillis()) / 1000L + AccountTable.SESSION_NEW_LIFESPAN;
-
+		
 		// Generate a base58 guid for session key
 		String sessionID = GUID.base58();
-
+		
 		// As unlikely as it is, on GUID collision,
 		// we do not want any session swarp EVER
 		if (mainTable.sessionLinkMap.get(sessionID) != null) {
 			throw new RuntimeException("GUID collision for sessionID : " + sessionID);
 		}
-
+		
 		// Time to set it all up, with expire timestamp
 		mainTable.sessionLinkMap.putWithExpiry(sessionID, _oid, expireTime);
 		mainTable.sessionInfoMap.putWithExpiry(sessionID, ConvertJSON.fromMap(info), expireTime
 			+ AccountTable.SESSION_RACE_BUFFER);
-
+		
 		// Return the session key
 		return sessionID;
 	}
-
+	
 	/**
 	 * Revoke a session, associated to this account.
 	 *
@@ -377,16 +377,16 @@ public class AccountObject extends Core_DataObject {
 		// Validate the session belongs to this account !
 		if (hasSession(sessionID)) {
 			// Session ownership validated, time to revoke!
-
+			
 			// Revoke all tokens associated to this session
 			revokeAllToken(sessionID);
-
+			
 			// Revoke the session info
 			mainTable.sessionLinkMap.remove(sessionID);
 			mainTable.sessionInfoMap.remove(sessionID);
 		}
 	}
-
+	
 	/**
 	 * Revoke all sessions, associated to this account
 	 **/
@@ -396,13 +396,13 @@ public class AccountObject extends Core_DataObject {
 			revokeSession(oneSession);
 		}
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Session token management
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Checks if the current session token is associated with the account
 	 *
@@ -414,7 +414,7 @@ public class AccountObject extends Core_DataObject {
 	public boolean hasToken(String sessionID, String tokenID) {
 		return hasSession(sessionID) && sessionID.equals(mainTable.sessionTokenMap.get(tokenID));
 	}
-
+	
 	/**
 	 * Get the token set associated with the session and account
 	 *
@@ -429,7 +429,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		return new HashSet<String>();
 	}
-
+	
 	/**
 	 * Generate a new token, with a timeout
 	 *
@@ -442,22 +442,22 @@ public class AccountObject extends Core_DataObject {
 	 * @return  The tokenID generated, null on invalid session
 	 **/
 	public String newToken(String sessionID, long expireTime) {
-
+		
 		// Terminate if session is invalid
 		if (!hasSession(sessionID)) {
 			return null;
 		}
-
+		
 		// Generate a base58 guid for session key
 		String tokenID = GUID.base58();
-
+		
 		// Issue the token
 		registerToken(sessionID, tokenID, GUID.base58(), expireTime);
-
+		
 		// Return the token
 		return tokenID;
 	}
-
+	
 	/**
 	 * Internal function, used to issue a token ID to the session
 	 * with the next token ID predefined
@@ -475,7 +475,7 @@ public class AccountObject extends Core_DataObject {
 		if (hasToken(sessionID, tokenID)) {
 			return;
 		}
-
+		
 		// Check if token has already been registered
 		String existingTokenSession = mainTable.sessionTokenMap.getString(tokenID, null);
 		if (existingTokenSession != null) {
@@ -490,17 +490,17 @@ public class AccountObject extends Core_DataObject {
 					"FATAL : Unable to register token previously registered to another session ID");
 			}
 		}
-
+		
 		// Renew every session!
 		mainTable.sessionLinkMap.setExpiry(sessionID, expireTime + AccountTable.SESSION_RACE_BUFFER);
 		mainTable.sessionInfoMap.setExpiry(sessionID, expireTime + AccountTable.SESSION_RACE_BUFFER
 			* 2);
-
+		
 		// Register the token
 		mainTable.sessionTokenMap.putWithExpiry(tokenID, sessionID, expireTime);
 		mainTable.sessionNextTokenMap.putWithExpiry(tokenID, nextTokenID, expireTime);
 	}
-
+	
 	/**
 	 * Checks if the current session token is associated with the account
 	 *
@@ -516,7 +516,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Revokes all tokens associated to a session
 	 *
@@ -528,7 +528,7 @@ public class AccountObject extends Core_DataObject {
 			revokeToken(sessionID, oneToken);
 		}
 	}
-
+	
 	/**
 	 * Get token expiriry
 	 *
@@ -543,7 +543,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		return -1;
 	}
-
+	
 	/**
 	 * Get token remaining lifespan
 	 *
@@ -555,19 +555,19 @@ public class AccountObject extends Core_DataObject {
 	public long getTokenLifespan(String sessionID, String tokenID) {
 		// Get expiry timestamp
 		long expiry = getTokenExpiry(sessionID, tokenID);
-
+		
 		// Invalid tokens are -1
 		if (expiry <= -1) {
 			return -1;
 		}
-
+		
 		long lifespan = expiry - (System.currentTimeMillis()) / 1000L;
 		if (lifespan < -1) {
 			return -1;
 		}
 		return lifespan;
 	}
-
+	
 	/**
 	 * Internal function, used to get the next token given a session and current token.
 	 * DOES NOT : Validate the next token if it exists
@@ -583,7 +583,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Get the next token AFTER validating if it is issued
 	 *
@@ -599,7 +599,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Generate next token in line, with expiry
 	 * Note that expiry is NOT set, if token was previously issued
@@ -617,30 +617,30 @@ public class AccountObject extends Core_DataObject {
 		if (nextToken == null) {
 			return null;
 		}
-
+		
 		// Issue next token
 		registerToken(sessionID, nextToken, GUID.base58(), expireTime);
 		// Return the next token, after its been issued
 		return nextToken;
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Group Configuration and Management
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	// Group Status and Management
 	// -------------------------------------------------------------------------
-
+	
 	// Group Management of Users
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Gets the cached child map
 	 **/
 	protected DataObject _group_userToRoleMap = null;
-
+	
 	/**
 	 * Gets the child map (cached?)
 	 **/
@@ -651,14 +651,14 @@ public class AccountObject extends Core_DataObject {
 		// true = uncheckedGet
 		return (_group_userToRoleMap = mainTable.memberRolesTable.get(this._oid(), true));
 	}
-
+	
 	/**
 	 * Gets and returns the member role, if it exists
 	 **/
 	public String getMemberRole(AccountObject memberObject) {
 		return group_userToRoleMap().getString(memberObject._oid());
 	}
-
+	
 	/**
 	 * Gets and returns the member meta map, if it exists
 	 * Only returns if member exists, else null
@@ -673,7 +673,7 @@ public class AccountObject extends Core_DataObject {
 		return mainTable.memberDataTable.get(
 			AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
-
+	
 	/**
 	 * Gets and returns the member meta map, if it exists
 	 * Only returns if member exists and matches role, else null
@@ -689,7 +689,7 @@ public class AccountObject extends Core_DataObject {
 		return mainTable.memberDataTable.get(
 			AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
 	}
-
+	
 	/**
 	 * Adds the member to the group with the given role, if it was not previously added
 	 *
@@ -703,7 +703,7 @@ public class AccountObject extends Core_DataObject {
 		// Set and return a new member object
 		return setMember(memberObject, role);
 	}
-
+	
 	/**
 	 * Adds the member to the group with the given role, or update the role if already added
 	 *
@@ -717,15 +717,15 @@ public class AccountObject extends Core_DataObject {
 		String memberOID = memberObject._oid();
 		String level = group_userToRoleMap().getString(memberOID);
 		DataObject childMeta = null;
-
+		
 		if (level == null || !level.equals(role)) {
-
+			
 			memberObject.saveDelta();
 			setGroupStatus(true);
-
+			
 			group_userToRoleMap().put(memberOID, role);
 			group_userToRoleMap().saveDelta();
-
+			
 			// true = uncheckedGet
 			childMeta = mainTable.memberDataTable.get(
 				AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
@@ -738,12 +738,12 @@ public class AccountObject extends Core_DataObject {
 		}
 		return childMeta;
 	}
-
+	
 	public DataObject removeMember(AccountObject memberObject) {
 		if (!this.isGroup()) {
 			return this;
 		}
-
+		
 		String memberOID = memberObject._oid();
 		String userRoleInGroup = group_userToRoleMap().getString(memberOID);
 		if (userRoleInGroup == null) {
@@ -751,18 +751,18 @@ public class AccountObject extends Core_DataObject {
 		}
 		group_userToRoleMap().remove(memberOID);
 		group_userToRoleMap().saveAll();
-
+		
 		mainTable.memberDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
 		mainTable.memberPrivateDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(),
 			memberOID));
 		System.out.println("Remove member called successfully");
-
+		
 		return memberObject;
 	}
-
+	
 	// Group Status Check
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Returns if set as group
 	 **/
@@ -775,7 +775,7 @@ public class AccountObject extends Core_DataObject {
 			return false;
 		}
 	}
-
+	
 	/**
 	 * Sets if the account is a group
 	 **/
@@ -787,18 +787,18 @@ public class AccountObject extends Core_DataObject {
 		}
 		this.saveDelta();
 	}
-
+	
 	// Group Configuration
 	// -------------------------------------------------------------------------
 	protected DataObject _group_membershipRoles = null;
-
+	
 	public DataObject group_membershipRoles() {
 		if (_group_membershipRoles != null) {
 			return _group_membershipRoles;
 		}
 		return (_group_membershipRoles = mainTable.accountPrivateDataTable.get(this._oid(), true));
 	}
-
+	
 	public DataObject addNewMembershipRole(String role) {
 		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if (currentRoles.contains(role)) {
@@ -807,7 +807,7 @@ public class AccountObject extends Core_DataObject {
 		currentRoles.add(role);
 		return setMembershipRoles(currentRoles);
 	}
-
+	
 	public DataObject setMembershipRoles(List<String> roles) {
 		this.setGroupStatus(true);
 		_group_membershipRoles = null;
@@ -817,7 +817,7 @@ public class AccountObject extends Core_DataObject {
 		group_membershipRoles().saveDelta();
 		return group_membershipRoles();
 	}
-
+	
 	public DataObject removeMembershipRole(String role) {
 		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
 		if (!currentRoles.contains(role)) {
@@ -826,7 +826,7 @@ public class AccountObject extends Core_DataObject {
 		currentRoles.remove(role);
 		return setMembershipRoles(currentRoles);
 	}
-
+	
 	/// Returns the list of members in the group
 	///
 	public String[] getMembers_id() {
@@ -839,13 +839,13 @@ public class AccountObject extends Core_DataObject {
 		}
 		return retList.toArray(new String[retList.size()]);
 	}
-
+	
 	/// Returns the list of groups the member is in
 	///
 	public String[] getGroups_id() {
 		return mainTable.memberRolesTable.getFromKeyName_id(_oid());
 	}
-
+	
 	/// Gets all the members object related to the group
 	///
 	public AccountObject[] getMembersAccountObject() {
@@ -856,19 +856,19 @@ public class AccountObject extends Core_DataObject {
 		}
 		return objList;
 	}
-
+	
 	/// Gets all the groups object the user is in
 	///
 	public AccountObject[] getGroups() {
 		return mainTable.getFromArray(getGroups_id());
 	}
-
+	
 	// Group management of users
 	//-------------------------------------------------------------------------
-
+	
 	// Is super user group handling
 	//-------------------------------------------------------------------------
-
+	
 	/// Returns if its a super user
 	///
 	public boolean isSuperUser() {
@@ -876,11 +876,11 @@ public class AccountObject extends Core_DataObject {
 		if (superUserGrp == null) {
 			return false;
 		}
-
+		
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
-
+	
 	// /**
 	//  * This method logs the details about login faailure for the user based on User ID
 	//  **/
@@ -889,7 +889,7 @@ public class AccountObject extends Core_DataObject {
 	// 	int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
 	// 	mainTable.loginThrottlingExpiryMap.put(this._oid(), elapsedTime);
 	// }
-
+	
 	/**
 	 * This method returns time left before next permitted login attempt for the user based on User ID
 	 **/
@@ -898,7 +898,7 @@ public class AccountObject extends Core_DataObject {
 		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
 		return allowedTime > 0 ? allowedTime : 0;
 	}
-
+	
 	// /**
 	//  * This method would be added in on next login failure for the user based on User ID
 	//  **/
@@ -906,7 +906,7 @@ public class AccountObject extends Core_DataObject {
 	// 	long elapsedValue = getExpiryTime();
 	// 	return elapsedValue;
 	// }
-
+	
 	/**
 	 * This method would be increment the attempt counter and update the delay for the user
 	 * to log in next
@@ -915,17 +915,18 @@ public class AccountObject extends Core_DataObject {
 		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
 		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
 		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
-		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(), (long)elapsedValue);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(),
+			(long) elapsedValue);
 	}
-
-	private long getAttempts(){
+	
+	private long getAttempts() {
 		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
 	}
-
+	
 	private long getExpiryTime() {
 		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
 	}
-
+	
 	/**
 	 * This method reset the entries for the user (should call after successful login)
 	 **/
@@ -933,7 +934,7 @@ public class AccountObject extends Core_DataObject {
 		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getAttempts(), 0l);
 		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(), 0l);
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Private Meta Data Table Management
@@ -941,17 +942,17 @@ public class AccountObject extends Core_DataObject {
 	///////////////////////////////////////////////////////////////////////////
 	private DataTable _accountPrivateDataTable = null;
 	private DataObject _accountPrivateData = null;
-
-	private DataTable accountPrivateDataTable(){
-		if(_accountPrivateDataTable != null){
+	
+	private DataTable accountPrivateDataTable() {
+		if (_accountPrivateDataTable != null) {
 			return _accountPrivateDataTable;
 		}
 		return (_accountPrivateDataTable = mainTable.accountPrivateDataTable);
 	}
-
-	public void setPrivateMetaData(String key, Object value){
+	
+	public void setPrivateMetaData(String key, Object value) {
 		// Create a new private data for the account if it does not exists
-		if ( accountPrivateDataTable().get(this._oid()) == null ){
+		if (accountPrivateDataTable().get(this._oid()) == null) {
 			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
 		} else {
 			_accountPrivateData = accountPrivateDataTable().get(this._oid());
@@ -960,19 +961,19 @@ public class AccountObject extends Core_DataObject {
 		_accountPrivateData.put(key, value);
 		_accountPrivateData.saveAll();
 	}
-
-	public String getPrivateMetaStringData(String key){
-		if ( _accountPrivateData != null ){
+	
+	public String getPrivateMetaStringData(String key) {
+		if (_accountPrivateData != null) {
 			return _accountPrivateData.getString(key, "");
 		}
 		// Create a new private data for the account if it does not exists
-		if ( accountPrivateDataTable().get(this._oid()) == null ){
+		if (accountPrivateDataTable().get(this._oid()) == null) {
 			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
 		} else {
 			_accountPrivateData = accountPrivateDataTable().get(this._oid());
 		}
-
+		
 		return _accountPrivateData.getString(key, "");
 	}
-
+	
 }

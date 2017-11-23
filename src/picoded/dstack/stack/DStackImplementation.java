@@ -75,7 +75,6 @@ public class DStackImplementation extends Core_CommonStack {
 	//
 	//-----------------------------------------------------------
 	
-
 	/**
 	 * Perform any required connection / file handlers / etc closure
 	 * This is to clean up any "resource" usage if needed.
@@ -83,7 +82,7 @@ public class DStackImplementation extends Core_CommonStack {
 	 * This proxy the closure call to the actual underlying implementation
 	 */
 	public void close() {
-		for(CommonStack layer : _stackLayers) {
+		for (CommonStack layer : _stackLayers) {
 			layer.close();
 		}
 	}

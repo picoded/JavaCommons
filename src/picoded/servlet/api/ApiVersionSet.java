@@ -32,19 +32,17 @@ public class ApiVersionSet {
 	protected void importVersionSet(ApiVersionSet importSet) {
 		// Endpoints
 		endpointMap.putAll(importSet.endpointMap);
-
+		
 		// Filters
 		beforeFilterMap.putAll(importSet.beforeFilterMap);
 		afterFilterMap.putAll(importSet.afterFilterMap);
 	}
-
+	
 	/**
 	 * Enum set for helper function access for before / endpoint / after function maps
 	 */
 	static enum ApiFunctionType {
-		BEFORE,
-		ENDPOINT,
-		AFTER
+		BEFORE, ENDPOINT, AFTER
 	};
 	
 	/**
@@ -54,14 +52,14 @@ public class ApiVersionSet {
 	 * 
 	 * @return The function map to manipulation
 	 */
-	Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap( ApiFunctionType type ) {
-		if( type == ApiFunctionType.BEFORE ) {
+	Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap(ApiFunctionType type) {
+		if (type == ApiFunctionType.BEFORE) {
 			return beforeFilterMap;
-		} else if( type == ApiFunctionType.ENDPOINT ) {
+		} else if (type == ApiFunctionType.ENDPOINT) {
 			return endpointMap;
-		} else if( type == ApiFunctionType.AFTER ) {
+		} else if (type == ApiFunctionType.AFTER) {
 			return afterFilterMap;
 		}
-		throw new IllegalArgumentException("Unknown ApiFunctionType : "+type);
+		throw new IllegalArgumentException("Unknown ApiFunctionType : " + type);
 	}
 }

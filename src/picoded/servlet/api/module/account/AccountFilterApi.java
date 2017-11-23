@@ -25,17 +25,17 @@ import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
  * Account table API builder
  **/
 public class AccountFilterApi extends AccountTableApi implements ApiModule {
-
+	
 	/**
 	 * The AccountTable reference
 	 **/
 	protected AccountTable table = null;
-
+	
 	/**
 	 * Static ERROR MESSAGES
 	 **/
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
-
+	
 	/**
 	 * Setup the account table api class
 	 *
@@ -45,10 +45,10 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		super(inTable);
 		table = super.table;
 	}
-
+	
 	// Global Variables
 	ApiResponse apr = null;
-
+	
 	// ////////////////////////////////////////////////////////////////////////////
 	// /// Account Admin Filtering
 	// ////////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 	// 	}
 	// 	return null;
 	// };
-
+	
 	/**
 	 * Does the actual setup for the API
 	 * Given the API Builder, and the namespace prefix
@@ -222,11 +222,11 @@ public class AccountFilterApi extends AccountTableApi implements ApiModule {
 		//
 		// builder.before(path + "account/group/*", group_bundle_check);
 		// builder.before(path + "account/group/admin/*", group_admin_bundle_check);
-
+		
 	}
-
+	
 	// Private Methods
-
+	
 	private ApiFunction isLoggedIn = (req, res) -> {
 		AccountObject ao = table.getRequestUser(req.getHttpServletRequest(), null);
 		if (ao == null) {

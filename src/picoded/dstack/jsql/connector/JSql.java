@@ -38,38 +38,38 @@ import picoded.core.common.JSqlType;
  * Database intreface base class.
  **/
 public abstract class JSql {
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Reusable output logging
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Internal self used logger
 	 **/
 	protected static final Logger LOGGER = Logger.getLogger(JSql.class.getName());
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Database specific constructors
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * SQLite static constructor, returns picoded.dstack.jsql.connector.db.JSql_Sqlite
 	 **/
 	public static JSql sqlite() {
 		return new picoded.dstack.jsql.connector.db.JSql_Sqlite();
 	}
-
+	
 	/**
 	 * SQLite static constructor, returns picoded.dstack.jsql.connector.db.JSql_Sqlite
 	 **/
 	public static JSql sqlite(String sqliteLoc) {
 		return new picoded.dstack.jsql.connector.db.JSql_Sqlite(sqliteLoc);
 	}
-
+	
 	/**
 	 * MySql static constructor, returns picoded.JSql.JSql_Mysql
 	 **/
@@ -77,20 +77,21 @@ public abstract class JSql {
 		return new picoded.dstack.jsql.connector.db.JSql_Mysql(dbServerAddress, dbName, dbUser,
 			dbPass);
 	}
-
+	
 	/**
 	 * MySql static constructor, returns picoded.JSql.JSql_Mysql
 	 **/
 	public static JSql mysql(String connectionUrl, Properties connectionProps) {
 		return new picoded.dstack.jsql.connector.db.JSql_Mysql(connectionUrl, connectionProps);
 	}
-
+	
 	/**
-	* Mssql static constructor, returns picoded.JSql.JSql_Mssql
-	**/
+	 * Mssql static constructor, returns picoded.JSql.JSql_Mssql
+	 **/
 	public static JSql mssql(String dbUrl, String dbName, String dbUser, String dbPass) {
 		return new picoded.dstack.jsql.connector.db.JSql_Mssql(dbUrl, dbName, dbUser, dbPass);
 	}
+	
 	/*
 	 * Oracle static constructor, returns picoded.dstack.jsql.connector.db.JSql_Oracle
 	public static JSql oracle(String oraclePath, String dbUser, String dbPass) {
@@ -101,40 +102,40 @@ public abstract class JSql {
 		return new picoded.dstack.jsql.connector.db.JSql_Oracle(inSqlConn);
 	}
 	 */
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Database connection handling
 	//
 	//-------------------------------------------------------------------------
-
-	public Connection getConn(){
+	
+	public Connection getConn() {
 		return sqlConn;
 	}
-
+	
 	//-------------------------------------------------------------------------
-
+	
 	// Database connection settings variables
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Internal refrence of the current sqlType the system is running as
 	 **/
 	protected JSqlType sqlType = JSqlType.INVALID;
-
+	
 	/**
 	 * Java standard database connection
 	 **/
 	protected Connection sqlConn = null;
-
+	
 	/**
 	 * database connection properties
 	 **/
 	protected Map<String, Object> connectionProps = null;
-
+	
 	// Database connection settings functions
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Returns the current sql type, this is read only
 	 *
@@ -143,7 +144,7 @@ public abstract class JSql {
 	public JSqlType sqlType() {
 		return this.sqlType;
 	}
-
+	
 	/**
 	 * Store the database connection parameters for recreating the connection
 	 *
@@ -175,7 +176,7 @@ public abstract class JSql {
 			connectionProps.put("connectionProps", connProps);
 		}
 	}
-
+	
 	/**
 	 * Recreate the current SQL connection.
 	 * This forcefully close any existing SQL connection, in the process if configured.
@@ -188,13 +189,13 @@ public abstract class JSql {
 	public void recreate(boolean force) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Standard raw query/execute command sets
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Executes the argumented SQL query, and immediately fetches the result from
 	 * the database into the result set.
@@ -215,7 +216,7 @@ public abstract class JSql {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * Executes the argumented SQL query, and returns the result object *without*
 	 * fetching the result data from the database.
@@ -232,7 +233,7 @@ public abstract class JSql {
 	public JSqlResult noFetchQuery_raw(String qString, Object... values) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	/**
 	 * Executes the argumented SQL update.
 	 *
@@ -253,13 +254,13 @@ public abstract class JSql {
 			return r.affectedRows();
 		}
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Generic SQL conversion and query
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Used for refrence checks / debugging only. This represents the core
 	 * generic SQL statement refactoring engine. That is currenlty used internally
@@ -274,7 +275,7 @@ public abstract class JSql {
 	public String genericSqlParser(String qString) {
 		return qString;
 	}
-
+	
 	/**
 	 * Internal exception catching, used for cases which its not possible to
 	 * easily handle with pure SQL query. Or cases where the performance cost in the
@@ -289,10 +290,10 @@ public abstract class JSql {
 	 * @return  TRUE, if the exception can be safely ignored
 	 **/
 	protected boolean sanatizeErrors(String originalQuery, String normalizedQuery, JSqlException e) {
-		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+		String stackTrace = picoded.core.exception.ExceptionUtils.getStackTrace(e);
 		return sanatizeErrors(originalQuery.toUpperCase(), normalizedQuery.toUpperCase(), stackTrace);
 	}
-
+	
 	/**
 	 * Internal exception catching, used for cases which its not possible to
 	 * easily handle with pure SQL query. Or cases where the performance cost in the
@@ -316,7 +317,7 @@ public abstract class JSql {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Executes the argumented SQL query, and immediately fetches the result from
 	 * the database into the result set.
@@ -344,7 +345,7 @@ public abstract class JSql {
 			}
 		}
 	}
-
+	
 	/**
 	 * Executes the argumented SQL query, and returns the result object *without*
 	 * fetching the result data from the database.
@@ -372,7 +373,7 @@ public abstract class JSql {
 			}
 		}
 	}
-
+	
 	/**
 	 * Executes the argumented SQL update.
 	 *
@@ -399,7 +400,7 @@ public abstract class JSql {
 			}
 		}
 	}
-
+	
 	/**
 	 * Prepare an SQL statement, for execution subsequently later
 	 *
@@ -413,20 +414,20 @@ public abstract class JSql {
 	public JSqlPreparedStatement prepareStatement(String qString, Object... values) {
 		return new JSqlPreparedStatement(qString, values, this);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Connection closure / disposal
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Returns true, if close() function was called prior
 	 **/
 	public boolean isClosed() {
 		return sqlConn == null;
 	}
-
+	
 	/**
 	 * Dispose of the respective SQL driver / connection
 	 **/
@@ -442,7 +443,7 @@ public abstract class JSql {
 			sqlConn = null;
 		}
 	}
-
+	
 	/**
 	 * Just incase a user forgets to dispose "as per normal"
 	 **/
@@ -453,13 +454,13 @@ public abstract class JSql {
 			super.finalize();
 		}
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Utility helper functions used to prepare common complex SQL quries
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Merge the 2 arrays together
 	 * Used to join arguments together
@@ -472,7 +473,7 @@ public abstract class JSql {
 	public Object[] joinArguments(Object[] arr1, Object[] arr2) {
 		return org.apache.commons.lang3.ArrayUtils.addAll(arr1, arr2);
 	}
-
+	
 	/**
 	 * Sets the auto commit level
 	 *
@@ -485,7 +486,7 @@ public abstract class JSql {
 			throw new JSqlException(e);
 		}
 	}
-
+	
 	/**
 	 * Gets the current auto commit setting
 	 *
@@ -498,7 +499,7 @@ public abstract class JSql {
 			throw new JSqlException(e);
 		}
 	}
-
+	
 	/**
 	 * Runs the commit (use only if setAutoCommit is false)
 	 **/
@@ -509,13 +510,13 @@ public abstract class JSql {
 			throw new JSqlException(e);
 		}
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// CREATE TABLE statement builder
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various
 	 * syntax differances of CREATE TABLE IF NOT EXISTS across the various SQL vendors (if any).
@@ -539,7 +540,7 @@ public abstract class JSql {
 	) {
 		return createTableStatement(tableName, columnName, columnTypes).update() >= 0;
 	}
-
+	
 	/**
 	 * Helps generate an SQL CREATE TABLE IF NOT EXISTS request. This function was created to acommedate the various
 	 * syntax differances of CREATE TABLE IF NOT EXISTS across the various SQL vendors (if any).
@@ -563,13 +564,13 @@ public abstract class JSql {
 	) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// SELECT statement builder
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors (if any).
@@ -585,7 +586,7 @@ public abstract class JSql {
 	) {
 		return selectStatement(tableName, "*", null, null, null, 0, 0).query();
 	}
-
+	
 	/**
 	 * Helps generate an SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors (if any).
@@ -603,7 +604,7 @@ public abstract class JSql {
 	) {
 		return selectStatement(tableName, selectStatement, null, null, null, 0, 0).query();
 	}
-
+	
 	/**
 	 * Helps generate an SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors (if any).
@@ -626,7 +627,7 @@ public abstract class JSql {
 		return selectStatement(tableName, selectStatement, whereStatement, whereValues, null, 0, 0)
 			.query();
 	}
-
+	
 	/**
 	 * Helps generate an SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors (if any).
@@ -659,7 +660,7 @@ public abstract class JSql {
 		return selectStatement(tableName, selectStatement, whereStatement, whereValues,
 			orderStatement, limit, offset).query();
 	}
-
+	
 	/**
 	 * Helps generate an SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors (if any).
@@ -703,7 +704,7 @@ public abstract class JSql {
 	) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// INSERT statement builder
@@ -713,7 +714,7 @@ public abstract class JSql {
 	//         have use cases outside the core JavaCommons stack.
 	//
 	//-------------------------------------------------------------------------
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// UPDATE statement builder
@@ -723,13 +724,13 @@ public abstract class JSql {
 	//         have use cases outside the core JavaCommons stack.
 	//
 	//-------------------------------------------------------------------------
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// UPSERT statement builder
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	 * syntax differances of UPSERT across the various SQL vendors.
@@ -761,7 +762,7 @@ public abstract class JSql {
 			null //
 		).update() >= 1;
 	}
-
+	
 	/**
 	 * Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	 * syntax differances of UPSERT across the various SQL vendors.
@@ -804,7 +805,7 @@ public abstract class JSql {
 			miscColumns //
 		).update() >= 1;
 	}
-
+	
 	/**
 	 * Helps generate an SQL UPSERT request. This function was created to acommedate the various
 	 * syntax differances of UPSERT across the various SQL vendors.
@@ -890,13 +891,13 @@ public abstract class JSql {
 	) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Multiple UPSERT
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Does multiple UPSERT continously. Use this command when doing,
 	 * a large number of UPSERT's to the same table with the same format.
@@ -935,7 +936,7 @@ public abstract class JSql {
 	) {
 		int rows = uniqueValuesList.size();
 		boolean res = true;
-
+		
 		// For each record, do the respective upsert
 		for (int i = 0; i < rows; ++i) {
 			Object[] uniqueValues = (uniqueValuesList != null && uniqueValuesList.size() > i) ? uniqueValuesList
@@ -944,7 +945,7 @@ public abstract class JSql {
 				.get(i) : null;
 			Object[] defaultValues = (defaultValuesList != null && defaultValuesList.size() > i) ? defaultValuesList
 				.get(i) : null;
-
+			
 			res = res && upsert( //
 				tableName, //
 				uniqueColumns, uniqueValues, //
@@ -952,16 +953,16 @@ public abstract class JSql {
 				defaultColumns, defaultValues, //
 				miscColumns);
 		}
-
+		
 		return res;
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// DELETE statement builder
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an SQL DELETE request. This function was created to acommedate the various
 	 * syntax differances of DELETE across the various SQL vendors (if any).
@@ -977,7 +978,7 @@ public abstract class JSql {
 	) {
 		return deleteStatement(tableName, null, null).update();
 	}
-
+	
 	/**
 	 * Helps generate an SQL DELETE request. This function was created to acommedate the various
 	 * syntax differances of DELETE across the various SQL vendors (if any).
@@ -998,7 +999,7 @@ public abstract class JSql {
 	) {
 		return deleteStatement(tableName, whereStatement, whereValues).update();
 	}
-
+	
 	/**
 	 * Helps generate an SQL DELETE request. This function was created to acommedate the various
 	 * syntax differances of DELETE across the various SQL vendors (if any).
@@ -1024,33 +1025,33 @@ public abstract class JSql {
 		String whereStatement, // The Columns to apply where clause, this must be sql neutral
 		Object[] whereValues // Values that corresponds to the where statement
 	) {
-
+		
 		if (tableName.length() > 30) {
 			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
-
+		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder queryBuilder = new StringBuilder("DELETE ");
-
+		
 		// From table names
 		queryBuilder.append(" FROM `" + tableName + "`");
-
+		
 		// Where clauses
 		if (whereStatement != null && (whereStatement = whereStatement.trim()).length() >= 3) {
 			queryBuilder.append(" WHERE ");
 			queryBuilder.append(whereStatement);
-
+			
 			if (whereValues != null) {
 				for (int b = 0; b < whereValues.length; ++b) {
 					queryArgs.add(whereValues[b]);
 				}
 			}
 		}
-
+		
 		// Create the query set
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// DROP TABLE statement builder
@@ -1060,7 +1061,7 @@ public abstract class JSql {
 	//         have use cases outside the core JavaCommons stack.
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an SQL DROP TABLE IF EXISTS request. This function was created to acommedate the various
 	 * syntax differances of DROP TABLE IF EXISTS across the various SQL vendors (if any).
@@ -1079,7 +1080,7 @@ public abstract class JSql {
 	) {
 		return (dropTableStatement(tablename).update() >= 0);
 	}
-
+	
 	/**
 	 * Helps generate an SQL DROP TABLE IF EXISTS request. This function was created to acommedate the various
 	 * syntax differances of DROP TABLE IF EXISTS across the various SQL vendors (if any).
@@ -1098,13 +1099,13 @@ public abstract class JSql {
 	) {
 		return prepareStatement("DROP TABLE IF EXISTS " + tablename);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// CREATE INDEX statement builder
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an SQL CREATE INDEX request. This function was created to acommedate the various
 	 * syntax differances of CREATE INDEX across the various SQL vendors (if any).
@@ -1123,7 +1124,7 @@ public abstract class JSql {
 	) {
 		return createIndexStatement(tableName, columnNames, null, null).update() >= 0;
 	}
-
+	
 	/**
 	 * Helps generate an SQL CREATE INDEX request. This function was created to acommedate the various
 	 * syntax differances of CREATE INDEX across the various SQL vendors (if any).
@@ -1145,7 +1146,7 @@ public abstract class JSql {
 	) {
 		return createIndexStatement(tableName, columnNames, indexType, null).update() >= 0;
 	}
-
+	
 	/**
 	 * Helps generate an SQL CREATE INDEX request. This function was created to acommedate the various
 	 * syntax differances of CREATE INDEX across the various SQL vendors (if any).
@@ -1170,7 +1171,7 @@ public abstract class JSql {
 	) {
 		return createIndexStatement(tableName, columnNames, indexType, indexSuffix).update() >= 0;
 	}
-
+	
 	/**
 	 * Helps generate an SQL CREATE INDEX request. This function was created to acommedate the various
 	 * syntax differances of CREATE INDEX across the various SQL vendors (if any).
@@ -1200,26 +1201,26 @@ public abstract class JSql {
 		if (tableName.length() > 30) {
 			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName);
 		}
-
+		
 		ArrayList<Object> queryArgs = new ArrayList<Object>();
 		StringBuilder queryBuilder = new StringBuilder("CREATE ");
-
+		
 		if (indexType != null && indexType.length() > 0) {
 			queryBuilder.append(indexType);
 			queryBuilder.append(" ");
 		}
-
+		
 		queryBuilder.append("INDEX IF NOT EXISTS ");
-
+		
 		// Creates a suffix, based on the collumn names
 		if (indexSuffix == null || indexSuffix.length() <= 0) {
 			indexSuffix = columnNames.replaceAll("/[^A-Za-z0-9]/", ""); //.toUpperCase(Locale.ENGLISH)?
 		}
-
+		
 		if ((tableName.length() + 1 + indexSuffix.length()) > 30) {
 			LOGGER.warning(JSqlException.oracleNameSpaceWarning + tableName + "_" + indexSuffix);
 		}
-
+		
 		queryBuilder.append("`");
 		queryBuilder.append(tableName);
 		queryBuilder.append("_");
@@ -1229,17 +1230,17 @@ public abstract class JSql {
 		queryBuilder.append("` (");
 		queryBuilder.append(columnNames);
 		queryBuilder.append(")");
-
+		
 		// Create the query set
 		return new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
 	}
-
+	
 	//-------------------------------------------------------------------------
 	//
 	// Randomly SELECT statement builder
 	//
 	//-------------------------------------------------------------------------
-
+	
 	/**
 	 * Helps generate an random SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors.
@@ -1259,7 +1260,7 @@ public abstract class JSql {
 	) {
 		return randomSelect(tableName, selectStatement, null, null, 0);
 	}
-
+	
 	/**
 	 * Helps generate an random SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors.
@@ -1283,7 +1284,7 @@ public abstract class JSql {
 	) {
 		return randomSelect(tableName, selectStatement, whereStatement, whereValues, 0);
 	}
-
+	
 	/**
 	 * Helps generate an random SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors.
@@ -1311,7 +1312,7 @@ public abstract class JSql {
 		return randomSelectStatement(tableName, selectStatement, whereStatement, whereValues,
 			rowLimit).query();
 	}
-
+	
 	/**
 	 * Helps generate an random SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors.
@@ -1329,7 +1330,7 @@ public abstract class JSql {
 	) {
 		return randomSelectStatement(tableName, selectStatement, null, null, 0);
 	}
-
+	
 	/**
 	 * Helps generate an random SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors.
@@ -1353,7 +1354,7 @@ public abstract class JSql {
 	) {
 		return randomSelectStatement(tableName, selectStatement, whereStatement, whereValues, 0);
 	}
-
+	
 	/**
 	 * Helps generate an random SQL SELECT request. This function was created to acommedate the various
 	 * syntax differances of SELECT across the various SQL vendors.
@@ -1392,5 +1393,5 @@ public abstract class JSql {
 	) {
 		throw new UnsupportedOperationException(JSqlException.invalidDatabaseImplementationException);
 	}
-
+	
 }

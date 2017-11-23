@@ -1,23 +1,23 @@
 package picoded.servlet.api.module.account;
+
 import javax.mail.internet.*;
 
 public class AccountConstantStrings {
-
+	
 	/// Common parameter names (standardised)
 	public static final String ACCOUNT_ID = "accountID";
 	public static final String LOGIN_NAME = "loginName";
 	public static final String LOGIN_NAME_LIST = "loginNameList";
-
+	
 	/// Common error / info messages
 	public static final String INFO_MISSING_LOGIN = "Missing login information (request is missing valid authentication)";
-
-
+	
 	//--------------------------------------------------------------------
 	//
 	// Everything below here is NOT yet approved
 	//
 	//--------------------------------------------------------------------
-
+	
 	/// Static REQUEST VARS
 	public static final String OID = "_oid";
 	public static final String ACCOUNT_NAME = "accountName";
@@ -43,13 +43,13 @@ public class AccountConstantStrings {
 	public static final String LOGINNAME = "loginName";
 	public static final String LOGINNAMELIST = "loginNameList";
 	public static final String USER_ID = "userID";
-
+	
 	// Rancher VARS
 	public static final String EMAIL = "email";
 	public static final String NODE_ID = "nodeID";
 	public static final String AUTH_KEY = "authKey";
 	public static final String ADMIN_PASS = "adminPass";
-
+	
 	/// Static RESPONSE VARS
 	// Single Value/Object Variables
 	public static final String RETURN = "return";
@@ -65,7 +65,7 @@ public class AccountConstantStrings {
 	public static final String SUCCESS_REMOVE = "succeedRemove";
 	public static final String FAIL_ADD = "failToAdd";
 	public static final String SUCCESS_ADD = "succeedAdd";
-
+	
 	/// Static PROPERTIES VARS
 	public static final String PROPERTIES_ROLE = "role";
 	public static final String PROPERTIES_MEMBERSHIP_ROLE = "membershipRoles";
@@ -80,7 +80,7 @@ public class AccountConstantStrings {
 	public static final String PROPERTIES_CREATE_STACK_TIMESTAMP = "createdStackTimeStamp";
 	public static final String PROPERTIES_HOST_URL = "hostURL";
 	public static final String PROPERTIES_STACK_ID = "stackID";
-
+	
 	/// ERROR MESSAGES
 	public static final String ERROR_NO_GROUP = "No group is found.";
 	public static final String ERROR_NO_GROUP_ID = "No groupID is found.";
@@ -117,7 +117,7 @@ public class AccountConstantStrings {
 	/// ADDITIONAL Variables
 	public static final String SPACE = " ";
 	public static final String GROUP = "group";
-
+	
 	/// Check States Variables (FILTER API)
 	public static final String SV_IS_SUPERUSER = "isSuperUser";
 	public static final String SV_IS_ADMIN = "isAdmin";
@@ -131,7 +131,7 @@ public class AccountConstantStrings {
 	public static final String SV_IS_PASSWORD_SATISFIED = "isPassFormat";
 	public static final String SV_IS_EMAIL_SATISFIED = "isEmailFormat";
 	public static final String SV_IS_META = "isMeta";
-
+	
 	/// API ENDPOINTS
 	public static final String API_ACCOUNT_IS_LOGIN = "account/isLogin";
 	public static final String API_ACCOUNT_LOGIN = "account/login";
@@ -143,7 +143,7 @@ public class AccountConstantStrings {
 	public static final String API_ACCOUNT_ADMIN_REMOVE = "account/admin/remove";
 	public static final String API_ACCOUNT_LIST = "account/list";
 	public static final String API_ACCOUNT_SET_LOGIN_NAME = "account/info/loginname";
-
+	
 	public static final String API_GROUP_GRP_ROLES = "group/groupRoles";
 	public static final String API_GROUP_GET_MEM_ROLE = "group/getMemberRole";
 	public static final String API_GROUP_GET_LIST_GRP_ID_MEM = "group/getListOfGroupIDOfMember";
@@ -154,9 +154,9 @@ public class AccountConstantStrings {
 	public static final String API_GROUP_ADMIN_REM_MEM_ROLE = "group/admin/removeMembershipRole";
 	public static final String API_GROUP_ADMIN_GET_MEM_LIST_INFO = "group/admin/get_member_list_info";
 	public static final String API_GROUP_ADMIN_ADD_REM_MEM = "group/admin/add_remove_member";
-
+	
 	public static final String API_RANCHER_REGISTER = "account/rancherRegister";
-
+	
 	// Methods that shared across Account APIs
 	// with help from http://stackoverflow.com/questions/624581/what-is-the-best-java-email-address-validation-method
 	public static boolean isEmailFormat(String inEmail) {

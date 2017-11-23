@@ -24,13 +24,13 @@ import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 
 /// Test the AccountTable API specifically
 public class DataTableAggregationApi_test extends ApiModule_test {
-
+	
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test setup
 	//
 	//----------------------------------------------------------------------------------------
-
+	
 	/// The test servlet to use
 	public static class DataTableAggregationApiTestServlet extends ApiModuleTestServlet {
 		@Override
@@ -39,31 +39,32 @@ public class DataTableAggregationApi_test extends ApiModule_test {
 			DataTable table = stack.getDataTable("test-data");
 			DataTableAggregationApi tableApi = new DataTableAggregationApi(table);
 			apiTestPath = "data";
-
+			
 			// Returning this api, will automatically do the setup needed
 			return tableApi;
 		}
 	}
-
+	
 	public CorePage setupServlet() {
 		return new DataTableAggregationApiTestServlet();
 	}
-
+	
 	//----------------------------------------------------------------------------------------
 	//
 	//  Test running
 	//
 	//----------------------------------------------------------------------------------------
 	@Test
-	public void newAggTest(){
+	public void newAggTest() {
 		requestJSON("data/new", "{ \"data\" : { \"doubleValue\" : 1 } }");
 		requestJSON("data/new", "{ \"data\" : { \"doubleValue\" : 5 } }");
 		requestJSON("data/new", "{ \"data\" : { \"doubleValue\" : 10 } }");
-
+		
 		// get it boyo
-		GenericConvertMap<String, Object> res = requestJSON("data/aggregatedlist", "{ \"aggregations\" : [ \"count(doubleValue)\", \"max(doubleValue)\", \"avg(doubleValue)\" ] }");
+		GenericConvertMap<String, Object> res = requestJSON("data/aggregatedlist",
+			"{ \"aggregations\" : [ \"count(doubleValue)\", \"max(doubleValue)\", \"avg(doubleValue)\" ] }");
 		Map<String, Object> aggMap = res.getStringMap("aggregationResult");
-
+		
 		assertEquals(3, GenericConvert.toInt(aggMap.get("count(doubleValue)")));
 		assertEquals(10.0, GenericConvert.toDouble(aggMap.get("max(doubleValue)")), 0);
 		assertEquals(5.33, GenericConvert.toDouble(aggMap.get("avg(doubleValue)")), 0);

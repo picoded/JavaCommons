@@ -59,7 +59,7 @@ public class StringEscape_test {
 		str = "I didn't  say \"you to run!\"";
 		assertNotNull(encodedStr = StringEscape.escapeCsv(str));
 	}
-
+	
 	@Test
 	public void stringEscapeCommonEscapeCharactersIntoAsciiTest() {
 		assertEquals("&#92;&#60;test&#92;&#62;",

@@ -78,31 +78,31 @@ import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
  **/
 public class ApiBuilder implements
 	UnsupportedDefaultMap<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> {
-
+	
 	//-------------------------------------------------------------------
 	//
 	// Constructor
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Object token representing a "removed" endpoint / filter
 	 **/
 	protected static final ApiFunction NULLAPIFUNCTION = (req, res) -> {
 		return res;
 	};
-
+	
 	/**
 	 * ROOT Api connection, refenced by sub-class implementation
 	 **/
 	protected ApiBuilder root = null;
-
+	
 	/**
 	 * Version specific namespace mapping
 	 * Major,Minor,Patch,Path = Endpoint
 	 **/
 	protected List<List<ApiVersionSet>> endpointVersionStore = null;
-
+	
 	/**
 	 * Blank constructor, to build a root end point
 	 **/
@@ -110,23 +110,23 @@ public class ApiBuilder implements
 		this.root = this;
 		this.endpointVersionStore = new ArrayList<List<ApiVersionSet>>();
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// Version string and configuration handling
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Major sementic version handling
 	 **/
 	protected int majorVersion = 0;
-
+	
 	/**
 	 * Minor sementic version handling
 	 **/
 	protected int minorVersion = 0;
-
+	
 	/**
 	 * Get the version values
 	 *
@@ -135,7 +135,7 @@ public class ApiBuilder implements
 	public int[] version() {
 		return new int[] { majorVersion, minorVersion };
 	}
-
+	
 	/**
 	 * Get the version string
 	 *
@@ -144,7 +144,7 @@ public class ApiBuilder implements
 	public String versionStr() {
 		return versionStr(majorVersion, minorVersion);
 	}
-
+	
 	/**
 	 * Get the version string
 	 *
@@ -153,7 +153,7 @@ public class ApiBuilder implements
 	protected String versionStr(int inMajor, int inMinor) {
 		return "v" + inMajor + "." + inMinor;
 	}
-
+	
 	/**
 	 * Set the version values
 	 *
@@ -167,13 +167,13 @@ public class ApiBuilder implements
 		minorVersion = inMinor;
 		return version();
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// (Raw, non collapsed) Version set handaling
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Get the current version set, after normalizing it
 	 *
@@ -182,7 +182,7 @@ public class ApiBuilder implements
 	protected ApiVersionSet getVersionSet() {
 		return getVersionSet(majorVersion, minorVersion);
 	}
-
+	
 	/**
 	 * Get a specified version set, after normalizing it
 	 *
@@ -198,35 +198,35 @@ public class ApiBuilder implements
 			minorVersionList = new ArrayList<ApiVersionSet>();
 			endpointVersionStore.set(inMajor, minorVersionList);
 		}
-
+		
 		// Normalize minor endpoint
 		while (minorVersionList.size() <= inMinor) {
 			minorVersionList.add(null);
 		}
-
+		
 		// Getting the stroage map
 		ApiVersionSet vSet = minorVersionList.get(inMinor);
 		if (vSet == null) {
 			vSet = new ApiVersionSet();
 			minorVersionList.set(inMinor, vSet);
 		}
-
+		
 		// Return the version set
 		return vSet;
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// (Collapsed) Version set handaling
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Internal cache of collapsed version set
 	 * Note that this is resetted, when any put operation is performed
 	 **/
 	protected Map<String, ApiVersionSet> cachedCollapsedVersionSet = new HashMap<String, ApiVersionSet>();
-
+	
 	/**
 	 * Get the (possibly) cached collapsed version set
 	 *
@@ -241,20 +241,20 @@ public class ApiBuilder implements
 	protected ApiVersionSet collapsedVersionSet(int inMajor, int inMinor) {
 		// Get the version string
 		String verStr = versionStr(inMajor, inMinor);
-
+		
 		// Fetch the version data
 		ApiVersionSet ret = cachedCollapsedVersionSet.get(verStr);
-
+		
 		// Make a new version set if null
 		if (ret == null) {
 			ret = generateCollapsedVersionSet(inMajor, inMinor);
 			cachedCollapsedVersionSet.put(verStr, ret);
 		}
-
+		
 		// return cached collapsed version set
 		return ret;
 	}
-
+	
 	/**
 	 * Get the (possibly) cached collapsed version set, of the current version
 	 *
@@ -264,7 +264,7 @@ public class ApiBuilder implements
 	protected ApiVersionSet collapsedVersionSet() {
 		return collapsedVersionSet(majorVersion, minorVersion);
 	}
-
+	
 	/**
 	 * Generates an uncached collapsed version set
 	 *
@@ -278,38 +278,38 @@ public class ApiBuilder implements
 	 **/
 	protected ApiVersionSet generateCollapsedVersionSet(int inMajor, int inMinor) {
 		ApiVersionSet ret = new ApiVersionSet();
-
+		
 		// Iterate major versions
 		int maxMajor = endpointVersionStore.size();
 		for (int major = 0; major < maxMajor; ++major) {
-
+			
 			// Get the list of minor versions
 			List<ApiVersionSet> minorSet = endpointVersionStore.get(major);
-
+			
 			// Iterate the minor versions
 			int maxMinor = minorSet.size();
 			for (int minor = 0; minor < maxMinor; ++minor) {
-
+				
 				// Load the set to import
 				ApiVersionSet setToImport = minorSet.get(minor);
-
+				
 				// If not null, import it
 				if (setToImport != null) {
 					ret.importVersionSet(setToImport);
 				}
-
+				
 				// Terminates if the relevent major & minor version is met
 				if (major >= inMajor && minor >= inMinor) {
 					break;
 				}
 			}
-
+			
 			// Terminate at the required major version is met
 			if (major >= inMajor) {
 				break;
 			}
 		}
-
+		
 		// Time to remove the "null" endpoints
 		HashSet<String> keySet = new HashSet<String>();
 		keySet.addAll(ret.endpointMap.keySet());
@@ -318,16 +318,16 @@ public class ApiBuilder implements
 				ret.endpointMap.remove(key);
 			}
 		}
-
+		
 		return ret;
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// ApiRequest setup process
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * The ApiRequest method setup handling, assumes an internal java call in this case
 	 *
@@ -342,7 +342,7 @@ public class ApiBuilder implements
 		ret.requestMethod = "java";
 		return ret;
 	}
-
+	
 	/**
 	 * The ApiRequest method setup handling, loading the request query paremeters from the servlet
 	 *
@@ -355,13 +355,13 @@ public class ApiBuilder implements
 		ret.queryObj = core.requestParameters();
 		return ret;
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// API put / remove map handling, and its filters
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Register the API function with its respective type
 	 *
@@ -369,24 +369,26 @@ public class ApiBuilder implements
 	 * @param  String path to sanitize and use
 	 * @param  Function to store as a "value"
 	 */
-	protected void registerApiFunction(ApiFunctionType type, String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
+	protected void registerApiFunction(ApiFunctionType type, String path,
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 		// Clears the collapsed version set cache
 		cachedCollapsedVersionSet.clear();
-
+		
 		// Change . into /
 		path = path.replaceAll("\\.", "/");
 		path = path.replaceAll("//", "/"); // Change // to /
 		path = path.replaceAll("^/", ""); // Remove / from the start of point
-
+		
 		// Get the current version, and write the respective endpoint to it
-		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = getVersionSet().functionMap(type);
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = getVersionSet()
+			.functionMap(type);
 		if (value == null) {
 			functionMap.put(path, NULLAPIFUNCTION);
 		} else {
 			functionMap.put(path, value);
 		}
 	}
-
+	
 	/**
 	 * Registers an API function to a single endpoint.
 	 *
@@ -401,7 +403,7 @@ public class ApiBuilder implements
 	public void endpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 		registerApiFunction(ApiFunctionType.ENDPOINT, path, value);
 	}
-
+	
 	/**
 	 * Registers an API before filter function to a single endpoint.
 	 *
@@ -413,7 +415,7 @@ public class ApiBuilder implements
 	public void before(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 		registerApiFunction(ApiFunctionType.BEFORE, path, value);
 	}
-
+	
 	/**
 	 * Registers an API after filter function to a single endpoint.
 	 *
@@ -425,7 +427,7 @@ public class ApiBuilder implements
 	public void after(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 		registerApiFunction(ApiFunctionType.AFTER, path, value);
 	}
-
+	
 	/**
 	 * Execute a request
 	 *
@@ -441,13 +443,13 @@ public class ApiBuilder implements
 		Map<String, Object> queryParams, Map<String, Object> contextParams) {
 		return execute(inMajor, inMinor, path, setupApiRequest(queryParams, contextParams), null);
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// Extending an API function / filter
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Registers an API function to a single endpoint.
 	 *
@@ -461,30 +463,29 @@ public class ApiBuilder implements
 	 **/
 	public void extendEndpoint(String path, BiFunction<ApiRequest, ApiResponse, ApiResponse> value) {
 		// The original endpoint function to extend
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> originalEndpoint = fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path);
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> originalEndpoint = fetchSpecificApiFunction(
+			ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path);
 		// If originalEndpoint is null, just implement directly
-		if( originalEndpoint == null ) {
+		if (originalEndpoint == null) {
 			endpoint(path, value);
 		} else {
 			// Registers the new endpoint function
-			endpoint(path, (req,res) -> {
+			endpoint(path, (req, res) -> {
 				// New request to use
 				ApiRequest overwriteReq = new ApiRequest(req, originalEndpoint);
 				// Call the BiFunction, with the extended request
 				return value.apply(overwriteReq, res);
 			});
 		}
-
+		
 	}
-
-
-
+	
 	//-------------------------------------------------------------------
 	//
 	// Fetch and get the relevent API Execution endpoints for the path
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Fetching a specific ApiFunction, that does an exact match for the path
 	 *
@@ -496,20 +497,18 @@ public class ApiBuilder implements
 	 * @return  The requested API Function, if found
 	 */
 	protected BiFunction<ApiRequest, ApiResponse, ApiResponse> fetchSpecificApiFunction(
-		ApiFunctionType type,
-		int inMajor, int inMinor,
-		String path
-	) {
+		ApiFunctionType type, int inMajor, int inMinor, String path) {
 		// Gets the collapsed version set
 		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
-
+		
 		// Get the current version, and write the respective endpoint to it
-		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = workingSet.functionMap(type);
-
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = workingSet
+			.functionMap(type);
+		
 		// Find the exact match
 		return functionMap.get(path);
 	}
-
+	
 	/**
 	 * Fetching ApiFunction that matches the given path, including functions with wildcard matches
 	 *
@@ -521,53 +520,51 @@ public class ApiBuilder implements
 	 * @return  The requested API Function, if found
 	 */
 	protected List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> fetchMultipleApiFunction(
-		ApiFunctionType type,
-		int inMajor, int inMinor,
-		String path
-	) {
+		ApiFunctionType type, int inMajor, int inMinor, String path) {
 		// Gets the collapsed version set
 		ApiVersionSet workingSet = collapsedVersionSet(inMajor, inMinor);
-
+		
 		// Get the current version, and write the respective endpoint to it
-		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = workingSet.functionMap(type);
-
+		Map<String, BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionMap = workingSet
+			.functionMap(type);
+		
 		// List of API functions, with matching path
 		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> filteredApiFunction = new ArrayList<BiFunction<ApiRequest, ApiResponse, ApiResponse>>();
-
+		
 		// Working pattern / match variables
 		Pattern pattern = Pattern.compile("");
 		Matcher match = null;
-
+		
 		// Iterate the function map, for relevent functions
 		for (String currentPath : functionMap.keySet()) {
 			// Working filterPath
 			String filterPath = currentPath;
-
+			
 			// Converts path into a usable regex, where * is a wildcard
 			filterPath = filterPath.replaceAll("\\.", "/"); // Regex: change all . to /
 			filterPath = filterPath.replaceAll("\\*", ".*"); // Regex: change * into .*
 			filterPath = filterPath.replaceAll("/\\.\\*$", "(/.*)?"); // Regex: change last /.* into optional (/.*)?
-
+			
 			// Compile the regex
 			pattern = Pattern.compile(filterPath);
 			match = pattern.matcher(path);
-
+			
 			// Check if a match occur, if so the function is added to the list
 			if (match.matches()) { // Find the exact match
 				filteredApiFunction.add(functionMap.get(currentPath));
 			}
 		}
-
+		
 		// Return list of ApiFunctions : maybe blank
 		return filteredApiFunction;
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// API Execution handling
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Checks for valid path, returns success or failure
 	 *
@@ -580,7 +577,7 @@ public class ApiBuilder implements
 	public boolean isValidPath(int inMajor, int inMinor, String path) {
 		return fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, inMajor, inMinor, path) != null;
 	}
-
+	
 	/**
 	 * Checks for valid path, returns success or failure
 	 *
@@ -591,7 +588,7 @@ public class ApiBuilder implements
 	public boolean isValidPath(String path) {
 		return fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, majorVersion, minorVersion, path) != null;
 	}
-
+	
 	/**
 	 * Utility function that iterate and execute the various ApiFunction
 	 * and modify the resulting ApiResponse accordingly
@@ -602,15 +599,17 @@ public class ApiBuilder implements
 	 *
 	 * @return The result object
 	 */
-	protected ApiResponse executeApiFunctionList(List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionList, ApiRequest req, ApiResponse res) {
+	protected ApiResponse executeApiFunctionList(
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> functionList, ApiRequest req,
+		ApiResponse res) {
 		// Iterate the functionList, and execute it
 		for (BiFunction<ApiRequest, ApiResponse, ApiResponse> func : functionList) {
 			ApiResponse funcResponse = func.apply(req, res);
 			if (funcResponse != null) {
 				res = funcResponse;
-
+				
 				// Automatically terminates on an error
-				if( funcResponse.get(ERROR) != null ) {
+				if (funcResponse.get(ERROR) != null) {
 					res.halt();
 				}
 			} else {
@@ -620,7 +619,7 @@ public class ApiBuilder implements
 		}
 		return res;
 	}
-
+	
 	/**
 	 * Execute a request
 	 *
@@ -635,35 +634,35 @@ public class ApiBuilder implements
 	public ApiResponse execute(int inMajor, int inMinor, String path, ApiRequest reqObj,
 		ApiResponse resObj) {
 		// Fetch the endpoint
-		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = fetchSpecificApiFunction(ApiFunctionType.ENDPOINT, inMajor,
-			inMinor, path);
+		BiFunction<ApiRequest, ApiResponse, ApiResponse> endpoint = fetchSpecificApiFunction(
+			ApiFunctionType.ENDPOINT, inMajor, inMinor, path);
 		// Endpoitn does not exists
 		if (endpoint == null) {
 			throw new UnsupportedOperationException("Missing requested path : " + path);
 		}
-
+		
 		// Fetch the list of filters
-		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> beforeFilterList = fetchMultipleApiFunction(ApiFunctionType.BEFORE,
-			inMajor, inMinor, path);
-		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> afterFilterList = fetchMultipleApiFunction(ApiFunctionType.AFTER,
-			inMajor, inMinor, path);
-
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> beforeFilterList = fetchMultipleApiFunction(
+			ApiFunctionType.BEFORE, inMajor, inMinor, path);
+		List<BiFunction<ApiRequest, ApiResponse, ApiResponse>> afterFilterList = fetchMultipleApiFunction(
+			ApiFunctionType.AFTER, inMajor, inMinor, path);
+		
 		// ApiResponse setup (if null)
 		if (resObj == null) {
 			resObj = new ApiResponse(this);
 		}
-
+		
 		// Attempt to do the execution, any HaltException is caught and handled here
 		try {
 			// Before filter handling
 			resObj = executeApiFunctionList(beforeFilterList, reqObj, resObj);
-
+			
 			// Endpoint execution
 			resObj = endpoint.apply(reqObj, resObj);
-
+			
 			// After filter handling
 			resObj = executeApiFunctionList(afterFilterList, reqObj, resObj);
-
+			
 			// Return result at the end
 			return resObj;
 		} catch (HaltException h) {
@@ -674,11 +673,11 @@ public class ApiBuilder implements
 		} catch (Exception e) {
 			throw e;
 		}
-
+		
 		// Return failure
 		// return null;
 	}
-
+	
 	/**
 	 * Execute a request
 	 *
@@ -692,7 +691,7 @@ public class ApiBuilder implements
 		Map<String, Object> contextParams) {
 		return execute(majorVersion, minorVersion, path, queryParams, contextParams);
 	}
-
+	
 	/**
 	 * Execute a request
 	 *
@@ -705,7 +704,7 @@ public class ApiBuilder implements
 	public ApiResponse execute(String path, ApiRequest reqObj, ApiResponse resObj) {
 		return execute(majorVersion, minorVersion, path, reqObj, resObj);
 	}
-
+	
 	/**
 	 * Execute a request
 	 *
@@ -717,13 +716,13 @@ public class ApiBuilder implements
 	public ApiResponse execute(String path, Map<String, Object> queryParams) {
 		return execute(majorVersion, minorVersion, path, queryParams, (Map<String, Object>) null);
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// API map compliance
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * Used mainly for debugging purposes, not optimize for general usage
 	 *
@@ -732,7 +731,7 @@ public class ApiBuilder implements
 	public Set<String> keySet() {
 		return collapsedVersionSet().endpointMap.keySet();
 	}
-
+	
 	/**
 	 * Used mainly for debugging purposes, not optimize for general usage
 	 *
@@ -741,7 +740,7 @@ public class ApiBuilder implements
 	public BiFunction<ApiRequest, ApiResponse, ApiResponse> get(Object key) {
 		return collapsedVersionSet().endpointMap.get(key);
 	}
-
+	
 	/**
 	 * Registers an API function to a single endpoint
 	 *
@@ -755,7 +754,7 @@ public class ApiBuilder implements
 		endpoint(path, value);
 		return null;
 	}
-
+	
 	/**
 	 * Removes an endpoint for the current version
 	 * This intentionally remove if from the specified version onwards
@@ -767,13 +766,13 @@ public class ApiBuilder implements
 	public BiFunction<ApiRequest, ApiResponse, ApiResponse> remove(String path) {
 		return put(path, null);
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// API JS Handling
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * [Internal use only] API namespace to assume for server when building the JS
 	 *
@@ -787,18 +786,18 @@ public class ApiBuilder implements
 	protected String getApiJS(String apiURL) {
 		return ApiBuilderJS.generateApiJs(this, apiURL, _apiNamespace);
 	}
-
+	
 	//-------------------------------------------------------------------
 	//
 	// Servlet processing
 	//
 	//-------------------------------------------------------------------
-
+	
 	/**
 	 * The intenal base CorePage to refrence any needed servlet setup data
 	 **/
 	protected CorePage corePageServlet = null;
-
+	
 	/**
 	 * Setup the servlet linkage, and does the respective API call
 	 *
@@ -821,11 +820,11 @@ public class ApiBuilder implements
 			intV = new int[versions.length];
 			for (int idx = 0; idx < versions.length; idx++)
 				intV[idx] = Integer.parseInt(versions[idx]);
-
+			
 			// Remove the versioning
 			if (path.length > 1)
 				path = Arrays.copyOfRange(path, 1, path.length);
-
+			
 		}
 		// Check if it is calling API JS
 		if (path.length >= 1 && path[0].equalsIgnoreCase("api.js")) {
@@ -838,31 +837,30 @@ public class ApiBuilder implements
 			}
 			return null;
 		}
-
+		
 		// If it is invalid path with or without versioning
 		String jointPath = String.join("/", path);
 		jointPath = jointPath.replaceAll("//", "/"); // Change // to /
-		if (!isValidPath(jointPath)
-			&& !isValidPath(intV[0], intV[1], jointPath)) {
+		if (!isValidPath(jointPath) && !isValidPath(intV[0], intV[1], jointPath)) {
 			//Invalid path, terminate
 			res.put("ERROR", "Unknown API request endpoint");
 			res.put("INFO", "Requested path : " + jointPath);
 			return res;
 		}
-
+		
 		try {
 			// The actual execution
 			return execute(jointPath, req, res);
 		} catch (Exception e) {
 			// Suppress and print out the error info
 			String errorMsg = e.getMessage();
-			if( errorMsg == null || errorMsg.trim().isEmpty() ) {
+			if (errorMsg == null || errorMsg.trim().isEmpty()) {
 				errorMsg = "Fatal Error";
 			}
-			res.put("ERROR", errorMsg.trim() );
-			res.put("INFO", org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e));
+			res.put("ERROR", errorMsg.trim());
+			res.put("INFO", picoded.core.exception.ExceptionUtils.getStackTrace(e));
 		}
 		return res;
 	}
-
+	
 }

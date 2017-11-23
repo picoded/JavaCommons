@@ -27,13 +27,13 @@ import javax.naming.ldap.LdapContext;
  * login session to an object.
  **/
 public class LDAPAuthenticator {
-
+	
 	//////////////////////////////////////////
 	//
 	//  Static vars
 	//
 	//////////////////////////////////////////
-
+	
 	/**
 	 * User Info attributes inside LDAP
 	 **/
@@ -42,63 +42,63 @@ public class LDAPAuthenticator {
 		"uid", "sn", "givenname", "memberOf", //
 		"samaccountname", "userPrincipalName" //
 	}; //
-
+	
 	//////////////////////////////////////////
 	//
 	//  Internal vars
 	//
 	//////////////////////////////////////////
-
+	
 	//
 	// Server config
 	//
-
+	
 	/**
 	 * Default domain name
 	 **/
 	private String defaultDomain = null;
-
+	
 	/**
 	 * Server name to connect to
 	 **/
 	private String serverName = null;
-
+	
 	/**
 	 * Server port number to connect to
 	 **/
 	private int port = 389; //default non secure port
-
+	
 	//
 	// Cached context
 	//
-
+	
 	/**
 	 * The cached context
 	 **/
 	protected LdapContext cachedContext = null;
-
+	
 	/**
 	 * The cached username in context
 	 **/
 	protected String cachedUser = null;
-
+	
 	/**
 	 * The cached domain in context
 	 **/
 	protected String cachedDomain = null;
-
+	
 	//////////////////////////////////////////
 	//
 	//  Constructor
 	//
 	//////////////////////////////////////////
-
+	
 	/**
 	 * Blank constructor (will rely on user, and server info for domain, etc)
 	 **/
 	protected LDAPAuthenticator() {
 	}
-
+	
 	/**
 	 * Constructor which setsup the various base config
 	 **/
@@ -107,24 +107,24 @@ public class LDAPAuthenticator {
 		this.port = port;
 		this.defaultDomain = domainName;
 	}
-
+	
 	/**
 	 * Closes the current cached context if any
 	 **/
 	public void close() throws NamingException {
 		cachedUser = null;
 		cachedDomain = null;
-
+		
 		closeContext(cachedContext);
 		cachedContext = null;
 	}
-
+	
 	//////////////////////////////////////////
 	//
 	//  Utility function
 	//
 	//////////////////////////////////////////
-
+	
 	/**
 	 * Closes the ldap context silently
 	 *
@@ -139,7 +139,7 @@ public class LDAPAuthenticator {
 			//			}
 		}
 	}
-
+	
 	/**
 	 * Converts the domain name, to the LDAP DC format
 	 *
@@ -160,31 +160,31 @@ public class LDAPAuthenticator {
 		}
 		return buf.toString();
 	}
-
+	
 	//////////////////////////////////////////
 	//
 	//  Authentication function
 	//
 	//////////////////////////////////////////
-
+	
 	/**
 	 * Used to authenticate a user given a username/password and domain name.
 	 *
 	 * @return  The expected error message, if any. Else simply null for success
 	 **/
 	public String login(String username, String password) {
-
+		
 		/**
 		 * Sanity checks
 		 **/
 		if (username == null) {
 			return "Invalid blank username (null)";
 		}
-
+		
 		if ((username = username.trim()).length() <= 0) {
 			return "Invalid blank username (length=0)";
 		}
-
+		
 		/**
 		 * Domain names overwrite
 		 **/
@@ -192,26 +192,26 @@ public class LDAPAuthenticator {
 		String domainName = defaultDomain.trim(); //domain name actually used
 		if (usedUsername.indexOf('@') >= 1) {
 			String[] splitNames = usedUsername.split("@");
-
+			
 			if (splitNames.length != 2) {
 				return "Unexpected username with improper domain (" + usedUsername + ")";
 			}
-
+			
 			usedUsername = splitNames[0];
 			domainName = splitNames[1].trim();
 		}
-
+		
 		/**
 		 * Domain names validation check
 		 **/
-
+		
 		/**
 		 * Possibly invalid domain name
 		 **/
 		if (domainName.length() <= 0) {
 			domainName = null;
 		}
-
+		
 		/**
 		 * Fallback to server domain
 		 **/
@@ -225,31 +225,31 @@ public class LDAPAuthenticator {
 				// Does nothing
 			}
 		}
-
+		
 		/**
 		 * Missing domain name check
 		 **/
 		if (domainName == null || domainName.length() <= 0) {
 			return "Missing domain name parameter for user (" + usedUsername + ")";
 		}
-
+		
 		/**
 		 * password length 0, is considered null (no password
 		 **/
 		if (password != null && (password = password.trim()).length() == 0) {
 			password = null;
 		}
-
+		
 		/**
 		 * Create property for context
 		 **/
 		Hashtable<String, String> props = new Hashtable<String, String>();
-
+		
 		/**
 		 * Context builder
 		 **/
 		props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-
+		
 		/**
 		 * User, domain and pass
 		 **/
@@ -257,19 +257,19 @@ public class LDAPAuthenticator {
 		if (password != null) {
 			props.put(Context.SECURITY_CREDENTIALS, password);
 		}
-
+		
 		/**
 		 * LDAP Server connection
 		 **/
 		String serverNameWithPort = serverName + ":" + port;
 		String ldapURL = "ldap://" + ((serverName == null) ? domainName : serverNameWithPort);
 		props.put(Context.PROVIDER_URL, ldapURL);
-
+		
 		/**
 		 * The login context
 		 **/
 		LdapContext loginContext = null;
-
+		
 		/**
 		 * Try and catch the errors
 		 **/
@@ -286,10 +286,10 @@ public class LDAPAuthenticator {
 		cachedDomain = domainName;
 		cachedUser = usedUsername;
 		cachedContext = loginContext;
-
+		
 		return null;
 	}
-
+	
 	/**
 	 * Get some basic user information. Containing the following (userInfoAttributes)
 	 *
@@ -302,7 +302,7 @@ public class LDAPAuthenticator {
 	 * @return Map<String,String> of the user info mentioned above.
 	 **/
 	public Map<String, String> userInfo() {
-
+		
 		/**
 		 * Basic setup and checks
 		 **/
@@ -311,11 +311,11 @@ public class LDAPAuthenticator {
 		String usedUsername = cachedUser;
 		String principalName = usedUsername + "@" + usedDomain;
 		LdapContext usedContext = cachedContext;
-
+		
 		if (usedContext == null) {
 			throw new RuntimeException("Missing user context, call authenticate() first");
 		}
-
+		
 		/**
 		 * Try to search user
 		 **/
@@ -326,7 +326,7 @@ public class LDAPAuthenticator {
 			NamingEnumeration<SearchResult> answer = usedContext.search(
 				domainNameToLdapDC(usedDomain), "(& (userPrincipalName=" + principalName
 					+ ")(objectClass=user))", controls);
-
+			
 			if (answer.hasMore()) {
 				Attributes attr = answer.next().getAttributes();
 				if (attr != null && attr.get("userPrincipalName") != null) {
@@ -338,7 +338,7 @@ public class LDAPAuthenticator {
 						if (attr.get(info) != null) {
 							val = attr.get(info).get();
 						}
-
+						
 						if (val != null) {
 							ret.put(info, val.toString());
 						} else {

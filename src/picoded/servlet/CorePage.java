@@ -759,9 +759,10 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 		// Get origin server
 		String originServer = httpRequest.getHeader("Referer");
-		if( originServer == null || originServer.isEmpty() ) {
+		if (originServer == null || originServer.isEmpty()) {
 			// Unable to process CORS as no referer was sent
-			httpResponse.addHeader("Access-Control-Warning", "Missing Referer header, Unable to process CORS");
+			httpResponse.addHeader("Access-Control-Warning",
+				"Missing Referer header, Unable to process CORS");
 			return;
 		}
 		// @TODO : Validate originServer against accepted list?
@@ -769,11 +770,11 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		// Sanatize origin server to be strictly
 		// http(s)://originServer.com, without additional "/" nor URI path
 		boolean refererHttps = false;
-		if( originServer.startsWith("https://") ) {
+		if (originServer.startsWith("https://")) {
 			refererHttps = true;
-			originServer = "https://"+originServer.substring( "https://".length() ).split("/")[0];
+			originServer = "https://" + originServer.substring("https://".length()).split("/")[0];
 		} else {
-			originServer = "http://"+originServer.substring( "http://".length() ).split("/")[0];
+			originServer = "http://" + originServer.substring("http://".length()).split("/")[0];
 		}
 
 		// @TODO : Validate originServer against accepted list?
@@ -781,7 +782,8 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		// By default CORS is enabled for all API requests
 		httpResponse.addHeader("Access-Control-Allow-Origin", originServer);
 		httpResponse.addHeader("Access-Control-Allow-Credentials", "true");
-		httpResponse.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
+		httpResponse.addHeader("Access-Control-Allow-Methods",
+			"POST, GET, OPTIONS, PUT, DELETE, HEAD");
 	}
 
 	///////////////////////////////////////////////////////
@@ -1163,7 +1165,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	public boolean outputJSONException(Map<String, Object> outputData,
 		Map<String, Object> templateData, PrintWriter output, Exception e) throws Exception {
 		// Converts the stack trace to a string
-		String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+		String stackTrace = picoded.core.exception.ExceptionUtils.getStackTrace(e);
 
 		// Performs a stack trace, and returns it in a JSON object
 		Map<String, String> ret = new HashMap<String, String>();

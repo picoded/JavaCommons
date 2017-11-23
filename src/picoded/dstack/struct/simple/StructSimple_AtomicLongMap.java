@@ -17,42 +17,42 @@ import picoded.core.conv.GenericConvert;
  * As such its sacrifices much utility for performance
  **/
 public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Constructor vars
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Stores the key to value map
 	 **/
 	protected ConcurrentMap<String, Long> valueMap = new ConcurrentHashMap<String, Long>();
-	
+
 	/**
 	 * Read write lock
 	 **/
 	public static final ReentrantReadWriteLock accessLock = new ReentrantReadWriteLock();
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Constructor setup
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Constructor
 	 **/
 	public StructSimple_AtomicLongMap() {
 		// does nothing =X
 	}
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Backend system setup / maintenance teardown
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Sets up the backend storage table, etc. If needed
 	 **/
@@ -60,7 +60,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	public void systemSetup() {
 		// does nothing
 	}
-	
+
 	/**
 	 * Teardown and delete the backend storage table, etc. If needed
 	 **/
@@ -68,7 +68,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	public void systemDestroy() {
 		valueMap.clear();
 	}
-	
+
 	/**
 	 *
 	 * Removes all data, without tearing down setup
@@ -84,13 +84,13 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 			accessLock.writeLock().unlock();
 		}
 	}
-	
+
 	//--------------------------------------------------------------------------
 	//
 	// Core put / get
 	//
 	//--------------------------------------------------------------------------
-	
+
 	/**
 	 * Stores (and overwrites if needed) key, value pair
 	 *
@@ -105,7 +105,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	public Long put(Object key, Long value) {
 		try {
 			accessLock.writeLock().lock();
-			
+
 			if (value == null) {
 				valueMap.remove(key);
 			} else {
@@ -116,7 +116,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 			accessLock.writeLock().unlock();
 		}
 	}
-	
+
 	/**
 	 * Returns the value, given the key
 	 * @param key param find the thae meta key
@@ -127,7 +127,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	public Long get(Object key) {
 		try {
 			accessLock.readLock().lock();
-			
+
 			Long val = valueMap.get(key);
 			if (val == null) {
 				return 0l;
@@ -137,7 +137,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 			accessLock.readLock().unlock();
 		}
 	}
-	
+
 	/**
 	 * Returns the value, given the key. Then apply the delta change
 	 *
@@ -150,23 +150,23 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	public Long getAndAdd(Object key, Object delta) {
 		try {
 			accessLock.readLock().lock();
-			
+
 			Long oldVal = valueMap.get(key);
-			
+
 			// Assume 0, if old value does not exists
 			if (oldVal == null) {
 				oldVal = (Long) 0l;
 			}
-			
+
 			Long newVal = oldVal.longValue() + GenericConvert.toNumber(delta).longValue();
 			valueMap.put(key.toString(), newVal);
-			
+
 			return oldVal;
 		} finally {
 			accessLock.readLock().unlock();
 		}
 	}
-	
+
 	/**
 	 * Returns 1 if deleted, given the key.
 	 *
@@ -187,7 +187,7 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 			accessLock.readLock().unlock();
 		}
 	}
-	
+
 	/**
 	 * Stores (and overwrites if needed) key, value pair
 	 *
@@ -200,23 +200,24 @@ public class StructSimple_AtomicLongMap extends Core_AtomicLongMap {
 	 **/
 	@Override
 	public boolean weakCompareAndSet(String key, Long expect, Long update) {
-		
+
 		try {
 			accessLock.writeLock().lock();
-			
 			Long curVal = valueMap.get(key);
-			
+
 			//if current value is equal to expected value, set to new value
-			if (curVal.equals(expect)) {
+			if (curVal != null && curVal.equals(expect)) {
 				valueMap.put(key, update);
-				
 				return true;
-			} else {
+			} else if(curVal == null || curVal == 0l){
+				valueMap.put(key, update);
+				return true;
+			} else{
 				return false;
 			}
 		} finally {
 			accessLock.writeLock().unlock();
 		}
 	}
-	
+
 }

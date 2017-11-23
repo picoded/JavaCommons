@@ -58,14 +58,14 @@ import picoded.servlet.util.FileServlet;
  * spawnInstance ----+--> processChain
  *                   |         |
  * doOption ---------+    doSharedSetup
- *                   |     && doSetup
+ *                   |     && doRequestSetup
  * doPost -----------+         |                       (excludes Head/Option)
- *                   |       doAuth ---------------+-> doRequest --> do_X_Request --> outputRequest
- * doGet ------------+         |                   |
- *                   |         V               isJsonRequest == true
- * doDelete ---------+     doSharedTeardown        |
- *                   |     && doTeardown           \-> doJson -----> do_X_Json -----> outputJSON
- * doPut ------------+                                 (excludes Head/Option)
+ *                   |       doAuth -------+-> doRequest --> do_X_Request --> outputRequest--+
+ * doGet ------------+                     |                                                 |
+ *                   |                 isJsonRequest == true                                 +-> doSharedTeardown
+ * doDelete ---------+                     |                                                 |   && doRequestTearDown
+ *                   |                     \-> doJson -----> do_X_Json -----> outputJSON-----+
+ * doPut ------------+                         (excludes Head/Option)
  *                   |
  * doHead -----------/
  *
@@ -547,7 +547,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 	/**
 	 * Returns the whole server application contextual path : needed for base URI for page redirects / etc
-	 * 
+	 *
 	 * For root this is "" blank, however for example
 	 * if deployed under "edge", it would be "/edge"
 	 *
@@ -756,7 +756,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		if (httpResponse == null) {
 			return;
 		}
-		
+
 		// Get origin server
 		String originServer = httpRequest.getHeader("Referer");
 		if( originServer == null || originServer.isEmpty() ) {
@@ -800,7 +800,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 				// Does setup
 				doSharedSetup();
-				doSetup();
+				doRequestSetup();
 
 				// Does CORS processing
 				if (isCorsRequest()) {
@@ -819,7 +819,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 
 				// Does teardwon
 				doSharedTeardown();
-				doTeardown();
+				doRequestTearDown();
 
 				// Returns success or failure
 				return ret;
@@ -967,7 +967,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	 * [To be extended by sub class, if needed]
 	 * Called once when initialized per request
 	 **/
-	public void doSetup() throws Exception {
+	public void doRequestSetup() throws Exception {
 		// Does nothing (to override)
 	}
 
@@ -976,7 +976,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	 * Called once when completed per request, regardless of request status
 	 * PS: This is rarely needed, just rely on java GC =)
 	 **/
-	public void doTeardown() throws Exception {
+	public void doRequestTearDown() throws Exception {
 		// Does nothing (to override)
 	}
 

@@ -24,10 +24,10 @@ graph LR
 	doPut ---|+| doHead
 	spawnInstance --> processChain
 	processChain --- doSharedSetup
-	doSharedSetup ---|&| doSetup
+	doSharedSetup ---|&| doRequestSetup
 	doSharedSetup --- doAuth
 	doAuth --- doSharedTeardown
-	doSharedTeardown ---|&| doTeardown
+	doSharedTeardown ---|&| doRequestTearDown
 	doAuth --> doRequest
 	doRequest --> do_X_Request
 	do_X_Request --> outputRequest
@@ -61,7 +61,7 @@ lcp1b(right)->lcp2b(right)->lcp3b
 **Methods Summary**
 
 + contextDestroyed(), contextInitialized(), destroyContext(), doAuth(), doDelete(), doDeleteJSON(), doDeleteRequest(), doException(), doGet(), doGetJSON(),
-doGetRequest(), doJSON(), doOptions(), doPost(), doPostJSON(), doPostRequest(), doRequest(), doSetup(), doSharedSetup(), doSharedTeardown(), doTeardown(),
+doGetRequest(), doJSON(), doOptions(), doPost(), doPostJSON(), doPostRequest(), doRequest(), doRequestSetup(), doSharedSetup(), doSharedTeardown(), doRequestTearDown(),
 getContextPath(), getContextURI(), getHttpServletRequest(), getHttpServletResponse(), getOutputStream(), getParameter(), getServletContextURI(), getWriter(),
 initializeContext(), initSetup(), isDELETE(), isGET(), isJsonRequest(), isOPTION(), isPOST(), isPUT(), outputFileServlet(), outputJSON(), outputJSONException(),
 outputRequest(), outputRequestException(), processChain(), requestCookieMap(), requestHeaderMap(), requestParameters(), requestServletPath(), requestType(),

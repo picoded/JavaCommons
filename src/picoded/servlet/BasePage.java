@@ -59,8 +59,7 @@ public class BasePage extends DStackPage {
 	 * @return String of the table prefix
 	 */
 	private String getAccountTablePrefix() {
-		return DConfig().getString("sys.DStack.baseAccount.name",
-			DConfig().getString("sys.account.tableConfig.tablePrefix", "account"));
+		return DConfig().getString("sys.account.tableConfig.tablePrefix", "account");
 	}
 
 	/**

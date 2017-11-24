@@ -20,7 +20,8 @@ public class AccountObject extends Core_DataObject {
 	// Constructor and setup
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region constructor and setup
+
 	/**
 	 * The original account table
 	 **/
@@ -38,12 +39,14 @@ public class AccountObject extends Core_DataObject {
 		mainTable = accTable;
 	}
 	
+	//#endregion constructor and setup
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Getting and setting login ID's
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region login id handling
+
 	/**
 	 * Checks if the current account has the provided LoginName
 	 *
@@ -150,15 +153,19 @@ public class AccountObject extends Core_DataObject {
 		
 		return true;
 	}
-	
+
+	//#endregion login id handling
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Syncronysing login names from authentication table, to account info
+	// Syncronysing data from authentication related tables to 
+	// queryable data table objects.
 	//
-	// NOTE: This is not actually used for authentication, but for convienience
+	// NOTE: This is not actually used for authentication, 
+	//       but for convienience in places such as admin tables
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region auth tables data sync
+
 	/**
 	 * Syncs the current user name list, with its metaobject
 	 * This is mainly for data table listing "convinence"
@@ -177,13 +184,15 @@ public class AccountObject extends Core_DataObject {
 		// Save the changes
 		this.saveDelta();
 	}
-	
+
+	//#endregion auth tables data sync
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Password management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region password management
+
 	/**
 	 * Gets and returns the stored password hash,
 	 * Intentionally made protected to avoid accidental use externally
@@ -261,12 +270,14 @@ public class AccountObject extends Core_DataObject {
 		return false;
 	}
 	
+	//#endregion password management
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Session management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region login session management
+
 	/**
 	 * Checks if the current session is associated with the account
 	 *
@@ -379,13 +390,15 @@ public class AccountObject extends Core_DataObject {
 			revokeSession(oneSession);
 		}
 	}
-	
+
+	//#endregion login session management
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Session token management
+	// Session.token management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region login session.token management
+
 	/**
 	 * Checks if the current session token is associated with the account
 	 *
@@ -607,6 +620,7 @@ public class AccountObject extends Core_DataObject {
 		return nextToken;
 	}
 	
+	//#endregion login session.token management
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Group Configuration and Management
@@ -923,8 +937,10 @@ public class AccountObject extends Core_DataObject {
 	// Private Meta Data Table Management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region user private data managment
+
 	// Internal private data object
+	// memoizer for privateDataObject()
 	protected DataObject privateDataObject = null;
 	
 	/**
@@ -953,4 +969,5 @@ public class AccountObject extends Core_DataObject {
 		return privateDataObject;
 	}
 	
+	//#endregion user private data managment
 }

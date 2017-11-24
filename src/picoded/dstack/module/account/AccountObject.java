@@ -940,40 +940,34 @@ public class AccountObject extends Core_DataObject {
 	// Private Meta Data Table Management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	private DataTable _accountPrivateDataTable = null;
-	private DataObject _accountPrivateData = null;
+
+	// Internal private data object
+	protected DataObject privateDataObject = null;
 	
-	private DataTable accountPrivateDataTable() {
-		if (_accountPrivateDataTable != null) {
-			return _accountPrivateDataTable;
+	/**
+	 * Private data object, this object is not meant to be exposed 
+	 * via any public API for security reasons.
+	 * 
+	 * @return  DataObject representing the user private information
+	 **/
+	public DataObject privateDataObject() {
+		// Cached data object
+		if( privateDataObject != null ) {
+			return privateDataObject;
 		}
-		return (_accountPrivateDataTable = mainTable.accountPrivateDataTable);
-	}
-	
-	public void setPrivateMetaData(String key, Object value) {
-		// Create a new private data for the account if it does not exists
-		if (accountPrivateDataTable().get(this._oid()) == null) {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
+
+		// The private data table to use
+		DataTable pDataTable = mainTable.accountPrivateDataTable;
+
+		// Initialize / get existing private data object 
+		if( pDataTable.get(this._oid()) == null ) {
+			privateDataObject = pDataTable.get(this._oid(), true);
 		} else {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid());
+			privateDataObject = pDataTable.get(this._oid());
 		}
-		// Put in the details and save it
-		_accountPrivateData.put(key, value);
-		_accountPrivateData.saveAll();
+
+		// private data object
+		return privateDataObject;
 	}
-	
-	public String getPrivateMetaStringData(String key) {
-		if (_accountPrivateData != null) {
-			return _accountPrivateData.getString(key, "");
-		}
-		// Create a new private data for the account if it does not exists
-		if (accountPrivateDataTable().get(this._oid()) == null) {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
-		} else {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid());
-		}
-		
-		return _accountPrivateData.getString(key, "");
-	}
-	
+
 }

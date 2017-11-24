@@ -154,7 +154,7 @@ public class AccountObject extends Core_DataObject {
 	
 	// @TODO : Reduce this down to a single "syncLoginnameLsit"
 	//         It probably would be more efficent anyway
-
+	
 	/**
 	 * Add the login name list to the account info object
 	 *
@@ -944,7 +944,7 @@ public class AccountObject extends Core_DataObject {
 	// Private Meta Data Table Management
 	//
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	// Internal private data object
 	protected DataObject privateDataObject = null;
 	
@@ -956,22 +956,22 @@ public class AccountObject extends Core_DataObject {
 	 **/
 	public DataObject privateDataObject() {
 		// Cached data object
-		if( privateDataObject != null ) {
+		if (privateDataObject != null) {
 			return privateDataObject;
 		}
-
+		
 		// The private data table to use
 		DataTable pDataTable = mainTable.accountPrivateDataTable;
-
+		
 		// Initialize / get existing private data object 
-		if( pDataTable.get(this._oid()) == null ) {
+		if (pDataTable.get(this._oid()) == null) {
 			privateDataObject = pDataTable.get(this._oid(), true);
 		} else {
 			privateDataObject = pDataTable.get(this._oid());
 		}
-
+		
 		// private data object
 		return privateDataObject;
 	}
-
+	
 }

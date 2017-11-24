@@ -346,7 +346,7 @@
 	************************************************** -->
 
 	<!-- Build all the respective realese jar files -->
-	<target name="build" depends="build-lib,compile-src">
+	<target name="build" depends="src-beautify,build-lib,compile-src">
 		<!-- no libs -->
 		<delete dir="bin/build/picodedJavaCommons-noLibs.jar" failonerror="false"/>
 		<jar destfile="bin/build/picodedJavaCommons-noLibs.jar">

@@ -115,11 +115,11 @@ public class CommonsPage extends BasePage {
 	
 	/**
 	 * The background thread handler, isolated as a runnable.
-	 * 
+	 *
 	 * This allows a clean isolation of the background thread,
 	 * From the initializeContext thread. Especially for 'sleep' calls
 	 */
-	Runnable backgroundThreadHandler = () -> {
+	protected Runnable backgroundThreadHandler = () -> {
 		// The config to use
 		GenericConvertMap<String, Object> bgConfig = DConfig().getGenericConvertStringMap(
 			"sys.background", "{}");
@@ -140,14 +140,14 @@ public class CommonsPage extends BasePage {
 			try {
 				backgroundProcess();
 			} catch (Exception e) {
-				log().warning("WARNING - Uncaught 'backgroundProcess' exception : " + e.getMessage());
 				log()
 					.warning(
-						"          Note that the 'backgroundProcess' should be designed to never throw an exception,");
-				log()
-					.warning(
-						"          As it will simply be ignored and diverted into the logs (with this message)");
-				log().warning(picoded.core.exception.ExceptionUtils.getStackTrace(e));
+						"WARNING - Uncaught 'backgroundProcess' exception : "
+							+ e.getMessage()
+							+ "\n          Note that the 'backgroundProcess' should be designed to never throw an exception,"
+							+ "\n          As it will simply be ignored and diverted into the logs (with this message)"
+							+ "\n" + picoded.core.exception.ExceptionUtils.getStackTrace(e) //
+					);
 			}
 			
 			// Does the appropriate interval delay, takes interruptException as termination
@@ -188,17 +188,17 @@ public class CommonsPage extends BasePage {
 	};
 	
 	// The running background thread
-	Thread backgroundThread = null;
+	protected Thread backgroundThread = null;
 	
 	/**
 	 * Loads the configuration and start the background thread
 	 */
-	void backgroundThreadHandler_start() {
+	protected void backgroundThreadHandler_start() {
 		if (DConfig().getBoolean("sys.background.enable", true)) {
 			// Start up the background thread start process, only if its enabled
 			backgroundThread = new Thread(backgroundThreadHandler);
 			// And start it up
-			backgroundThread.run();
+			backgroundThread.start();
 		}
 	}
 	
@@ -207,7 +207,7 @@ public class CommonsPage extends BasePage {
 	 * Either gracefully, or forcefully.
 	 */
 	@SuppressWarnings("deprecation")
-	void backgroundThreadHandler_stop() {
+	protected void backgroundThreadHandler_stop() {
 		// Checks if there is relevent background thread first
 		if (backgroundThread != null) {
 			// Set the interupption flag
@@ -246,8 +246,8 @@ public class CommonsPage extends BasePage {
 	 **/
 	@Override
 	public void destroyContext() throws Exception {
-		super.destroyContext();
 		backgroundThreadHandler_stop();
+		super.destroyContext();
 	}
 	
 	////////////////////////////////////////////

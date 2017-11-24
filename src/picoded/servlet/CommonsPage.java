@@ -115,7 +115,7 @@ public class CommonsPage extends BasePage {
 	
 	/**
 	 * The background thread handler, isolated as a runnable.
-	 * 
+	 *
 	 * This allows a clean isolation of the background thread,
 	 * From the initializeContext thread. Especially for 'sleep' calls
 	 */
@@ -237,7 +237,7 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		backgroundThreadHandler_start();
+		// backgroundThreadHandler_start();
 	}
 	
 	/**
@@ -247,7 +247,7 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void destroyContext() throws Exception {
 		super.destroyContext();
-		backgroundThreadHandler_stop();
+		// backgroundThreadHandler_stop();
 	}
 	
 	////////////////////////////////////////////

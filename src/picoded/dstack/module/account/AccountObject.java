@@ -84,11 +84,13 @@ public class AccountObject extends Core_DataObject {
 		saveDelta();
 		
 		// Technically a race condition =X
+		// Especially if its a name collision, if its an email collision should be a very rare event.
 		//
-		// But name collision, if its an email collision should be a very rare event.
+		// @TODO : Consider using name locks? to prevent such situations?
 		mainTable.accountLoginNameMap.put(name, _oid);
-		// Populate the name list
-		populateLoginNameList(name);
+		
+		// Sync up the namelist in dataobject
+		syncLoginNameList();
 		
 		// Success of failure
 		return hasLoginName(name);
@@ -100,9 +102,12 @@ public class AccountObject extends Core_DataObject {
 	 * @param  LoginName to setup for this account
 	 **/
 	public void removeLoginName(String name) {
+		// If login name exists
 		if (hasLoginName(name)) {
+			// Remove name list from authtentication table
 			mainTable.accountLoginNameMap.remove(name);
-			removeLoginNameFromList(name);
+			// Sync up the namelist in dataobject
+			syncLoginNameList();
 		}
 	}
 	
@@ -138,8 +143,10 @@ public class AccountObject extends Core_DataObject {
 			}
 			// Remove the login ID
 			mainTable.accountLoginNameMap.remove(oldName);
-			removeLoginNameFromList(oldName);
 		}
+		
+		// Sync up the namelist in dataobject
+		syncLoginNameList();
 		
 		return true;
 	}
@@ -152,50 +159,22 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	
-	// @TODO : Reduce this down to a single "syncLoginnameLsit"
-	//         It probably would be more efficent anyway
-	
 	/**
-	 * Add the login name list to the account info object
-	 *
-	 * @param Name to be added
+	 * Syncs the current user name list, with its metaobject
+	 * This is mainly for data table listing "convinence"
 	 */
-	protected void populateLoginNameList(String name) {
-		if (name == null || name.length() <= 0) {
-			throw new RuntimeException("No Login Name to be set.");
-		}
+	protected void syncLoginNameList() {
+		// Get the raw name list
+		Set<String> rawList = getLoginNameSet();
 		
-		// Get the current list of login names
-		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
-		// Add if not exists
-		if (!loginNames.contains(name)) {
-			loginNames.add(name);
-		}
-		// Put it back to the object
-		this.put(LOGINNAMELIST, loginNames);
-		// Save the object
-		this.saveDelta();
-	}
-	
-	/**
-	 * Remove the login name in the list of the account info object
-	 *
-	 * @param Name to be removed
-	 */
-	protected void removeLoginNameFromList(String name) {
-		if (name == null || name.length() <= 0) {
-			throw new RuntimeException("No Login Name to be remove.");
-		}
+		// Sort it out as an array
+		ArrayList<String> nameList = new ArrayList<>(rawList);
+		Collections.sort(nameList);
 		
-		// Get the current list of login names
-		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
-		// Add if not exists
-		if (!loginNames.contains(name)) {
-			loginNames.remove(name);
-		}
-		// Put it back to the object
-		this.put(LOGINNAMELIST, loginNames);
-		// Save the object
+		// Update the meta data
+		this.put(LOGINNAMELIST, nameList);
+		
+		// Save the changes
 		this.saveDelta();
 	}
 	

@@ -33,6 +33,7 @@ public class AccountObject extends Core_DataObject {
 	 * and the account GUID
 	 **/
 	protected AccountObject(AccountTable accTable, String inOID) {
+		// Inherit all the default data table methods
 		super((Core_DataTable) (accTable.accountDataTable), inOID);
 		mainTable = accTable;
 	}
@@ -151,6 +152,9 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	
+	// @TODO : Reduce this down to a single "syncLoginnameLsit"
+	//         It probably would be more efficent anyway
+
 	/**
 	 * Add the login name list to the account info object
 	 *

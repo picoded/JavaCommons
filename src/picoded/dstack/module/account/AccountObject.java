@@ -273,7 +273,81 @@ public class AccountObject extends Core_DataObject {
 	//#endregion password management
 	///////////////////////////////////////////////////////////////////////////
 	//
+	// Login throttling
+	//
+	///////////////////////////////////////////////////////////////////////////
+	//#region login throttling (for passwrod api)
+
+	/**
+	 * Returns the unix timestamp (in seconds) in which the account will unlock
+	 * 
+	 * @return if > 0, linux timestamp (seconds) when login is permitted. 0 means the account is not locked
+	 **/
+	public long getUnlockTimestamp() {
+		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
+	}
+	
+	/**
+	 * Returns the number of failed login attempts performed
+	 * 
+	 * @return Number of login attempts performed since last succesful login
+	 **/
+	public long getFailedLoginAttempts() {
+		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
+	}
+	
+	/**
+	 * Reset the entries for the user (should only be called after successful login)
+	 **/
+	public void resetLoginThrottle() {
+		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getFailedLoginAttempts(), 0l);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getUnlockTimestamp(), 0l);
+	}
+	
+	/**
+	 * Returns time left in seconds before next permitted login attempt for the user based on User ID
+	 * 
+	 * @return if > 0, linux timestamp (seconds) when login is permitted. 
+	 **/
+	public int getLockTimeLeft() {
+		long val = getUnlockTimestamp();
+		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
+		return allowedTime > 0 ? allowedTime : 0;
+	}
+	
+	/**
+	 * Increment the number of failed login attempts, and the lock timeout respectively
+	 **/
+	public void incrementFailedLoginAttempts() {
+		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
+		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getUnlockTimestamp(),
+			(long) elapsedValue);
+	}
+	
+	//#endregion login throttling (for passwrod api)
+	///////////////////////////////////////////////////////////////////////////
+	//
 	// Session management
+	//
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Session vs Token notes
+	// ----------------------
+	//
+	// Session : represents a sucessful login attempt,
+	// which does not change and can only be extended. 
+	// 
+	// Token : is issued through a session, and gets replaced with newer 
+	// tokens over time, extending the session in the process.
+	//
+	// Tokens's are issued in a chain, where the next token is issued in 
+	// advance and linked to the previous token (and session). 
+	//
+	// This ensure that in event of a race condition  of multiple HTTP calls,
+	// and a token upgrade occurs. All HTTP calls would be upgraded to the
+	// same succeding token.
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region login session management
@@ -318,11 +392,14 @@ public class AccountObject extends Core_DataObject {
 	/**
 	 * Generate a new session with the provided meta information
 	 *
-	 * Additionally if no tokens are generated and issued in the next
+	 * If no tokens are generated and issued in the next
 	 * 30 seconds, the session will expire.
 	 *
 	 * Subseqently session expirary will be tag to
 	 * the most recently generated token.
+	 * 
+	 * The intended use case in the API, is for a token to be 
+	 * immediately issued after session via the API.
 	 *
 	 * Additionally info object is INTENTIONALLY NOT stored as a
 	 * DataObject, for performance reasons.
@@ -876,60 +953,6 @@ public class AccountObject extends Core_DataObject {
 		
 		String superUserGroupRole = superUserGrp.getMemberRole(this);
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
-	}
-	
-	// /**
-	//  * This method logs the details about login faailure for the user based on User ID
-	//  **/
-	// private void initializeLoginFailureAttempt() {
-	// 	mainTable.loginThrottlingAttemptMap.put(this._oid(), 1);
-	// 	int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-	// 	mainTable.loginThrottlingExpiryMap.put(this._oid(), elapsedTime);
-	// }
-	
-	/**
-	 * This method returns time left before next permitted login attempt for the user based on User ID
-	 **/
-	public int getNextLoginTimeAllowed() {
-		long val = getExpiryTime();
-		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
-		return allowedTime > 0 ? allowedTime : 0;
-	}
-	
-	// /**
-	//  * This method would be added in on next login failure for the user based on User ID
-	//  **/
-	// public long getTimeElapsedNextLogin() {
-	// 	long elapsedValue = getExpiryTime();
-	// 	return elapsedValue;
-	// }
-	
-	/**
-	 * This method would be increment the attempt counter and update the delay for the user
-	 * to log in next
-	 **/
-	public void incrementNextAllowedLoginTime() {
-		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
-		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
-		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
-		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(),
-			(long) elapsedValue);
-	}
-	
-	private long getAttempts() {
-		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
-	}
-	
-	private long getExpiryTime() {
-		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
-	}
-	
-	/**
-	 * This method reset the entries for the user (should call after successful login)
-	 **/
-	public void resetLoginThrottle() {
-		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getAttempts(), 0l);
-		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(), 0l);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

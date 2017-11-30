@@ -237,7 +237,7 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void initializeContext() throws Exception {
 		super.initializeContext();
-		// backgroundThreadHandler_start();
+		backgroundThreadHandler_start();
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class CommonsPage extends BasePage {
 	 **/
 	@Override
 	public void destroyContext() throws Exception {
-		// backgroundThreadHandler_stop();
+		backgroundThreadHandler_stop();
 		super.destroyContext();
 	}
 

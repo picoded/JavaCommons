@@ -147,7 +147,7 @@ public class RancherObject {
 	 */
 	public Map<String, Object> retrieveCatalog() {
 		URLConnection uc = initializeConnection(baseURL + "/v" + catalog_version
-			+ "-catalog/templates/" + catalogTemplate + ":" + templateVersion);
+			+ "-catalog/templates/" + catalogTemplate + ":" + externalID);
 		uc.setRequestProperty("Authorization", basicAuth);
 		String catalog = "";
 		Map<String, Object> catalogMap = new HashMap<>();
@@ -212,7 +212,7 @@ public class RancherObject {
 	public GenericConvertMap<String, Object> stopStack(String stackID) {
 		String url = baseURL + "/v" + beta_version + "-beta/projects/" + projectID + "/stacks/"
 			+ stackID + "?action=deactivateservices";
-		return setAndSendRequest(url, "POST", null);
+		return setAndSendRequest(url, "POST", new byte[0]);
 	}
 	
 	public GenericConvertMap<String, Object> getStack(String stackID) {
@@ -287,6 +287,7 @@ public class RancherObject {
 			// Convert response into Map
 			result = ConvertJSON.toMap(response.toString());
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Connection error while passing data to rancher.");
 			// Additional errors captured and placed to result
 			result.put("status", responseCode);

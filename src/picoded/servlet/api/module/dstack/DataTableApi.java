@@ -77,26 +77,12 @@ public class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public ApiFunction newEntry = (req, res) -> {
-		// Get the oid, and sanatise output settings
-		Map<String, Object> newData = req.getStringMap(DATA, "{}");
-		
-		// Try get the object respectively
-		DataObject obj = dataTable.newEntry();
-		
-		// Update data only if object was found, and updated
-		obj.putAll(newData);
-		obj.saveAll();
-		
-		// Output the OID
-		res.put(RESULT, obj._oid());
-		
-		// End and return result
-		return res;
+		return DataTableStaticApi.newEntry(res, dataTable, req.getStringMap("data", "{}"));
 	};
 	
 	/////////////////////////////////////////////
 	//
-	// Basic get and set
+	// Basic get, set and delete
 	//
 	/////////////////////////////////////////////
 	
@@ -108,7 +94,7 @@ public class DataTableApi extends CommonApiModule {
 	 * ## HTTP Request Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type	    | Description                                                                   |
+	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | object ID used to retrieve the data object. If no oid is given, return null.  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -116,7 +102,7 @@ public class DataTableApi extends CommonApiModule {
 	 * ## JSON Object Output Parameters
 	 *
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | Parameter Name  | Variable Type	    | Description                                                                   |
+	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | _oid            | String             | The internal object ID used                                                   |
 	 * | result          | {Object}           | Data object, if found                                                         |
@@ -125,19 +111,7 @@ public class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public ApiFunction get = (req, res) -> {
-		// Get the oid, and sanatise output settings
-		String oid = req.getString(OID, null);
-		
-		// Put back config in response
-		res.put(OID, oid);
-		res.put(RESULT, null);
-		
-		// Try get the object respectively
-		DataObject obj = dataTable.get(oid);
-		res.put(RESULT, obj);
-		
-		// End and return result
-		return res;
+		return DataTableStaticApi.get(res, dataTable, req.getString("_oid", null));
 	};
 	
 	/**
@@ -168,47 +142,8 @@ public class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public ApiFunction set = (req, res) -> {
-		// Get the oid, and sanatise output settings
-		String oid = req.getString(OID, null);
-		String updateMode = req.getString(UPDATE_MODE, "delta");
-		Map<String, Object> updateData = req.getStringMap(DATA, "{}");
-		
-		// Put back config in response
-		res.put(OID, oid);
-		res.put(RESULT, null);
-		res.put(UPDATE_MODE, updateMode);
-		
-		// Try get the object respectively
-		DataObject obj = dataTable.get(oid);
-		
-		// Update data only if object was found, and updated
-		if (obj != null) {
-			if (updateMode.equalsIgnoreCase("full")) {
-				// Does a full replacement update
-				obj.clear();
-				obj.putAll(updateData);
-				obj.saveAll();
-				
-				// Return back the full updated data (for easier debugging)
-				res.put(RESULT, obj);
-			} else {
-				// Default mode is delta
-				updateMode = "delta";
-				obj.putAll(updateData);
-				obj.saveDelta();
-				
-				// Return back the delta updated data (for easier debugging)
-				res.put(RESULT, obj);
-			}
-		} else {
-			res.put(ERROR, "Invalid '_oid' given");
-		}
-		
-		// Output the update mode (for easier debugging)
-		res.put(UPDATE_MODE, updateMode);
-		
-		// End and return result
-		return res;
+		return DataTableStaticApi.set(res, dataTable, req.getString("_oid", null),
+			req.getStringMap("data", "{}"), req.getString("updateMode", "delta"));
 	};
 	
 	/**
@@ -236,34 +171,12 @@ public class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public ApiFunction delete = (req, res) -> {
-		// Get the oid, and sanatise output settings
-		String oid = req.getString(OID, null);
-		
-		// Put back config in response
-		res.put(OID, oid);
-		res.put(RESULT, false);
-		
-		// If oid is null / empty, terminate
-		if (oid == null || oid.isEmpty()) {
-			return res;
-		}
-		
-		// If oid does not exsits, termiante
-		if (!dataTable.containsKey(oid)) {
-			return res;
-		}
-		
-		// Remove, and return true
-		dataTable.remove(oid);
-		res.put(RESULT, true);
-		
-		// End and return result
-		return res;
+		return DataTableStaticApi.delete(res, dataTable, req.getString("_oid", null));
 	};
 	
 	/////////////////////////////////////////////
 	//
-	// KeyName look up (for adminstration)
+	// KeyName look up (mainly for adminstration)
 	//
 	/////////////////////////////////////////////
 	
@@ -292,7 +205,6 @@ public class DataTableApi extends CommonApiModule {
 		// Get and return keynames
 		Set<String> resSet = dataTable.getKeyNames();
 		res.put(RESULT, new ArrayList<String>(resSet));
-		
 		// End and return result
 		return res;
 	};

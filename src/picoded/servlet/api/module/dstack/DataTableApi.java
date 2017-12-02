@@ -270,6 +270,7 @@ public class DataTableApi extends CommonApiModule {
 			res.put(ERROR, "fieldList, requested cannot be an empty array");
 			res.halt();
 		}
+		
 		// The query to use
 		String query = req.getString(QUERY, "").trim();
 		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
@@ -290,16 +291,6 @@ public class DataTableApi extends CommonApiModule {
 		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
 		String searchMode = req.getString(SEARCH_MODE, "prefix");
 		
-		// Fix a specific issue in DataTable, where searchString is
-		// sent with beginning and ending quotes, remove it accordingly
-		if (searchString.length() >= 2) {
-			if ( //
-			(searchString.startsWith("\"") && searchString.endsWith("\"")) || //
-				(searchString.startsWith("'") && searchString.endsWith("'"))) { //
-				searchString = searchString.substring(1, searchString.length() - 1);
-			}
-		}
-		
 		// Start, Length, and ordering limiting of data
 		int start = req.getInt(START, 0);
 		int length = req.getInt(LENGTH, 50);
@@ -307,185 +298,17 @@ public class DataTableApi extends CommonApiModule {
 		
 		// The result data row mode
 		String rowMode = req.getString(ROW_MODE, "object");
+		
 		// Processing the query and search together
 		//
 		// Since the above does extensive null check fallbacks,
 		// everything past this point can safely be assumed to be not null
 		//-------------------------------------------------------------------------------
 		
-		// The actual joint query to use in list API, handled internally
-		String jointQuery = query;
-		Object[] jointQueryArgs = queryArgs;
-		
-		// Checks if search string is valid, and process it
-		MutablePair<String, Object[]> searchQuery = generateSearchStringFromSearchPhrase(
-			searchString, searchFieldList, searchMode);
-		if (searchQuery != null) {
-			if (query.isEmpty() || queryArgs.length == 0) {
-				// If query is empty, assumes that search replaces it
-				jointQuery = searchQuery.getLeft();
-				jointQueryArgs = searchQuery.getRight();
-			} else {
-				// query isnt empty, does a "merge" with it
-				jointQuery = "(" + query + ") AND (" + searchQuery.getLeft() + ")";
-				jointQueryArgs = ArrayConv.addAll(queryArgs, searchQuery.getRight());
-			}
-		} // else fallsback to just query
-		
-		// Executing the query, and getting its result
-		//-------------------------------------------------------------------------------
-		
-		// The resulting data object, and total count
-		DataObject[] dataObjs = null;
-		long dataCount = 0;
-		
-		// Converts the jointQuery to null, if blank
-		if (jointQuery.isEmpty() || jointQueryArgs.length == 0) {
-			jointQuery = null;
-			jointQueryArgs = null;
-		}
-		
-		// Fetching the objects and count
-		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
-		dataCount = dataTable.queryCount(jointQuery, jointQueryArgs);
-		
-		// Process the result for output
-		res.put(FIELD_LIST, fieldList);
-		res.put(TOTAL_COUNT, dataCount);
-		res.put(RESULT, formatDataObjectList(dataObjs, fieldList, rowMode));
-		
 		// End and return result
-		return res;
+		return DataTableStaticApi.list(res, dataTable, fieldList, query, queryArgs, searchString,
+			searchFieldList, searchMode, start, length, orderBy, rowMode);
 	};
-	
-	/////////////////////////////////////////////
-	//
-	// List functions utils
-	// (maybe migrated to another class)
-	//
-	/////////////////////////////////////////////
-	
-	/**
-	 * Generate query string from a single word, to apply across multiple collumns.
-	 * Returns null if searchString failed to be processed
-	 *
-	 * @param  searchString String used in searching
-	 * @param  queryCols    String[] query collumns to use, and search against
-	 * @param  queryMode String representing the wildcard mode (PREFIX / SUFFIX / BOTH)
-	 *
-	 * @return MutablePair<String,List> for the query and arguments respectively
-	 */
-	protected static MutablePair<String, Object[]> generateSearchStringFromSearchPhrase(
-		String searchString, String[] queryCols, String queryMode) {
-		// No query is needed, terminate and return null
-		if (searchString.isEmpty() || queryCols.length <= 0) {
-			return null;
-		}
-		
-		// The return args
-		StringBuilder query = new StringBuilder();
-		List<Object> queryArgs = new ArrayList<Object>();
-		
-		// Split the search string where whitespaces occur
-		String[] searchStringSplit = searchString.trim().split("\\s+");
-		
-		// Iterate the search string
-		for (int i = 0; i < searchStringSplit.length; ++i) {
-			String searchWord = searchStringSplit[i];
-			
-			// Prepare the query block for one search word
-			query.append("(");
-			
-			// Iterate the collumns to query
-			for (int colIdx = 0; colIdx < queryCols.length; ++colIdx) {
-				
-				// Within a single word, append OR statements for each collumn
-				query.append(queryCols[colIdx] + " LIKE ?");
-				
-				// Query arg for the search
-				queryArgs.add(generateSearchWordWithWildcard(searchWord, queryMode));
-				
-				// Append or statemetns between collumns
-				if (colIdx < queryCols.length - 1) {
-					query.append(" OR ");
-				}
-			}
-			
-			// Close the query block for the search word
-			query.append(")");
-			
-			// Append the AND statement between word blocks
-			if (i < searchStringSplit.length - 1) {
-				query.append(" AND ");
-			}
-			
-			// Second string onwards is an "any" prefix and suffix wildcard
-			queryMode = "any";
-		}
-		
-		// Invalid blank query (wrongly formatted input?)
-		if (query.length() <= 2) {
-			return null;
-		}
-		
-		// Return the built query
-		return new MutablePair<String, Object[]>(query.toString(), queryArgs.toArray(new Object[0]));
-	}
-	
-	/**
-	 * Generate a string, with the SQL wildcard attached, in accordence to the given search word, and/or wildcard mode
-	 *
-	 * @param  searchWord  to modify
-	 * @param  queryMode  to use, either prefix/suffix/exact/any(fallback)
-	 *
-	 * @return  Modified string to pass as argument in larger query
-	 */
-	protected static String generateSearchWordWithWildcard(String searchWord, String queryMode) {
-		// if (queryMode.equalsIgnoreCase("exact")) {
-		// 	return searchWord;
-		// }
-		if (queryMode.equalsIgnoreCase("prefix")) {
-			return searchWord + "%";
-		} else if (queryMode.equalsIgnoreCase("suffix")) {
-			return "%" + searchWord;
-		} else {
-			return "%" + searchWord + "%";
-		}
-	}
-	
-	/**
-	 * Format the data object list result
-	 */
-	protected static List<Object> formatDataObjectList(DataObject[] dataObjs, String[] fieldList,
-		String rowMode) {
-		// Check if row mode is an array, else assume its an object
-		boolean isArrayMode = rowMode.equalsIgnoreCase("array");
-		// The return data
-		List<Object> ret = new ArrayList<Object>();
-		
-		// Iterate data objects
-		for (DataObject obj : dataObjs) {
-			// Prepare the result in accordance to the data mode
-			if (isArrayMode) {
-				// Assume array mode output
-				List<Object> row = new ArrayList<Object>();
-				for (int i = 0; i < fieldList.length; ++i) {
-					row.add(obj.get(fieldList[i]));
-				}
-				ret.add(row);
-			} else {
-				// Assume object mode output
-				Map<String, Object> row = new HashMap<String, Object>();
-				for (int i = 0; i < fieldList.length; ++i) {
-					row.put(fieldList[i], obj.get(fieldList[i]));
-				}
-				ret.add(row);
-			}
-		}
-		
-		// Return the result
-		return ret;
-	}
 	
 	/////////////////////////////////////////////
 	//
@@ -581,6 +404,7 @@ public class DataTableApi extends CommonApiModule {
 		// Change some formatting of result
 		res.put("data", res.get("result", null));
 		res.put("recordsFiltered", res.get("totalCount", null));
+		res.put("recordsTotal", res.get("totalCount", null));
 		
 		// Clear original formatting
 		res.put("result", null);

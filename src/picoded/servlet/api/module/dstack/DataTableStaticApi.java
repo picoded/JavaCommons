@@ -437,12 +437,13 @@ public class DataTableStaticApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public static <T extends GenericConvertMap<String, Object>> T list(T res, DataTable dTable,
-		String[] fieldList, String query, Object[] queryArgs,
-		String searchString, String[] searchFieldList, String searchMode,
-		int start, int length, String orderBy, String rowMode) {
+		String[] fieldList, String query, Object[] queryArgs, String searchString,
+		String[] searchFieldList, String searchMode, int start, int length, String orderBy,
+		String rowMode) {
 		MutablePair<String, Object[]> queryPair = collapseSearchStringAndQuery(query, queryArgs,
 			searchString, searchFieldList, searchMode, "AND");
-		return list(res, dTable, fieldList, queryPair.getLeft(), queryPair.getRight(), start, length, orderBy, rowMode);
+		return list(res, dTable, fieldList, queryPair.getLeft(), queryPair.getRight(), start, length,
+			orderBy, rowMode);
 	}
 	
 	/**
@@ -479,9 +480,9 @@ public class DataTableStaticApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public static <T extends GenericConvertMap<String, Object>> T list(T res, DataTable dTable,
-		String[] fieldList, String query, Object[] queryArgs,
-		int start, int length, String orderBy, String rowMode) {
-
+		String[] fieldList, String query, Object[] queryArgs, int start, int length, String orderBy,
+		String rowMode) {
+		
 		// Converts the query to null, if 'blank'
 		if (query.isEmpty() || queryArgs.length == 0) {
 			query = null;
@@ -500,136 +501,5 @@ public class DataTableStaticApi {
 		// End and return result
 		return res;
 	}
-	
-	// /////////////////////////////////////////////
-	// //
-	// // List varients (for UI integration)
-	// //
-	// /////////////////////////////////////////////
-	
-	// /**
-	//  * # $prefix/list/datatables
-	//  *
-	//  * Varient of the list function : Used specifically for datatable integration.
-	//  *
-	//  * This supports the list field parameters, unless overwritten by a DataTable field (as listed below), such as rowMode='array';
-	//  *
-	//  * ## DataTables specific parameters
-	//  *
-	//  * +---------------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name      | Variable Type      | Description                                                                   |
-	//  * +---------------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | rowMode             | String (optional)  | Fixed as 'array', any values sent here is ignored                             |
-	//  * +---------------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | draw                | int (optional)     | Draw counter echoed back (used by the datatables.js server-side API)          |
-	//  * +---------------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | search[value]       | String (optional)  | Overwrites searchValue if given                                               |
-	//  * +---------------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | order[0][column]    | int (optional)     | Column ID to perform table ordering, ignored if 'orderBy' parameter is set    |
-	//  * | order[X][orderable] | boolean (optional) | Column ID (X) status, if not false. Ordering by specified column occurs       |
-	//  * +---------------------+--------------------+-------------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type      | Description                                                                   |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | draw            | int (optional)     | Draw counter echoed back (used by the datatables.js server-side API)          |
-	//  * | recordsTotal    | int (not critical) | Total amount of records. Before any search filter (But after base filters)    |
-	//  * | recordsFiltered | int (not critical) | Total amount of records, matching the query, and search (replaces totalCount) |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | data            | Array[Array]       | Data result of row records, each row is an array, Replaces result             |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | error           | String (Optional)  | Errors encounted if any                                                       |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  */
-	// public ApiFunction datatables = (req, res) -> {
-	// 	// Proxy the draw request
-	// 	res.put("draw", req.getInt("draw", 0));
-	
-	// 	// Set row mode
-	// 	req.put(ROW_MODE, "array");
-	
-	// 	// Get search[value]
-	// 	String searchValue = req.getString("search[value]");
-	// 	if (searchValue != null && !searchValue.isEmpty()) {
-	// 		req.put(SEARCH_STRING, searchValue);
-	// 	}
-	
-	// 	// DataTables : Order by string integration
-	// 	//----------------------------------------------------------------------------
-	
-	// 	// Get fieldList arguments
-	// 	String[] fieldList = req.getStringArray(FIELD_LIST, "['_oid']");
-	
-	// 	// If orderBy string is not configured, use dataTable settings
-	// 	String orderByStr = req.getString("orderBy");
-	// 	if (orderByStr == null || orderByStr.isEmpty()) {
-	// 		// try and get datatables order data
-	// 		int orderByColumn = req.getInt("order[0][column]", -1);
-	// 		if (orderByColumn <= -1) {
-	// 			orderByStr = null;
-	// 		} else {
-	// 			boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]",
-	// 				false);
-	// 			if (!isColumnOrderable || fieldList.length < orderByColumn) {
-	// 				orderByStr = null;
-	// 			} else {
-	// 				orderByStr = fieldList[orderByColumn];
-	// 			}
-	// 		}
-	
-	// 		// orderBy DESC or ASC
-	// 		String orderByStyle = req.getString("order[0][dir]", "asc");
-	// 		orderByStr += " " + orderByStyle;
-	
-	// 		// Set the orderBy string value respectively
-	// 		req.put("orderBy", orderByStr);
-	// 	}
-	
-	// 	// Does the default list processing
-	// 	res = list.apply(req, res);
-	
-	// 	// Change some formatting of result
-	// 	res.put("data", res.get("result", null));
-	// 	res.put("recordsFiltered", res.get("totalCount", null));
-	
-	// 	// Clear original formatting
-	// 	res.put("result", null);
-	// 	res.put("totalCount", null);
-	
-	// 	// Return it
-	// 	return res;
-	// };
-	
-	// /////////////////////////////////////////////
-	// //
-	// // Actual API setup
-	// //
-	// /////////////////////////////////////////////
-	
-	// /**
-	//  * Does the setup of the StringEscape filter, and AccessFilter config.
-	//  *
-	//  * This functionality can be refined via the config object
-	//  */
-	// protected void apiSetup(ApiBuilder api, String prefixPath,
-	// 	GenericConvertMap<String, Object> config) {
-	// 	super.apiSetup(api, prefixPath, config);
-	
-	// 	api.endpoint(prefixPath + "/new", newEntry);
-	// 	api.endpoint(prefixPath + "/newEntry", newEntry);
-	
-	// 	api.endpoint(prefixPath + "/get", get);
-	// 	api.endpoint(prefixPath + "/set", set);
-	// 	api.endpoint(prefixPath + "/delete", delete);
-	
-	// 	api.endpoint(prefixPath + "/list", list);
-	// 	api.endpoint(prefixPath + "/list/datatables", datatables);
-	
-	// 	api.endpoint(prefixPath + "/keyNames", keyNames);
-	// }
 	
 }

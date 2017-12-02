@@ -481,7 +481,23 @@ public class DataTableStaticApi {
 	public static <T extends GenericConvertMap<String, Object>> T list(T res, DataTable dTable,
 		String[] fieldList, String query, Object[] queryArgs,
 		int start, int length, String orderBy, String rowMode) {
+
+		// Converts the query to null, if 'blank'
+		if (query.isEmpty() || queryArgs.length == 0) {
+			query = null;
+			queryArgs = null;
+		}
 		
+		// Fetching the objects and count
+		DataObject[] dataObjs = dTable.query(query, queryArgs, orderBy, start, length);
+		long dataCount = dTable.queryCount(query, queryArgs);
+		
+		// Process the result for output
+		res.put("fieldList", fieldList);
+		res.put("totalCount", dataCount);
+		res.put("result", formatDataObjectList(dataObjs, fieldList, rowMode));
+		
+		// End and return result
 		return res;
 	}
 	

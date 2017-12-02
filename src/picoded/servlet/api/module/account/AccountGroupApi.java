@@ -75,10 +75,7 @@ public class AccountGroupApi extends CommonApiModule {
 	 * @param  queryArgs  query arguments to use
 	 * @param  orderBy    orderby query string
 	 */
-
-
-
-
+	
 	/*
 	private static String list_GET_and_POST_inner(
 		int draw, int start,
@@ -202,7 +199,7 @@ public class AccountGroupApi extends CommonApiModule {
 	}
 	
 	return ConvertJSON.fromObject(ret);
-}
-*/
-
+	}
+	 */
+	
 }

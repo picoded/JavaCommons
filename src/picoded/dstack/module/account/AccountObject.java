@@ -20,7 +20,8 @@ public class AccountObject extends Core_DataObject {
 	// Constructor and setup
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region constructor and setup
+
 	/**
 	 * The original account table
 	 **/
@@ -33,16 +34,19 @@ public class AccountObject extends Core_DataObject {
 	 * and the account GUID
 	 **/
 	protected AccountObject(AccountTable accTable, String inOID) {
+		// Inherit all the default data table methods
 		super((Core_DataTable) (accTable.accountDataTable), inOID);
 		mainTable = accTable;
 	}
 	
+	//#endregion constructor and setup
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Getting and setting login ID's
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region login id handling
+
 	/**
 	 * Checks if the current account has the provided LoginName
 	 *
@@ -83,11 +87,13 @@ public class AccountObject extends Core_DataObject {
 		saveDelta();
 		
 		// Technically a race condition =X
+		// Especially if its a name collision, if its an email collision should be a very rare event.
 		//
-		// But name collision, if its an email collision should be a very rare event.
+		// @TODO : Consider using name locks? to prevent such situations?
 		mainTable.accountLoginNameMap.put(name, _oid);
-		// Populate the name list
-		populateLoginNameList(name);
+		
+		// Sync up the namelist in dataobject
+		syncLoginNameList();
 		
 		// Success of failure
 		return hasLoginName(name);
@@ -99,9 +105,12 @@ public class AccountObject extends Core_DataObject {
 	 * @param  LoginName to setup for this account
 	 **/
 	public void removeLoginName(String name) {
+		// If login name exists
 		if (hasLoginName(name)) {
+			// Remove name list from authtentication table
 			mainTable.accountLoginNameMap.remove(name);
-			removeLoginNameFromList(name);
+			// Sync up the namelist in dataobject
+			syncLoginNameList();
 		}
 	}
 	
@@ -137,70 +146,53 @@ public class AccountObject extends Core_DataObject {
 			}
 			// Remove the login ID
 			mainTable.accountLoginNameMap.remove(oldName);
-			removeLoginNameFromList(oldName);
 		}
+		
+		// Sync up the namelist in dataobject
+		syncLoginNameList();
 		
 		return true;
 	}
-	
+
+	//#endregion login id handling
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Syncronysing login names from authentication table, to account info
+	// Syncronysing data from authentication related tables to 
+	// queryable data table objects.
 	//
-	// NOTE: This is not actually used for authentication, but for convienience
+	// NOTE: This is not actually used for authentication, 
+	//       but for convienience in places such as admin tables
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region auth tables data sync
+
 	/**
-	 * Add the login name list to the account info object
-	 *
-	 * @param Name to be added
+	 * Syncs the current user name list, with its metaobject
+	 * This is mainly for data table listing "convinence"
 	 */
-	protected void populateLoginNameList(String name) {
-		if (name == null || name.length() <= 0) {
-			throw new RuntimeException("No Login Name to be set.");
-		}
+	protected void syncLoginNameList() {
+		// Get the raw name list
+		Set<String> rawList = getLoginNameSet();
 		
-		// Get the current list of login names
-		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
-		// Add if not exists
-		if (!loginNames.contains(name)) {
-			loginNames.add(name);
-		}
-		// Put it back to the object
-		this.put(LOGINNAMELIST, loginNames);
-		// Save the object
+		// Sort it out as an array
+		ArrayList<String> nameList = new ArrayList<>(rawList);
+		Collections.sort(nameList);
+		
+		// Update the meta data
+		this.put(LOGINNAMELIST, nameList);
+		
+		// Save the changes
 		this.saveDelta();
 	}
-	
-	/**
-	 * Remove the login name in the list of the account info object
-	 *
-	 * @param Name to be removed
-	 */
-	protected void removeLoginNameFromList(String name) {
-		if (name == null || name.length() <= 0) {
-			throw new RuntimeException("No Login Name to be remove.");
-		}
-		
-		// Get the current list of login names
-		List<String> loginNames = this.getList(LOGINNAMELIST, new ArrayList<String>());
-		// Add if not exists
-		if (!loginNames.contains(name)) {
-			loginNames.remove(name);
-		}
-		// Put it back to the object
-		this.put(LOGINNAMELIST, loginNames);
-		// Save the object
-		this.saveDelta();
-	}
-	
+
+	//#endregion auth tables data sync
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Password management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region password management
+
 	/**
 	 * Gets and returns the stored password hash,
 	 * Intentionally made protected to avoid accidental use externally
@@ -278,12 +270,88 @@ public class AccountObject extends Core_DataObject {
 		return false;
 	}
 	
+	//#endregion password management
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Login throttling
+	//
+	///////////////////////////////////////////////////////////////////////////
+	//#region login throttling (for passwrod api)
+
+	/**
+	 * Returns the unix timestamp (in seconds) in which the account will unlock
+	 * 
+	 * @return if > 0, linux timestamp (seconds) when login is permitted. 0 means the account is not locked
+	 **/
+	public long getUnlockTimestamp() {
+		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
+	}
+	
+	/**
+	 * Returns the number of failed login attempts performed
+	 * 
+	 * @return Number of login attempts performed since last succesful login
+	 **/
+	public long getFailedLoginAttempts() {
+		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
+	}
+	
+	/**
+	 * Reset the entries for the user (should only be called after successful login)
+	 **/
+	public void resetLoginThrottle() {
+		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getFailedLoginAttempts(), 0l);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getUnlockTimestamp(), 0l);
+	}
+	
+	/**
+	 * Returns time left in seconds before next permitted login attempt for the user based on User ID
+	 * 
+	 * @return if > 0, linux timestamp (seconds) when login is permitted. 
+	 **/
+	public int getLockTimeLeft() {
+		long val = getUnlockTimestamp();
+		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
+		return allowedTime > 0 ? allowedTime : 0;
+	}
+	
+	/**
+	 * Increment the number of failed login attempts, and the lock timeout respectively
+	 **/
+	public void incrementFailedLoginAttempts() {
+		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
+		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getUnlockTimestamp(),
+			(long) elapsedValue);
+	}
+	
+	//#endregion login throttling (for passwrod api)
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Session management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//
+	// Session vs Token notes
+	// ----------------------
+	//
+	// Session : represents a sucessful login attempt,
+	// which does not change and can only be extended. 
+	// 
+	// Token : is issued through a session, and gets replaced with newer 
+	// tokens over time, extending the session in the process.
+	//
+	// Tokens's are issued in a chain, where the next token is issued in 
+	// advance and linked to the previous token (and session). 
+	//
+	// This ensure that in event of a race condition  of multiple HTTP calls,
+	// and a token upgrade occurs. All HTTP calls would be upgraded to the
+	// same succeding token.
+	//
+	///////////////////////////////////////////////////////////////////////////
+	//#region login session management
+
 	/**
 	 * Checks if the current session is associated with the account
 	 *
@@ -324,11 +392,14 @@ public class AccountObject extends Core_DataObject {
 	/**
 	 * Generate a new session with the provided meta information
 	 *
-	 * Additionally if no tokens are generated and issued in the next
+	 * If no tokens are generated and issued in the next
 	 * 30 seconds, the session will expire.
 	 *
 	 * Subseqently session expirary will be tag to
 	 * the most recently generated token.
+	 * 
+	 * The intended use case in the API, is for a token to be 
+	 * immediately issued after session via the API.
 	 *
 	 * Additionally info object is INTENTIONALLY NOT stored as a
 	 * DataObject, for performance reasons.
@@ -396,13 +467,15 @@ public class AccountObject extends Core_DataObject {
 			revokeSession(oneSession);
 		}
 	}
-	
+
+	//#endregion login session management
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Session token management
+	// Session.token management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	
+	//#region login session.token management
+
 	/**
 	 * Checks if the current session token is associated with the account
 	 *
@@ -624,6 +697,7 @@ public class AccountObject extends Core_DataObject {
 		return nextToken;
 	}
 	
+	//#endregion login session.token management
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Group Configuration and Management
@@ -881,99 +955,42 @@ public class AccountObject extends Core_DataObject {
 		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
 	}
 	
-	// /**
-	//  * This method logs the details about login faailure for the user based on User ID
-	//  **/
-	// private void initializeLoginFailureAttempt() {
-	// 	mainTable.loginThrottlingAttemptMap.put(this._oid(), 1);
-	// 	int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
-	// 	mainTable.loginThrottlingExpiryMap.put(this._oid(), elapsedTime);
-	// }
-	
-	/**
-	 * This method returns time left before next permitted login attempt for the user based on User ID
-	 **/
-	public int getNextLoginTimeAllowed() {
-		long val = getExpiryTime();
-		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
-		return allowedTime > 0 ? allowedTime : 0;
-	}
-	
-	// /**
-	//  * This method would be added in on next login failure for the user based on User ID
-	//  **/
-	// public long getTimeElapsedNextLogin() {
-	// 	long elapsedValue = getExpiryTime();
-	// 	return elapsedValue;
-	// }
-	
-	/**
-	 * This method would be increment the attempt counter and update the delay for the user
-	 * to log in next
-	 **/
-	public void incrementNextAllowedLoginTime() {
-		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
-		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
-		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
-		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(),
-			(long) elapsedValue);
-	}
-	
-	private long getAttempts() {
-		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
-	}
-	
-	private long getExpiryTime() {
-		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
-	}
-	
-	/**
-	 * This method reset the entries for the user (should call after successful login)
-	 **/
-	public void resetLoginThrottle() {
-		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getAttempts(), 0l);
-		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(), 0l);
-	}
-	
 	///////////////////////////////////////////////////////////////////////////
 	//
 	// Private Meta Data Table Management
 	//
 	///////////////////////////////////////////////////////////////////////////
-	private DataTable _accountPrivateDataTable = null;
-	private DataObject _accountPrivateData = null;
+	//#region user private data managment
+
+	// Internal private data object
+	// memoizer for privateDataObject()
+	protected DataObject privateDataObject = null;
 	
-	private DataTable accountPrivateDataTable() {
-		if (_accountPrivateDataTable != null) {
-			return _accountPrivateDataTable;
-		}
-		return (_accountPrivateDataTable = mainTable.accountPrivateDataTable);
-	}
-	
-	public void setPrivateMetaData(String key, Object value) {
-		// Create a new private data for the account if it does not exists
-		if (accountPrivateDataTable().get(this._oid()) == null) {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
-		} else {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid());
-		}
-		// Put in the details and save it
-		_accountPrivateData.put(key, value);
-		_accountPrivateData.saveAll();
-	}
-	
-	public String getPrivateMetaStringData(String key) {
-		if (_accountPrivateData != null) {
-			return _accountPrivateData.getString(key, "");
-		}
-		// Create a new private data for the account if it does not exists
-		if (accountPrivateDataTable().get(this._oid()) == null) {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid(), true);
-		} else {
-			_accountPrivateData = accountPrivateDataTable().get(this._oid());
+	/**
+	 * Private data object, this object is not meant to be exposed 
+	 * via any public API for security reasons.
+	 * 
+	 * @return  DataObject representing the user private information
+	 **/
+	public DataObject privateDataObject() {
+		// Cached data object
+		if (privateDataObject != null) {
+			return privateDataObject;
 		}
 		
-		return _accountPrivateData.getString(key, "");
+		// The private data table to use
+		DataTable pDataTable = mainTable.accountPrivateDataTable;
+		
+		// Initialize / get existing private data object 
+		if (pDataTable.get(this._oid()) == null) {
+			privateDataObject = pDataTable.get(this._oid(), true);
+		} else {
+			privateDataObject = pDataTable.get(this._oid());
+		}
+		
+		// private data object
+		return privateDataObject;
 	}
 	
+	//#endregion user private data managment
 }

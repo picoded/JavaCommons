@@ -326,6 +326,15 @@ public interface Query extends Predicate<Object> {
 	}
 	
 	/**
+	 * Searches using the query, and sorted by the comparator
+	 **/
+	default <V> List<V> search(List<V> list, Comparator<V> compareFunc) {
+		List<V> ret = search(list);
+		Collections.sort(ret, compareFunc);
+		return ret;
+	}
+	
+	/**
 	 * Searches using the query, and returns the resulting set
 	 **/
 	default <K, V> List<V> search(Map<K, V> set) {

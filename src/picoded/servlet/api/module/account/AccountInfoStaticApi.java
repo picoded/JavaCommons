@@ -12,6 +12,9 @@ import picoded.core.conv.StringEscape;
 import picoded.core.conv.GenericConvert;
 import java.util.function.BiFunction;
 import picoded.core.struct.GenericConvertMap;
+import picoded.core.struct.MutablePair;
+import picoded.core.struct.query.OrderBy;
+import picoded.core.struct.query.Query;
 import picoded.core.struct.GenericConvertHashMap;
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
@@ -20,7 +23,7 @@ import picoded.core.common.SystemSetupInterface;
 /**
  * Account table group API as static funcitons
  **/
-public class AccountGroupStaticApi {
+public class AccountInfoStaticApi {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -82,28 +85,48 @@ public class AccountGroupStaticApi {
 		int start, int length, String orderBy,
 		String rowMode) {
 		
-		// // No special group based filter, does standard data table query
-		// if( (insideGroupAny == null || insideGroupAny.length == 0) &&
-		// 	(hasGroupRoleAny == null || hasGroupRoleAny.length == 0)
-		// ) {
-		// 	return DataTableStaticApi.list(res, aTable.accountDataTable(), fieldList, query, queryArgs, searchString, searchFieldList, searchMode, start, length, orderBy, rowMode);
-		// }
+		// No special group based filter, does standard data table query
+		if( (insideGroupAny == null || insideGroupAny.length == 0) &&
+			(hasGroupRoleAny == null || hasGroupRoleAny.length == 0)
+		) {
+			return DataTableStaticApi.list(res, aTable.accountDataTable(), fieldList, query, queryArgs, searchString, searchFieldList, searchMode, start, length, orderBy, rowMode);
+		}
 		
-		// // Does group based custom - not so efficent filtering first by initial query
-		// String[] oidList = aTable.accountDataTable().query_id(query, queryArgs, null);
+		// Does an initial query
+		String[] oidList = aTable.accountDataTable().query_id(query, queryArgs, null);
 
-		// // Then filter it down by the insideGroup, and role
-		// AccountObject[] filteredAccounts = aTable.filterUsersByGroupAndRole( oidList, insideGroupAny, hasGroupRoleAny );
+		// Then filter it down by the insideGroup, and role
+		AccountObject[] filteredAccounts = aTable.filterUsersByGroupAndRole( oidList, insideGroupAny, hasGroupRoleAny );
 
-		// // Get the record total
-		// res.put("recordsTotal", filteredAccounts.length);
+		// Get the record total
+		res.put("recordsTotal", filteredAccounts.length);
 
-		// // Time to build actual query
-		// MutablePair<String, Object[]> queryPair = collapseSearchStringAndQuery(query, queryArgs,
-		// searchString, searchFieldList, searchMode, "AND");
+		// Time to build actual query, and search it down
+		MutablePair<String, Object[]> queryPair = DataTableStaticApi.collapseSearchStringAndQuery(query, queryArgs,
+		searchString, searchFieldList, searchMode, "AND");
 		
-		// // 
+		// Prepare the query, and order by filter
+		Query filter = Query.build(queryPair.getLeft(), queryPair.getRight());
+		OrderBy<AccountObject> order = new OrderBy<AccountObject>(orderBy);
 
+		// Execute the query
+		List<AccountObject> queriedList = Arrays.asList(filteredAccounts);
+		List<AccountObject> filteredAndOrdered = filter.search(queriedList, order);
+
+		// Get the filtered length
+		res.put("recordsFiltered", filteredAndOrdered.size());
+
+		// Actual list
+		List<AccountObject> actualList = new ArrayList<AccountObject>();
+		
+		// Gets the subset list (using start and length)
+		int maxIdx = start + length;
+		for( int idx = start; idx < maxIdx; ++idx ) {
+			actualList.add( filteredAndOrdered.get(idx) );
+		}
+
+		// Prepare the result and returns it
+		res.put("result", DataTableStaticApi.formatDataObjectList(actualList.toArray(new AccountObject[] {}), fieldList, rowMode));
 		return res;
 	}
 

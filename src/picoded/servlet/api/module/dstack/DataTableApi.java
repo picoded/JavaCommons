@@ -288,7 +288,7 @@ public class DataTableApi extends CommonApiModule {
 		}
 		
 		// Search value to filter the result by
-		String searchString = req.getString(SEARCH_STRING, "").trim();
+		String searchString = req.getString("searchString", "").trim();
 		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
 		String searchMode = req.getString(SEARCH_MODE, "prefix");
 		
@@ -317,6 +317,54 @@ public class DataTableApi extends CommonApiModule {
 	//
 	/////////////////////////////////////////////
 	
+	/**
+	 * Utility funciton, used to prepare list commands for data-table compatibility
+	 */
+	public static void jsDatatableArgumentsCompatibility(GenericConvertMap<String,Object>req, GenericConvertMap<String,Object>res) {
+		// Proxy the draw request
+		res.put("draw", req.getInt("draw", 0));
+		
+		// Set row mode (always array)
+		req.put(ROW_MODE, "array");
+		
+		// Get search[value]
+		String searchValue = req.getString("search[value]");
+		if (searchValue != null && !searchValue.isEmpty()) {
+			req.put("searchString", searchValue);
+		}
+		
+		// DataTables : Order by string integration
+		//----------------------------------------------------------------------------
+		
+		// Get fieldList arguments
+		String[] fieldList = req.getStringArray(FIELD_LIST, "['_oid']");
+		
+		// If orderBy string is not configured, use dataTable settings
+		String orderByStr = req.getString("orderBy");
+		if (orderByStr == null || orderByStr.isEmpty()) {
+			// try and get datatables order data
+			int orderByColumn = req.getInt("order[0][column]", -1);
+			if (orderByColumn <= -1) {
+				orderByStr = null;
+			} else {
+				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]",
+					false);
+				if (!isColumnOrderable || fieldList.length < orderByColumn) {
+					orderByStr = null;
+				} else {
+					orderByStr = fieldList[orderByColumn];
+				}
+			}
+			
+			// orderBy DESC or ASC
+			String orderByStyle = req.getString("order[0][dir]", "asc");
+			orderByStr += " " + orderByStyle;
+			
+			// Set the orderBy string value respectively
+			req.put("orderBy", orderByStr);
+		}
+	}
+
 	/**
 	 * # $prefix/list/datatables
 	 *
@@ -354,49 +402,9 @@ public class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 */
 	public ApiFunction datatables = (req, res) -> {
-		// Proxy the draw request
-		res.put("draw", req.getInt("draw", 0));
-		
-		// Set row mode
-		req.put(ROW_MODE, "array");
-		
-		// Get search[value]
-		String searchValue = req.getString("search[value]");
-		if (searchValue != null && !searchValue.isEmpty()) {
-			req.put(SEARCH_STRING, searchValue);
-		}
-		
-		// DataTables : Order by string integration
-		//----------------------------------------------------------------------------
-		
-		// Get fieldList arguments
-		String[] fieldList = req.getStringArray(FIELD_LIST, "['_oid']");
-		
-		// If orderBy string is not configured, use dataTable settings
-		String orderByStr = req.getString("orderBy");
-		if (orderByStr == null || orderByStr.isEmpty()) {
-			// try and get datatables order data
-			int orderByColumn = req.getInt("order[0][column]", -1);
-			if (orderByColumn <= -1) {
-				orderByStr = null;
-			} else {
-				boolean isColumnOrderable = req.getBoolean("columns[" + orderByColumn + "][orderable]",
-					false);
-				if (!isColumnOrderable || fieldList.length < orderByColumn) {
-					orderByStr = null;
-				} else {
-					orderByStr = fieldList[orderByColumn];
-				}
-			}
-			
-			// orderBy DESC or ASC
-			String orderByStyle = req.getString("order[0][dir]", "asc");
-			orderByStr += " " + orderByStyle;
-			
-			// Set the orderBy string value respectively
-			req.put("orderBy", orderByStr);
-		}
-		
+		// Adjusting arguments for compatibility
+		jsDatatableArgumentsCompatibility(req,res);
+
 		// Does the default list processing
 		res = list.apply(req, res);
 		

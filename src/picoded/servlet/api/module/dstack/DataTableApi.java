@@ -300,13 +300,8 @@ public class DataTableApi extends CommonApiModule {
 		// The result data row mode
 		String rowMode = req.getString(ROW_MODE, "object");
 		
-		// Processing the query and search together
-		//
-		// Since the above does extensive null check fallbacks,
-		// everything past this point can safely be assumed to be not null
+		// Processing the query and search together, return result
 		//-------------------------------------------------------------------------------
-		
-		// End and return result
 		return DataTableStaticApi.list(res, dataTable, fieldList, query, queryArgs, searchString,
 			searchFieldList, searchMode, start, length, orderBy, rowMode);
 	};

@@ -404,7 +404,11 @@ public class DataTableApi extends CommonApiModule {
 		// Change some formatting of result
 		res.put("data", res.get("result", null));
 		res.put("recordsFiltered", res.get("totalCount", null));
-		res.put("recordsTotal", res.get("totalCount", null));
+
+		// The raw total (before search filter)
+		String query = req.getString(QUERY, "").trim();
+		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
+		res.put("recordsTotal", dataTable.queryCount(query,queryArgs));
 		
 		// Clear original formatting
 		res.put("result", null);

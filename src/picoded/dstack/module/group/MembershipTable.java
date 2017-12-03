@@ -273,301 +273,64 @@ public class MembershipTable extends ModuleStructure {
 
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Universal object listing =/
+	// Datatable based query
+	//
+	// @TODO : Refactor this out to a core.struct.query.AbstractMapMapQuery
 	//
 	///////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Does a rather complex multi-query, across group, member, and membership.
-	 * And return the chosen object type. 
-	 * 
-	 * For query / args pairs that are null, they are effectively wildcards.
-	 * 
-	 * @param  groupQuery        group based query
-	 * @param  groupArgs         group based query args
-	 * @param  memberQuery       member based query
-	 * @param  memberArgs        member based query args
-	 * @param  membershipQuery   membership based query
-	 * @param  membershipArgs    membership based query args
-	 * 
-	 * @return list of memberships, after all the various queries
-	 */
-	public List<MembershipObject> multiQuery(
-		String groupQuery,      Object[] groupArgs,
-		String memberQuery,     Object[] memberArgs,
-		String membershipQuery, Object[] membershipArgs
-	) {
-
-		// Note that the query route changes 
-		// According to the parameters provided
-		// Under currently best guess assumptions
-		//
-		// @CONSIDER : Optimizing the query based on real usage
-		//             or alternatively with a hint parameter
-
-		if( groupQuery != null && groupArgs != null ) {
-
-			// If group query is provided, query will be executed
-			// in the following sequence, skipping if needed.
-			//
-			// 1. groupQuery
-			// 2. membershipQuery
-			// 3. memberQuery
-
-		} 
-
-		// DataObject[] groupList = null;
-		// DataObject[] memberList = null;
-
-		// // Build using group list first, if query is given
-		// if( groupQuery != null && groupArgs != null ) {
-		// 	groupList = groupTable.query(groupQuery, groupArgs);
-		// }
-
-		// // Build from member list
-		// if( memberList != null && memberArgs != null ) {
-		// 	// Group list is null, so use member query directly
-		// 	if( groupList == null ) {
-
-		// 	}
-		// }
-
-		return null;
-	}
-
-
-
-
-
-
-
-
-
-
-
-	
-	// //
-	// // Getting users based on filters
-	// // TODO: To optimise because Sam is dumb
-	// // --------------------------------------------------------------------------
-	
-	// /**
-	//  * Get a list of account objects, given the group any / role filter
-	//  * 
-	//  * @param insideGroupAny  validate that the account objects return belong to filter out the results
-	//  * @param hasRoleAny      filter to memebers with atleast the given roles
-	//  * 
-	//  * @return filtered list of account objects
-	//  */
-	// public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
-	// 	return filterUsersByGroupAndRole( accountDataTable.keySet().toArray(new String[] {}), insideGroupAny, hasRoleAny );
-	// }
-
-	// /**
-	//  * Get a list of account objects, given the group any / role filter
-	//  * 
-	//  * @param accountList     list of account account id's to filter
-	//  * @param insideGroupAny  validate that the account objects return belong to filter out the results
-	//  * @param hasRoleAny      filter to memebers with atleast the given roles
-	//  * 
-	//  * @return filtered list of account objects
-	//  */
-	// public AccountObject[] filterUsersByGroupAndRole(String[] accountIDArray, String[] insideGroupAny, String[] hasRoleAny) {
-	// 	if (accountIDArray == null) {
-	// 		return null;
-	// 	}
-		
-	// 	// The return array
-	// 	ArrayList<AccountObject> ret = new ArrayList<AccountObject>();
-
-	// 	// the group / role check flag
-	// 	boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
-	// 	boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
-		
-	// 	for (String accountID : accountIDArray) {
-	// 		AccountObject ao = get(accountID);
-			
-	// 		if (ao == null) {
-	// 			continue;
-	// 		}
-			
-	// 		// Possible Error found: returns null in one of the array
-	// 		AccountObject[] userGroups = ao.getGroups();
-			
-	// 		if (userGroups == null) {
-	// 			continue;
-	// 		}
-			
-	// 		for (AccountObject userGroup : userGroups) {
-				
-	// 			// To avoid null error in the array
-	// 			if (userGroup == null) {
-	// 				continue;
-	// 			}
-				
-	// 			if (doGroupCheck) {
-	// 				if (ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-	// 					if (doRoleCheck) {
-	// 						String memberRole = userGroup.getMemberRole(ao);
-	// 						if (ArrayUtils.contains(hasRoleAny, memberRole)) {
-	// 							ret.add(ao);
-	// 						}
-	// 					} else {
-	// 						ret.add(ao);
-	// 					}
-	// 				}
-	// 			} else {
-	// 				if (doRoleCheck) {
-	// 					String memberRole = userGroup.getMemberRole(ao);
-	// 					if (ArrayUtils.contains(hasRoleAny, memberRole)) {
-	// 						ret.add(ao);
-	// 					}
-	// 				} else {
-	// 					ret.add(ao);
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-		
-	// 	return ret.toArray(new AccountObject[ret.size()]);
-	// }
-
-
 	// ///////////////////////////////////////////////////////////////////////////
 	// //
-	// // Group Configuration and Management
+	// // Universal object listing =/
 	// //
 	// ///////////////////////////////////////////////////////////////////////////
-	
-	// // Group Status and Management
-	// // -------------------------------------------------------------------------
-	
-	// // Group Management of Users
-	// //-------------------------------------------------------------------------
-	
+
 	// /**
-	//  * Gets the cached child map
-	//  **/
-	// protected DataObject _group_userToRoleMap = null;
-	
-	// /**
-	//  * Gets the child map (cached?)
-	//  **/
-	// protected DataObject group_userToRoleMap() {
-	// 	if (_group_userToRoleMap != null) {
-	// 		return _group_userToRoleMap;
-	// 	}
-	// 	// true = uncheckedGet
-	// 	return (_group_userToRoleMap = mainTable.memberRolesTable.get(this._oid(), true));
+	//  * Does a rather complex multi-query, across group, member, and membership.
+	//  * And return the chosen object type. 
+	//  * 
+	//  * For query / args pairs that are null, they are effectively wildcards.
+	//  * 
+	//  * @param  groupQuery        group based query
+	//  * @param  groupArgs         group based query args
+	//  * @param  memberQuery       member based query
+	//  * @param  memberArgs        member based query args
+	//  * @param  membershipQuery   membership based query
+	//  * @param  membershipArgs    membership based query args
+	//  * 
+	//  * @return list of memberships, after all the various queries
+	//  */
+	// public List<MembershipObject> multiQuery(
+	// 	String groupQuery,      Object[] groupArgs,
+	// 	String memberQuery,     Object[] memberArgs,
+	// 	String membershipQuery, Object[] membershipArgs
+	// ) {
+	// 	// Note that the query route changes 
+	// 	// According to the parameters provided
+	// 	// Under currently best guess assumptions
+	// 	//
+	// 	// @CONSIDER : Optimizing the query based on real usage
+	// 	//             or alternatively with a hint parameter
+	// 	if( groupQuery != null && groupArgs != null ) {
+	// 		// If group query is provided, query will be executed
+	// 		// in the following sequence, skipping if needed.
+	// 		//
+	// 		// 1. groupQuery
+	// 		// 2. membershipQuery
+	// 		// 3. memberQuery
+	// 	} 
+	// 	// DataObject[] groupList = null;
+	// 	// DataObject[] memberList = null;
+	// 	// // Build using group list first, if query is given
+	// 	// if( groupQuery != null && groupArgs != null ) {
+	// 	// 	groupList = groupTable.query(groupQuery, groupArgs);
+	// 	// }
+	// 	// // Build from member list
+	// 	// if( memberList != null && memberArgs != null ) {
+	// 	// 	// Group list is null, so use member query directly
+	// 	// 	if( groupList == null ) {
+	// 	// 	}
+	// 	// }
+	// 	return null;
 	// }
-	
-	// /**
-	//  * Gets and returns the member role, if it exists
-	//  **/
-	// public String getMemberRole(AccountObject memberObject) {
-	// 	return group_userToRoleMap().getString(memberObject._oid());
-	// }
-	
-	// /**
-	//  * Gets and returns the member meta map, if it exists
-	//  * Only returns if member exists, else null
-	//  **/
-	// public DataObject getMember(AccountObject memberObject) {
-	// 	String memberOID = memberObject._oid();
-	// 	String level = group_userToRoleMap().getString(memberOID);
-	// 	if (level == null || level.length() <= 0) {
-	// 		return null;
-	// 	}
-	// 	// true = uncheckedGet
-	// 	return mainTable.memberDataTable.get(
-	// 		AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-	// }
-	
-	// /**
-	//  * Gets and returns the member meta map, if it exists
-	//  * Only returns if member exists and matches role, else null
-	//  **/
-	// public DataObject getMember(AccountObject memberObject, String role) {
-	// 	role = mainTable.validateMembershipRole(this._oid(), role);
-	// 	String memberOID = memberObject._oid();
-	// 	String level = group_userToRoleMap().getString(memberOID);
-	// 	if (level == null || !level.equals(role)) {
-	// 		return null;
-	// 	}
-	// 	// true = uncheckedGet
-	// 	return mainTable.memberDataTable.get(
-	// 		AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-	// }
-	
-	// /**
-	//  * Adds the member to the group with the given role, if it was not previously added
-	//  *
-	//  * Returns the group-member unique meta object, null if previously exists
-	//  **/
-	// public DataObject addMember(AccountObject memberObject, String role) {
-	// 	// Gets the existing object, if exists terminates
-	// 	if (getMember(memberObject) != null) {
-	// 		return null;
-	// 	}
-	// 	// Set and return a new member object
-	// 	return setMember(memberObject, role);
-	// }
-	
-	// /**
-	//  * Adds the member to the group with the given role, or update the role if already added
-	//  *
-	//  * Returns the group-member unique meta object
-	//  **/
-	// public DataObject setMember(AccountObject memberObject, String role) {
-	// 	role = mainTable.validateMembershipRole(this._oid(), role);
-	// 	if (role == null) {
-	// 		return null;
-	// 	}
-	// 	String memberOID = memberObject._oid();
-	// 	String level = group_userToRoleMap().getString(memberOID);
-	// 	DataObject childMeta = null;
-		
-	// 	if (level == null || !level.equals(role)) {
-			
-	// 		memberObject.saveDelta();
-	// 		setGroupStatus(true);
-			
-	// 		group_userToRoleMap().put(memberOID, role);
-	// 		group_userToRoleMap().saveDelta();
-			
-	// 		// true = uncheckedGet
-	// 		childMeta = mainTable.memberDataTable.get(
-	// 			AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-	// 		childMeta.put(PROPERTIES_ROLE, role);
-	// 		childMeta.saveDelta();
-	// 	} else {
-	// 		// true = uncheckedGet
-	// 		childMeta = mainTable.memberDataTable.get(
-	// 			AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-	// 	}
-	// 	return childMeta;
-	// }
-	
-	// public DataObject removeMember(AccountObject memberObject) {
-	// 	if (!this.isGroup()) {
-	// 		return this;
-	// 	}
-		
-	// 	String memberOID = memberObject._oid();
-	// 	String userRoleInGroup = group_userToRoleMap().getString(memberOID);
-	// 	if (userRoleInGroup == null) {
-	// 		return null;
-	// 	}
-	// 	group_userToRoleMap().remove(memberOID);
-	// 	group_userToRoleMap().saveAll();
-		
-	// 	mainTable.memberDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
-	// 	mainTable.memberPrivateDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(),
-	// 		memberOID));
-	// 	System.out.println("Remove member called successfully");
-		
-	// 	return memberObject;
-	// }
-	
-	
 }

@@ -446,7 +446,14 @@ public class DataTableStaticApi {
 		
 		// Get total result counts
 		res.put("recordsTotal", dTable.queryCount(query, queryArgs));
-		res.put("recordsFiltered", dTable.queryCount(queryPair.getLeft(), queryPair.getRight()));
+
+		if( queryPair.getLeft() == null || queryPair.getLeft().equalsIgnoreCase(query) ) {
+			// No additional search filter used : skip additional queryCount
+			res.put("recordsFiltered", res.get("recordsTotal"));
+		} else {
+			// Additional search filter was used
+			res.put("recordsFiltered", dTable.queryCount(queryPair.getLeft(), queryPair.getRight()));
+		}
 		
 		// Process and list the actual results
 		return list(res, dTable, fieldList, queryPair.getLeft(), queryPair.getRight(), start, length,

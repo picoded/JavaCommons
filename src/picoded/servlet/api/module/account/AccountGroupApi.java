@@ -64,18 +64,6 @@ public class AccountGroupApi extends CommonApiModule {
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/**
-	 * Account specific varient of the listing API
-	 * 
-	 * @param  res        resulting object to return
-	 * @param  start      starting index to return result from
-	 * @param  length     number of results to return
-	 * @param  headers    headers to return in result
-	 * @param  query      query string paramter to use
-	 * @param  queryArgs  query arguments to use
-	 * @param  orderBy    orderby query string
-	 */
-	
 	/*
 	private static String list_GET_and_POST_inner(
 		int draw, int start,

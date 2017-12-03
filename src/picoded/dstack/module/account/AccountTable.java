@@ -1157,24 +1157,42 @@ public class AccountTable extends ModuleStructure implements
 	// Getting users based on filters
 	// TODO: To optimise because Sam is dumb
 	// --------------------------------------------------------------------------
+	
+	/**
+	 * Get a list of account objects, given the group any / role filter
+	 * 
+	 * @param insideGroupAny  validate that the account objects return belong to filter out the results
+	 * @param hasRoleAny      filter to memebers with atleast the given roles
+	 * 
+	 * @return filtered list of account objects
+	 */
 	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
-		List<AccountObject> ret = new ArrayList<AccountObject>();
-		String query = "";
-		String[] objectIDs = new String[insideGroupAny.length + hasRoleAny.length];
-		for (int idx = 0; idx < insideGroupAny.length; idx++) {
-			query = "";
-		}
-		DataObject[] metaObjs = accountDataTable.query(null, null, "oID", 0, 0); //initial query just to get everything out so i can filter
-		
-		if (metaObjs == null) {
+		return filterUsersByGroupAndRole( accountDataTable.keySet().toArray(new String[] {}), insideGroupAny, hasRoleAny );
+	}
+
+	/**
+	 * Get a list of account objects, given the group any / role filter
+	 * 
+	 * @param accountList     list of account account id's to filter
+	 * @param insideGroupAny  validate that the account objects return belong to filter out the results
+	 * @param hasRoleAny      filter to memebers with atleast the given roles
+	 * 
+	 * @return filtered list of account objects
+	 */
+	public AccountObject[] filterUsersByGroupAndRole(String[] accountIDArray, String[] insideGroupAny, String[] hasRoleAny) {
+		if (accountIDArray == null) {
 			return null;
 		}
 		
+		// The return array
+		ArrayList<AccountObject> ret = new ArrayList<AccountObject>();
+
+		// the group / role check flag
 		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
 		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
 		
-		for (DataObject metaObj : metaObjs) {
-			AccountObject ao = get(metaObj._oid());
+		for (String accountID : accountIDArray) {
+			AccountObject ao = get(accountID);
 			
 			if (ao == null) {
 				continue;

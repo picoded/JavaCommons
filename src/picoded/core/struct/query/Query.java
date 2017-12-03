@@ -311,6 +311,20 @@ public interface Query extends Predicate<Object> {
 	//--------------------------------------------------------------------
 	// Map based search
 	//--------------------------------------------------------------------
+
+	/**
+	 * Searches using the query, and returns the resulting set
+	 **/
+	default <V> List<V> search(List<V> list) {
+		List<V> ret = new ArrayList<V>();
+		for (V val :list) {
+			if (test(val)) {
+				ret.add(val);
+			}
+		}
+		return ret;
+	}
+	
 	/**
 	 * Searches using the query, and returns the resulting set
 	 **/

@@ -427,7 +427,8 @@ public class DataTableStaticApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | totalCount      | int                | Total amount of records, matching the query, and search filter                |
+	 * | recordsFiltered | int                | Total amount of records, matching the query, and search filter                |
+	 * | recordsTotal    | int (not critical) | Total amount of records, matching the query, before any search filter         |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -442,6 +443,12 @@ public class DataTableStaticApi {
 		String rowMode) {
 		MutablePair<String, Object[]> queryPair = collapseSearchStringAndQuery(query, queryArgs,
 			searchString, searchFieldList, searchMode, "AND");
+		
+		// Get total result counts
+		res.put("recordsTotal", dTable.queryCount(query, queryArgs));
+		res.put("recordsFiltered", dTable.queryCount(queryPair.getLeft(), queryPair.getRight()));
+		
+		// Process and list the actual results
 		return list(res, dTable, fieldList, queryPair.getLeft(), queryPair.getRight(), start, length,
 			orderBy, rowMode);
 	}
@@ -470,8 +477,6 @@ public class DataTableStaticApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | totalCount      | int                | Total amount of records, matching the query, and search filter                |
-	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | result          | Array[Obj/Array]   | Array of row records, each row is represented as an array                     |
@@ -491,11 +496,9 @@ public class DataTableStaticApi {
 		
 		// Fetching the objects and count
 		DataObject[] dataObjs = dTable.query(query, queryArgs, orderBy, start, length);
-		long dataCount = dTable.queryCount(query, queryArgs);
 		
 		// Process the result for output
 		res.put("fieldList", fieldList);
-		res.put("totalCount", dataCount);
 		res.put("result", formatDataObjectList(dataObjs, fieldList, rowMode));
 		
 		// End and return result

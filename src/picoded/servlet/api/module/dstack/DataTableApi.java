@@ -250,7 +250,8 @@ public class DataTableApi extends CommonApiModule {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | totalCount      | int                | Total amount of records, matching the query, and search filter                |
+	 * | recordsFiltered | int (not critical) | Total amount of records, matching the query, and search                       |
+	 * | recordsTotal    | int (not critical) | Total amount of records, matching the query, before any search filter         |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -344,8 +345,6 @@ public class DataTableApi extends CommonApiModule {
 	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | draw            | int (optional)     | Draw counter echoed back (used by the datatables.js server-side API)          |
-	 * | recordsTotal    | int (not critical) | Total amount of records. Before any search filter (But after base filters)    |
-	 * | recordsFiltered | int (not critical) | Total amount of records, matching the query, and search (replaces totalCount) |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -403,16 +402,8 @@ public class DataTableApi extends CommonApiModule {
 		
 		// Change some formatting of result
 		res.put("data", res.get("result", null));
-		res.put("recordsFiltered", res.get("totalCount", null));
-
-		// The raw total (before search filter)
-		String query = req.getString(QUERY, "").trim();
-		Object[] queryArgs = req.getObjectArray(QUERY_ARGS, EmptyArray.STRING);
-		res.put("recordsTotal", dataTable.queryCount(query,queryArgs));
-		
 		// Clear original formatting
 		res.put("result", null);
-		res.put("totalCount", null);
 		
 		// Return it
 		return res;

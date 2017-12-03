@@ -1,0 +1,61 @@
+package picoded.dstack.module.group;
+
+import java.util.*;
+
+import picoded.dstack.*;
+import picoded.dstack.core.*;
+import picoded.core.conv.*;
+import picoded.core.struct.*;
+import picoded.util.security.*;
+
+/**
+ * Represents a single group / user account.
+ **/
+public class MembershipObject extends Core_DataObject {
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Constructor and setup
+	//
+	///////////////////////////////////////////////////////////////////////////
+	//#region constructor and setup
+
+	/**
+	 * The original account table
+	 **/
+	protected MembershipTable main = null;
+	
+	/**
+	 * [INTERNAL USE ONLY]
+	 *
+	 * Cosntructor setup, using an account table,
+	 * and the account GUID
+	 **/
+	protected MembershipObject(MembershipTable mainTable, String inOID) {
+		// Inherit all the default data table methods
+		super((Core_DataTable) (mainTable.membershipTable), inOID);
+		main = mainTable;
+	}
+	
+	/**
+	 * Put and set its delta value, set null is considered "remove"
+	 *
+	 * @param  key to use
+	 * @param  Value to store, does conversion to numeric if possible
+	 *
+	 * @return The previous value
+	 **/
+	@Override
+	public Object put(String key, Object value) {
+		// Safety check for reserved keywords
+		if(key.equalsIgnoreCase("groupid") || key.equalsIgnoreCase("memberid")) {
+			// Check for non-null value, which is after first time setup.
+			if( get(key.toLowerCase()) != null ) {
+				throw new RuntimeException("Unable to change groupid/memberid - these are protected values");
+			}
+		}
+		// "Super" call
+		return super.put(key, value);
+	}
+}
+	

@@ -168,6 +168,20 @@ public interface DataTable extends UnsupportedDefaultMap<String, DataObject>, Co
 	 *
 	 * @param   where query statement
 	 * @param   where clause values array
+	 *
+	 * @return  The String[] array
+	 **/
+	default String[] query_id(String whereClause, Object[] whereValues) {
+		return query_id(whereClause, whereValues, null, -1, -1);
+	}
+	
+	/**
+	 * Performs a search query, and returns the respective DataObject keys.
+	 *
+	 * This is the GUID key varient of query, this is critical for stack lookup
+	 *
+	 * @param   where query statement
+	 * @param   where clause values array
 	 * @param   query string to sort the order by, use null to ignore
 	 *
 	 * @return  The String[] array

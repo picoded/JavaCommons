@@ -1,4 +1,4 @@
-package picoded.util;
+package picoded.util.template;
 
 import java.lang.String;
 import java.text.SimpleDateFormat;

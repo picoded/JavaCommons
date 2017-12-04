@@ -206,7 +206,7 @@ public class AccountLoginApi extends CommonApiModule {
 		
 		// Check if account has been locked out
 		if (ao != null) {
-			int timeAllowed = ao.getNextLoginTimeAllowed();
+			int timeAllowed = ao.getLockTimeLeft();
 			if (timeAllowed != 0) {
 				res.put(INFO, "Unable to login, account is locked for " + timeAllowed + " seconds");
 				return res;
@@ -223,7 +223,7 @@ public class AccountLoginApi extends CommonApiModule {
 		if (loginAO == null) {
 			// if user exists
 			if (ao != null) {
-				ao.incrementNextAllowedLoginTime();
+				ao.incrementFailedLoginAttempts();
 			}
 			res.put(INFO, "Invalid username or password");
 			return res;

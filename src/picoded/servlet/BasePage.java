@@ -7,6 +7,8 @@ import picoded.dstack.module.account.*;
 import picoded.servlet.api.module.account.*;
 import picoded.dstack.*;
 
+import picoded.servlet.api.ApiBuilder;
+
 /**
  * Extends DStackPage and cater the initialization of the AccountTable
  */

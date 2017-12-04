@@ -120,21 +120,9 @@ public class AccountTableApi extends CommonApiModule {
 		if (newAccount != null) {
 			// Check is it group
 			if (isGroup) {
-				newAccount.setGroupStatus(true);
-				boolean defaultRoles = req.getBoolean(DEFAULT_ROLES, true);
-				List<String> list = req.getList(ROLE, null);
-				// Set roles
-				if (defaultRoles || list == null) {
-					newAccount.setMembershipRoles(table.defaultMembershipRoles());
-				} else {
-					newAccount.setMembershipRoles(list);
-				}
-				// Add the user who create the group as the admin
-				AccountObject firstAdmin = table.getRequestUser(req.getHttpServletRequest(), null);
-				if (firstAdmin != null) // Set the creator as the admin
-					newAccount.setMember(firstAdmin, "admin");
-			} else {
-				newAccount.setGroupStatus(false);
+				res.put(ERROR, "Creating group is currently unavailable.");
+				res.put(INFO, "`isGroup` param is disabled.");
+				return res;
 			}
 			// Attach all of the login names in loginNameList to account
 			for (String name : loginNameList) {
@@ -295,20 +283,7 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction groupRoles = (req, res) -> {
-		String[] paramsToCheck = new String[] { GROUP_ID };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		List<String> membershipRoles = group.group_membershipRoles().getList(
-			PROPERTIES_MEMBERSHIP_ROLE, "[]");
-		res.put(LIST, membershipRoles);
+		res.put(INFO, "group roles endpoint is currently unavailable");
 		// Return result
 		return res;
 	};
@@ -338,29 +313,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction getMemberRoleFromGroup = (req, res) -> {
-		String[] paramsToCheck = new String[] { GROUP_ID, USER_ID };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		String userID = req.getString(USER_ID);
-		
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		AccountObject userToAdd = table.get(userID);
-		if (userToAdd == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-		String role = group.getMemberRole(userToAdd);
-		if (role == null) {
-			res.put(ERROR, "No role for user is found.");
-		} else {
-			res.put(SINGLE_RETURN_VALUE, role);
-		}
+		res.put(INFO, "get member role endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -389,21 +343,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction add_new_membership_role = (req, res) -> {
-		String[] paramsToCheck = new String[] { GROUP_ID, ROLE };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		String role = req.getString(ROLE);
-		
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		
-		DataObject groupResult = group.addNewMembershipRole(role);
-		res.put(DATA, groupResult);
+		res.put(INFO, "add new member role endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -432,25 +373,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction remove_membership_role = (req, res) -> {
-		String[] paramsToCheck = new String[] { GROUP_ID, ROLE };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		String role = req.getString(ROLE);
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		
-		DataObject groupResult = group.removeMembershipRole(role);
-		if (groupResult == null) {
-			res.put(ERROR, "No such role is found.");
-		} else {
-			res.put(DATA, groupResult);
-		}
-		
+		res.put(INFO, "remove member role endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -491,100 +415,9 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction get_member_list_info = (req, res) -> {
-		String groupID = req.getString(GROUP_ID);
-		System.out.println("get_member_list_info");
-		AccountObject group = (groupID != null) ? table.get(groupID) : table.getRequestUser(
-			req.getHttpServletRequest(), null);
-		if (group == null || !group.isGroup()) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		
-		String[] headers = req.getStringArray(HEADERS, "['" + PROPERTIES_OID + "', '"
-			+ PROPERTIES_ROLE + "']");
-		AccountObject[] memberobjList = group.getMembersAccountObject();
-		List<List<Object>> returnList = new ArrayList<List<Object>>();
-		int listCounter = 0;
-		for (AccountObject ao : memberobjList) {
-			DataObject currentGrpAOMeta = group.getMember(ao);
-			returnList.add(new ArrayList<Object>());
-			for (String column : headers) {
-				if (column.equalsIgnoreCase(PROPERTIES_OID)) {
-					returnList.get(listCounter).add(ao._oid());
-				} else if (column.equalsIgnoreCase(PROPERTIES_NAME)) {
-					Set<String> names = ao.getLoginNameSet();
-					names.clear();
-					for (String name : ao.getLoginNameSet()) {
-						names.add(StringEscape.commonHtmlEscapeCharacters(name));
-					}
-					returnList.get(listCounter).add(ao.getLoginNameSet());
-				} else if (column.equalsIgnoreCase(PROPERTIES_ROLE)) {
-					returnList.get(listCounter).add(
-						StringEscape.commonHtmlEscapeCharacters(group.getMemberRole(ao)));
-				} else if (column.toLowerCase().startsWith("account_")) {
-					String headerSuffix = column.substring("account_".length());
-					Object propertyValue = (ao.get(headerSuffix) != null) ? ao.get(headerSuffix) : "";
-					returnList.get(listCounter).add(propertyValue);
-				} else if (column.toLowerCase().startsWith("group_")) {
-					String headerSuffix = column.substring("group_".length());
-					Object propertyValue = (group.get(headerSuffix) != null) ? group.get(headerSuffix)
-						: "";
-					returnList.get(listCounter).add(propertyValue);
-				} else {
-					Object propertyValue = (currentGrpAOMeta.get(column) != null) ? currentGrpAOMeta
-						.get(column) : "";
-					returnList.get(listCounter).add(propertyValue);
-				}
-			}
-			listCounter++;
-		}
-		res.put(GROUP_ID, group._oid());
-		res.put(DATA, returnList);
-		res.put(DRAW, req.getInt("draw"));
-		res.put(RECORDS_TOTAL, returnList.size());
-		res.put(RECORDS_FILTERED, returnList.size());
-		res.put(HEADERS, headers);
+		res.put(INFO, "get member list endpoint is currently unavailable");
+		// Return result
 		return res;
-	};
-	//
-	// /**
-	//  * Description: This function performs add/remove members from existing groups
-	//  *
-	//  *
-	//  *  @param actionObject - GenericConvertMap<String, Object> Contains the action and groupID to be performed by the function
-	//  * @param userIDList - String[] Contains the list of user ID to be processed
-	//  *
-	//  *  @return returnResult - GenericConvertMap<String, Object> Returns the failedList and successList back to caller
-	//  */
-	private BiFunction<GenericConvertMap<String, Object>, String[], GenericConvertHashMap<String, Object>> addOrRemove = (
-		actionObject, userIDList) -> {
-		List<String> failedList = new ArrayList<String>(), successList = new ArrayList<String>();
-		AccountObject group = (AccountObject) actionObject.get(GROUP), currentUser = null;
-		String action = actionObject.getString("action"), role = actionObject.getString(ROLE);
-		String actionErrorMsg = (action.equalsIgnoreCase("add")) ? "User is already in group or role is not found."
-			: "User is not in group.";
-		for (String userID : userIDList) {
-			currentUser = table.get(userID);
-			if (currentUser == null) {
-				failedList.add("ID: " + userID + ", Error: " + ERROR_NO_USER);
-				continue;
-			}
-			DataObject result = (action.equalsIgnoreCase("add")) ? group.addMember(currentUser, role)
-				: group.removeMember(currentUser);
-			if (result == null) {
-				failedList.add("ID: " + userID + ", Error: " + actionErrorMsg);
-				continue;
-			} else if (action.equalsIgnoreCase("remove") && result.getInt(PROPERTIES_IS_GROUP) == 0
-				&& result._oid() == group._oid()) {
-				failedList.add("ID: " + group._oid() + ", Error: " + ERROR_NOT_GROUP);
-				break;
-			}
-			successList.add(userID);
-		}
-		GenericConvertHashMap<String, Object> returnResult = new GenericConvertHashMap<String, Object>();
-		returnResult.put("failedList", failedList);
-		returnResult.put("successList", successList);
-		return returnResult;
 	};
 	//
 	// /**
@@ -614,39 +447,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction add_remove_member = (req, res) -> {
-		// Checks all input are given before proceeding
-		String[] addList = req.getStringArray(ADD_LIST, "[]");
-		String[] removeList = req.getStringArray(REMOVE_LIST, "[]");
-		String role = req.getString(ROLE, null);
-		
-		String[] paramsToCheck = new String[] { GROUP_ID };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		GenericConvertHashMap<String, Object> actionObject = new GenericConvertHashMap<String, Object>();
-		actionObject.put(GROUP, group);
-		if (role == null && addList.length > 0) {
-			res.put(ERROR, ERROR_NO_ROLE);
-		} else if (addList.length > 0) {
-			actionObject.put("action", "add");
-			actionObject.put(ROLE, role);
-			GenericConvertHashMap<String, Object> result = addOrRemove.apply(actionObject, addList);
-			res.put(FAIL_ADD, result.getStringArray("failedList"));
-			res.put(SUCCESS_ADD, result.getStringArray("successList"));
-		}
-		if (removeList.length > 0) {
-			actionObject.put("action", "remove");
-			GenericConvertMap<String, Object> result = addOrRemove.apply(actionObject, removeList);
-			res.put(FAIL_REMOVE, result.getStringArray("failedList"));
-			res.put(SUCCESS_REMOVE, result.getStringArray("successList"));
-		}
+		res.put(INFO, "add/remove member endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -676,33 +478,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction get_single_member_meta = (req, res) -> {
-		String userID = req.getString(USER_ID, null);
-		AccountObject ao = (userID != null) ? table.get(userID) : table.getRequestUser(
-			req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-		String role = req.getString(ROLE);
-		
-		String[] paramsToCheck = new String[] { GROUP_ID };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		
-		DataObject groupResult = (role != null) ? group.getMember(ao, role) : group.getMember(ao);
-		if (groupResult == null) {
-			res.put(ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
-		} else {
-			res.put(DATA, groupResult);
-		}
+		res.put(INFO, "get member meta endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -736,46 +513,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction update_member_meta_info = (req, res) -> {
-		res.put(SUCCESS, false);
-		String memberIDToUpdate = req.getString(USER_ID, null);
-		AccountObject ao = (memberIDToUpdate != null) ? table.get(memberIDToUpdate) : table
-			.getRequestUser(req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-		
-		String[] paramsToCheck = new String[] { GROUP_ID, DATA };
-		res = check_parameters(paramsToCheck, req, res);
-		if (res.get(ERROR) != null)
-			return res;
-		String groupID = req.getString(GROUP_ID);
-		Object metaObjRaw = req.get(DATA);
-		
-		AccountObject group = table.get(groupID);
-		if (group == null) {
-			res.put(ERROR, ERROR_NO_GROUP);
-			return res;
-		}
-		DataObject currentMemberMeta = group.getMember(ao);
-		if (currentMemberMeta == null) {
-			res.put(ERROR, ERROR_NOT_IN_GROUP_OR_ROLE);
-			return res;
-		}
-		String updateMode = req.getString(UPDATE_MODE, "delta");
-		Map<String, Object> metaObj = ConvertJSON.toMap((String) metaObjRaw);
-		updateMode = (!updateMode.equalsIgnoreCase("full")) ? "delta" : updateMode;
-		currentMemberMeta.putAll(metaObj);
-		if (updateMode.equalsIgnoreCase("full")) {
-			currentMemberMeta.saveAll();
-		} else {
-			currentMemberMeta.saveDelta();
-		}
-		res.put(ACCOUNT_ID, ao._oid());
-		res.put(DATA, metaObj);
-		res.put(UPDATE_MODE, updateMode);
-		res.put(SUCCESS, true);
-		
+		res.put(INFO, "update member meta endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -831,14 +570,8 @@ public class AccountTableApi extends CommonApiModule {
 		String oldPassword = req.getString(OLD_PASSWORD);
 		String newPassword = req.getString(NEW_PASSWORD);
 		
-		// If current account is super user,
+		// @TODO:If current account is super user,
 		// and is not modifying himself
-		if (oldPassword == null && cu.isSuperUser() && !cu._oid().equals(ao._oid())) {
-			// Bypass old password check, and set new password
-			ao.setPassword(newPassword);
-			res.put(RESULT, true);
-			return res;
-		}
 		
 		// Ensure from here user logged in and changing password is the same
 		if (ao._oid().equals(cu._oid()) == false) {
@@ -859,201 +592,6 @@ public class AccountTableApi extends CommonApiModule {
 		// return result
 		return res;
 	};
-	
-	// /**
-	//  * # get_user_or_group_list
-	//  *
-	//  * Lists the users according to the search criteria
-	//  *
-	//  * This JSON api is compatible with the datatables.js server side API.
-	//  * See: https://web.archive.org/web/20140627100023/http://datatables.net/manual/server-side
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type      | Description                                                                   |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
-	//  * | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
-	//  * | length          | int (optional)     | Default 50: The number of records to return                                   |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | insideGroup_any | String[](optional) | Default null, else filters for only accounts inside the listed groups ID      |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
-	//  * | query           | String (optional)  | Requested Query filter                                                        |
-	//  * | queryArgs       | String[] (optional)| Requested Query filter arguments                                              |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | groupStatus     | String (optional)  | Default "both", either "user" or "group". Used to lmit the result set         |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | sanitiseOutput | boolean (optional) | Default TRUE. If false, returns UNSANITISED data, so common escape characters |
-	//  * |                |                    | are returned as well.                                                         |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+s
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type      | Description                                                                   |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | draw            | int (optional)     | Draw counter echoed back, and used by the datatables.js server-side API       |
-	//  * | recordsTotal    | int                | Total amount of records. Before any search filter (But after base filters)    |
-	//  * | recordsFilterd  | int                | Total amount of records. After all search filter                              |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | headers         | String[](optional) | Default ["_oid", "names"], the collumns to return                             |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | data            | array              | Array of row records                                                          |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | error           | String (Optional)  | Errors encounted if any                                                       |
-	//  * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	//  **/
-	// protected ApiFunction get_user_or_group_list = (req, res) -> {
-	// 	int draw = req.getInt("draw");
-	// 	int start = req.getInt("start", 0);
-	// 	int limit = req.getInt("length");
-	// 	String[] insideGroupAny = req.getStringArray("insideGroup_any");
-	// 	String[] hasGroupRole_any = req.getStringArray("hasGroupRole_any");
-	// 	String groupStatus = req.getString("groupStatus");
-	//
-	// 	String orderByStr = req.getString("orderBy", "oID");
-	//
-	// 	String[] headers = req.getStringArray("headers", "['" + PROPERTIES_OID + "', '"
-	// 		+ PROPERTIES_NAME + "']");
-	//
-	// 	String query = req.getString("query");
-	// 	String[] queryArgs = req.getStringArray("queryArgs");
-	//
-	// 	// Data tables search refinement
-	// 	String[] queryColumns = req.getStringArray("queryColumns", headers);
-	// 	String wildcardMode = req.getString("wildcardMode", "suffix");
-	//
-	// 	String searchParams = req.getString("searchValue", "").trim(); //datatables specific key
-	//
-	// 	if (searchParams.isEmpty()) {
-	// 		searchParams = req.getString("search[value]", "").trim();
-	// 	}
-	// 	if (searchParams.length() >= 2 && searchParams.charAt(0) == '"'
-	// 		&& searchParams.charAt(searchParams.length() - 1) == '"') {
-	// 		searchParams = searchParams.substring(1, searchParams.length() - 1);
-	// 	}
-	//
-	// 	if (!searchParams.isEmpty() && queryColumns != null && queryColumns.length > 0) {
-	// 		List<String> queryArgsList = new ArrayList<String>(); //rebuild query arguments
-	// 		if (queryArgs != null) {
-	// 			for (String queryArg : queryArgs) {
-	// 				queryArgsList.add(queryArg);
-	// 			}
-	// 		}
-	//
-	// 		if (query == null) {
-	// 			query = generateQueryStringForSearchValue(searchParams, queryColumns);
-	// 		} else {
-	// 			query = query + " AND " + generateQueryStringForSearchValue(searchParams, queryColumns);
-	// 		}
-	//
-	// 		generateQueryStringArgsForSearchValue_andAddToList(searchParams, queryColumns,
-	// 			wildcardMode, queryArgsList);
-	// 		queryArgs = queryArgsList.toArray(new String[queryArgsList.size()]);
-	// 	}
-	//
-	// 	DataTable mtObj = table.accountDataTable();
-	// 	Map<String, Object> links = new HashMap<>();
-	// 	Map<String, Object> pagination = new HashMap<>();
-	// 	pagination.put("total", table.size());
-	// 	limit = (limit == 0) ? table.size() : limit;
-	// 	pagination.put("per_page", limit);
-	// 	pagination.put("current_page", start + 1);
-	// 	pagination.put("last_page", Math.ceil(table.size() / limit));
-	// 	links.put("pagination", pagination);
-	// 	//put back into response
-	// 	res.put("links", links);
-	// 	res.put(DRAW, draw);
-	// 	res.put(HEADERS, headers);
-	// 	res.put(RECORDS_TOTAL, table.size());
-	// 	if (query != null && !query.isEmpty() && queryArgs != null && queryArgs.length > 0) {
-	// 		res.put(RECORDS_FILTERED, mtObj.queryCount(query, queryArgs));
-	// 	} else {
-	// 		res.put(RECORDS_FILTERED, mtObj.queryCount(null, null));
-	// 	}
-	//
-	// 	boolean sanitiseOutput = req.getBoolean("sanitiseOutput", true);
-	//
-	// 	// List<List<Object>> data = new ArrayList<List<Object>>();
-	// 	String dataStr = "";
-	// 	boolean asObject = true;
-	// 	try {
-	// 		dataStr = list_GET_and_POST_inner(table, draw, start, limit, headers, query, queryArgs,
-	// 			orderByStr, insideGroupAny, hasGroupRole_any, groupStatus, sanitiseOutput, asObject);
-	// 		// System.out.println(ConvertJSON.fromObject(data)+" <<<<<<<<<<<<<<<<< data");
-	// 		List<Object> data = ConvertJSON.toList(dataStr);
-	// 		res.put(DATA, data);
-	// 	} catch (Exception e) {
-	// 		res.put("error", e.getMessage());
-	// 	}
-	//
-	// 	return res;
-	// };
-	//
-	// /**
-	//  * # update_current_user_info
-	//  *
-	//  * Update the account meta of existing/current user
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type          | Description                                                               |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | accountID       | String  (Optional)    | ID of the user/current user to retrieve                                    |
-	//  * | loginName       | String  (Optional)    | loginName of the user/current user to retrieve                             |
-	//  * | updateMode      | String                | Mode of the update used, full or delta (default: delta)                    |
-	//  * | data            | {Object}              | information to be updated                                                  |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type         | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | accountID       | String                | The account ID of the user                                                 |
-	//  * | result          | {Object}              | The information of the user                                                |
-	//  * | update          | boolean               | false for failed change and true for success                               |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  **/
-	// protected ApiFunction update_current_user_info = (req, res) -> {
-	// 	res.put(UPDATE, false);
-	// 	String loginName = req.getString(LOGINNAME, "");
-	// 	String accountID = req.getString(ACCOUNT_ID, "");
-	// 	AccountObject ao = (!accountID.isEmpty()) ? table.get(accountID) :
-	// 										 (!loginName.isEmpty()) ? table.getFromLoginName(loginName) :
-	// 										 table.getRequestUser(req.getHttpServletRequest(), null);
-	// 	if (ao == null) {
-	// 		res.put(ERROR, ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	//
-	// 	String[] paramsToCheck = new String[] { DATA };
-	// 	res = check_parameters(paramsToCheck, req, res);
-	// 	if (res.get(ERROR) != null){
-	// 		return res;
-	// 	}
-	// 	Object metaObjRaw = req.getStringMap(DATA);
-	// 	String updateMode = req.getString(UPDATE_MODE, "delta");
-	// 	Map<String, Object> metaObj = ConvertJSON.toMap(ConvertJSON.fromObject(metaObjRaw));
-	// 	updateMode = ( !updateMode.equalsIgnoreCase("full") ) ? "delta" : updateMode;
-	// 	ao.putAll(metaObj);
-	// 	if (updateMode.equalsIgnoreCase("full")) {
-	// 		ao.saveAll();
-	// 	} else {
-	// 		ao.saveDelta();
-	// 	}
-	// 	Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
-	// 	res.put(ACCOUNT_ID, ao._oid());
-	// 	res.put(RESULT, commonInfo);
-	// 	res.put(UPDATE, true);
-	//
-	// 	return res;
-	// };
 	
 	/**
 	 * # delete_user_account
@@ -1097,52 +635,6 @@ public class AccountTableApi extends CommonApiModule {
 		return res;
 	};
 	
-	// /**
-	//  * # account_info
-	//  *
-	//  * Retrieve the account information of existing/current user using username
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type          | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | userID          | String  (Optional)    | ID of the user/current user to retrieve                                     |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | Parameter Name  | Variable Type         | Description                                                                |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | accountID       | String                | The account ID of the user                                                 |
-	//  * | result          | {Object}              | The information of the user                                                |
-	//  * | update          | boolean               | false for no change and true for success                                   |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  * | ERROR           | String (Optional)     | Errors encountered if any                                                  |
-	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
-	//  **/
-	// protected ApiFunction account_info = (req, res) -> {
-	// 	String loginName = req.getString(LOGINNAME, "");
-	// 	String accountID = req.getString(ACCOUNT_ID, "");
-	// 	AccountObject ao = (!loginName.isEmpty()) ? table.getFromLoginName(loginName) :
-	// 										 (!accountID.isEmpty()) ? table.get(accountID) : table
-	// 										 .getRequestUser(req.getHttpServletRequest(), null);
-	// 	if (ao == null) {
-	// 		res.put(ERROR, ERROR_NO_USER);
-	// 		return res;
-	// 	}
-	// 	Object metaObjRaw = req.getStringMap(DATA, null);
-	// 	if (metaObjRaw == null ){
-	// 		Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(ao, true);
-	// 		res.put(ACCOUNT_ID, ao._oid());
-	// 		res.put(RESULT, commonInfo);
-	// 		res.put(UPDATE, false);
-	// 		return res;
-	// 	} else {
-	// 		return this.update_current_user_info.apply(req, res);
-	// 	}
-	// };
 	//
 	// /**
 	//  * # getListOfGroupIDOfMember
@@ -1169,15 +661,8 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction getListOfGroupIDOfMember = (req, res) -> {
-		String userID = req.getString(USER_ID, "");
-		AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(
-			req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-		String[] listOfGroups = ao.getGroups_id();
-		res.put(LIST, listOfGroups);
+		res.put(INFO, "get list of group id endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
 	//
@@ -1205,58 +690,10 @@ public class AccountTableApi extends CommonApiModule {
 	//  * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	//  **/
 	protected ApiFunction getListOfGroupObjectOfMember = (req, res) -> {
-		String userID = req.getString(USER_ID, "");
-		AccountObject ao = (!userID.isEmpty()) ? table.get(userID) : table.getRequestUser(
-			req.getHttpServletRequest(), null);
-		if (ao == null) {
-			res.put(ERROR, ERROR_NO_USER);
-			return res;
-		}
-		AccountObject[] listOfGroupsObj = ao.getGroups();
-		List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
-		int listCounter = 0;
-		for (AccountObject groupObj : listOfGroupsObj) {
-			Map<String, Object> commonInfo = extractCommonInfoFromAccountObject(groupObj, true);
-			groupList.add(commonInfo);
-			listCounter++;
-		}
-		res.put(LIST, groupList);
+		res.put(INFO, "get list of group object endpoint is currently unavailable");
+		// Return result
 		return res;
 	};
-	//
-	// /**
-	//  * # lock time
-	//  *
-	//  * This function is used to retrieve the locked out timing for the accountName
-	//  *
-	//  * ## HTTP Request Parameters
-	//  *
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name | Variable Type      | Description                                                                   |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | accountName    | String             | Errors encountered if any                                                       |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  *
-	//  * ## JSON Object Output Parameters
-	//  *
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | Parameter Name | Variable Type      | Description                                                                   |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  * | lockTime       | long               | If the number is whole number, it will be int                                 |
-	//  * +----------------+--------------------+-------------------------------------------------------------------------------+
-	//  **/
-	// // TO BE DELETED
-	// protected ApiFunction lockTime = (req, res) -> {
-	// 	String accountName = req.getString(ACCOUNT_NAME, null);
-	// 	if (accountName != null) {
-	// 		AccountObject ao = table.getFromLoginName(accountName);
-	// 		if (ao != null) {
-	// 			long attempts = ao.getAttempts(ao._oid());
-	// 			res.put("lockTime", table.calculateDelay.apply(ao, attempts));
-	// 		}
-	// 	}
-	// 	return res;
-	// };
 	
 	/**
 	 * # set_login_name
@@ -1392,49 +829,12 @@ public class AccountTableApi extends CommonApiModule {
 				}
 				commonInfo.put("accountNames", accNames);
 			}
-			commonInfo.put("isSuperUser", account.isSuperUser());
-			commonInfo.put("isGroup", account.isGroup());
 			// Extract hostURL from user account object
 			commonInfo.put(PROPERTIES_HOST_URL, account.get(PROPERTIES_HOST_URL));
 			// Extract email from user account object
 			commonInfo.put(PROPERTIES_EMAIL, account.get(PROPERTIES_EMAIL));
 			// Extract name from user account object
 			commonInfo.put(PROPERTIES_NAME, account.get(PROPERTIES_NAME));
-			Map<String, List<Map<String, Object>>> groupMap = new HashMap<String, List<Map<String, Object>>>();
-			AccountObject[] groups = account.getGroups();
-			// Check if any groups exist for the member
-			if (groups != null) {
-				List<Map<String, Object>> groupList = new ArrayList<Map<String, Object>>();
-				for (AccountObject group : groups) {
-					Map<String, Object> newGroup = new HashMap<String, Object>();
-					newGroup.put("groupID", group._oid());
-					// Extracting group names and sanitising if needed
-					Set<String> groupNames = group.getLoginNameSet();
-					if (sanitiseOutput) {
-						groupNames.clear();
-						for (String groupName : group.getLoginNameSet()) {
-							groupNames.add(StringEscape.commonHtmlEscapeCharacters(groupName));
-						}
-					}
-					newGroup.put("names", groupNames);
-					//extracting member roles and sanitising if needed
-					String role = group.getMemberRole(account);
-					if (sanitiseOutput) {
-						role = StringEscape.commonHtmlEscapeCharacters(role);
-					}
-					newGroup.put("role", role); //sanitise role just in case
-					role = (role == null) ? "" : role;
-					boolean isAdmin = role.equalsIgnoreCase("admin")
-						|| role.equalsIgnoreCase("superuser");
-					newGroup.put("isAdmin", isAdmin);
-					// Check if is group admin
-					if (isAdmin) {
-						commonInfo.replace("isAnyGroupAdmin", true);
-					}
-					groupList.add(newGroup);
-				}
-				commonInfo.put("groups", groupList);
-			}
 		} else {
 			System.out
 				.println("AccountLogin -> extractCommonInfoFromAccountObject -> AccountObject is null!");
@@ -1526,32 +926,10 @@ public class AccountTableApi extends CommonApiModule {
 					}
 					
 					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
-				} else {
-					//do filtered query
-					fullUserArray = _DataTableObj.getUsersByGroupAndRole(insideGroup_any,
-						hasGroupRole_any);
 				}
 				
 				if (fullUserArray == null || fullUserArray.length == 0) {
 					return ConvertJSON.fromObject(ret);
-				}
-				
-				//group status filtering
-				if (groupStatus != null) {
-					List<AccountObject> filteredUsers = new ArrayList<AccountObject>();
-					for (AccountObject ao : fullUserArray) {
-						if (groupStatus.equalsIgnoreCase("group")) {
-							if (ao.isGroup()) {
-								filteredUsers.add(ao);
-							}
-						} else if (groupStatus.equalsIgnoreCase("user")) {
-							if (!ao.isGroup()) {
-								filteredUsers.add(ao);
-							}
-						}
-					}
-					
-					fullUserArray = filteredUsers.toArray(new AccountObject[filteredUsers.size()]);
 				}
 				
 				for (AccountObject ao : fullUserArray) {

@@ -101,9 +101,7 @@ public class AccountLoginApi extends CommonApiModule {
 				resultMap.put(LOGIN_NAME_LIST, loginNameList);
 			}
 			
-			// Get isSuperUser, isGroup
-			resultMap.put("isSuperUser", account.isSuperUser());
-			resultMap.put("isGroup", account.isGroup());
+			// @TODO: Get isSuperUser, isGroup
 		}
 		
 		// Return result map

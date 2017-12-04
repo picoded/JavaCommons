@@ -10,22 +10,22 @@ import picoded.servlet.api.module.struct.MapProxyApi;
 import picoded.web.EmailBroadcaster;
 
 public class CommonsPage extends BasePage {
-
+	
 	@Override
 	public boolean doAuth(Map<String, Object> templateData) throws Exception {
 		return super.doAuth(templateData);
 	}
-
+	
 	////////////////////////////////////////////
 	//
 	// api modules setup / integration
 	//
 	////////////////////////////////////////////
-
+	
 	//------------------------------------------
 	// apiSetup loaded
 	//------------------------------------------
-
+	
 	/**
 	 * !To Override
 	 * to configure the ApiBuilder steps
@@ -35,18 +35,18 @@ public class CommonsPage extends BasePage {
 	@Override
 	public void apiSetup(ApiBuilder api) {
 		super.apiSetup(api);
-
+		
 		// api.config setup
 		apiSetup_config();
 	}
-
+	
 	//------------------------------------------
 	// api.config - support
 	//------------------------------------------
-
+	
 	/** apiSetup_config return memoizer */
 	protected MapProxyApi apiSetup_config = null;
-
+	
 	/**
 	 * The configuration api module, if enabled.
 	 * @return The used MapProxyApi, or null if disabled
@@ -55,33 +55,33 @@ public class CommonsPage extends BasePage {
 		if (apiSetup_config != null) {
 			return apiSetup_config;
 		}
-
+		
 		// return null if disabled
 		if (DConfig().getBoolean("sys.api.config.enabled", true) == false) {
 			return null;
 		}
-
+		
 		// Get the configuration map
 		GenericConvertMap<String, Object> configMap = DConfig().getGenericConvertStringMap(
 			"sys.api.config", "{}");
-
+		
 		// Prepare the map proxy api
 		MapProxyApi ret = new MapProxyApi(DConfig());
-
+		
 		// Setup the api
 		ret.apiSetup(apiBuilder(), configMap.getString("namespace", "config"), configMap);
-
+		
 		// The return object
 		apiSetup_config = ret;
 		return ret;
 	}
-
+	
 	////////////////////////////////////////////
 	//
 	// background threading : public
 	//
 	////////////////////////////////////////////
-
+	
 	/**
 	 * This is to be called only within "backgroundProcess"
 	 * @return true, if the process is a background thread
@@ -89,7 +89,7 @@ public class CommonsPage extends BasePage {
 	public boolean isBackgroundThread() {
 		return backgroundThread != null;
 	}
-
+	
 	/**
 	 * This is to be called only within "backgroundProcess"
 	 * @return true, if the process is a background thread, and not interrupted
@@ -97,7 +97,7 @@ public class CommonsPage extends BasePage {
 	public boolean isBackgroundThreadAlive() {
 		return (isBackgroundThread() && !Thread.interrupted());
 	}
-
+	
 	/**
 	 * [To be extended by sub class, if needed]
 	 * The background process to execute per tick.
@@ -105,14 +105,14 @@ public class CommonsPage extends BasePage {
 	public void backgroundProcess() {
 		// Does nothing, for now
 	}
-
+	
 	////////////////////////////////////////////
 	//
 	// background threading : internal
 	// [ NOT OFFICIALLY SUPPORTED FOR EXTENSION ]
 	//
 	////////////////////////////////////////////
-
+	
 	/**
 	 * The background thread handler, isolated as a runnable.
 	 *
@@ -123,19 +123,19 @@ public class CommonsPage extends BasePage {
 		// The config to use
 		GenericConvertMap<String, Object> bgConfig = DConfig().getGenericConvertStringMap(
 			"sys.background", "{}");
-
+		
 		// is "start" interval mode
 		boolean intervalModeIsStart = bgConfig.getString("mode", "between").equalsIgnoreCase("start");
 		long configInterval = bgConfig.getLong("interval", 10000);
-
+		
 		// The invcoation timestamp in previous call
 		long previousStartTimestamp = 0;
-
+		
 		// Start of background thread loop
 		while (isBackgroundThreadAlive()) {
 			// Get the new start timestamp
 			long startTimestamp = System.currentTimeMillis();
-
+			
 			// Does the background process
 			try {
 				backgroundProcess();
@@ -149,7 +149,7 @@ public class CommonsPage extends BasePage {
 							+ "\n" + picoded.core.exception.ExceptionUtils.getStackTrace(e) //
 					);
 			}
-
+			
 			// Does the appropriate interval delay, takes interruptException as termination
 			try {
 				if (!isBackgroundThreadAlive()) {
@@ -181,15 +181,15 @@ public class CommonsPage extends BasePage {
 							"backgroundThreadHandler - caught Unexpected InterruptedException (outside termination event)");
 				}
 			}
-
+			
 			// Update the previous start timestamp
 			previousStartTimestamp = startTimestamp;
 		}
 	};
-
+	
 	// The running background thread
 	protected Thread backgroundThread = null;
-
+	
 	/**
 	 * Loads the configuration and start the background thread
 	 */
@@ -201,7 +201,7 @@ public class CommonsPage extends BasePage {
 			backgroundThread.start();
 		}
 	}
-
+	
 	/**
 	 * Loads the configuration and stop the background thread
 	 * Either gracefully, or forcefully.
@@ -222,14 +222,14 @@ public class CommonsPage extends BasePage {
 						+ e.getMessage());
 				log().warning(picoded.core.exception.ExceptionUtils.getStackTrace(e));
 			}
-
+			
 			// Does the actual termination if needed
 			if (backgroundThread.isAlive()) {
 				backgroundThread.stop();
 			}
 		}
 	}
-
+	
 	/**
 	 * [To be extended by sub class, if needed]
 	 * Initialize context setup process
@@ -239,7 +239,7 @@ public class CommonsPage extends BasePage {
 		super.initializeContext();
 		backgroundThreadHandler_start();
 	}
-
+	
 	/**
 	 * [To be extended by sub class, if needed]
 	 * Initialize context destroy process
@@ -249,20 +249,20 @@ public class CommonsPage extends BasePage {
 		backgroundThreadHandler_stop();
 		super.destroyContext();
 	}
-
+	
 	////////////////////////////////////////////
 	//
 	// common modules
 	//
 	////////////////////////////////////////////
-
+	
 	//------------------------------------------
 	// systemEmail - support
 	//------------------------------------------
-
+	
 	/** systemEmail return memoizer */
 	protected EmailBroadcaster systemEmail = null;
-
+	
 	/**
 	 * Stadnard broadcast email module support,
 	 * this is based on sys.smtp configuration
@@ -271,12 +271,12 @@ public class CommonsPage extends BasePage {
 		if (systemEmail != null) {
 			return systemEmail;
 		}
-
+		
 		// return null if disabled
 		if (DConfig().getBoolean("sys.smtp.enabled", true) == false) {
 			return null;
 		}
-
+		
 		// Set up the system email settings
 		// Get hostname, user, pass, and from account
 		String hostname = DConfig().getString("sys.smtp.host", "smtp.mailinator.com:25");

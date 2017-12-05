@@ -1,5 +1,7 @@
 package picoded.core.struct.query.utils;
 
+import java.util.Map;
+
 public interface CollectionQueryForIDInterface <K, V extends Map<String,Object>> 
 	extends CollectionQueryInterface<V>
 {

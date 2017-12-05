@@ -96,7 +96,9 @@ public class AccountInfoStaticApi {
 		String[] oidList = aTable.accountDataTable().query_id(query, queryArgs, null);
 
 		// Then filter it down by the insideGroup, and role
-		AccountObject[] filteredAccounts = aTable.filterUsersByGroupAndRole( oidList, insideGroupAny, hasGroupRoleAny );
+		//
+		// @TODO : Deprecate this funciton
+		AccountObject[] filteredAccounts = null; //aTable.filterUsersByGroupAndRole( oidList, insideGroupAny, hasGroupRoleAny );
 
 		// Get the record total
 		res.put("recordsTotal", filteredAccounts.length);

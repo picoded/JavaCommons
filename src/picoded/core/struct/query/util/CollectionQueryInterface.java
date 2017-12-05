@@ -1,5 +1,13 @@
 package picoded.core.struct.query.utils;
 
+import java.util.Map;
+
+/**
+ * Utility interface, to provide a standardised interface to query
+ * Collection for various results.
+ * 
+ * Ideally this should be optimized for the relevent backend.
+ */
 public interface CollectionQueryInterface <V extends Map<String,Object>> {
 
 

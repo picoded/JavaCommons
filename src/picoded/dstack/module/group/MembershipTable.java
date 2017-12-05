@@ -15,7 +15,7 @@ import static picoded.servlet.api.module.account.AccountConstantStrings.*;
  * MembershipTable used to provide group ownership based functionality,
  * against existing data table compatible backend.
  **/
-public class MembershipTable extends ModuleStructure implements DataTable {
+public class MembershipTable extends ModuleStructure  {
 	
 	///////////////////////////////////////////////////////////////////////////
 	//

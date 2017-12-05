@@ -219,8 +219,10 @@ public interface DataTable extends UnsupportedDefaultMap<String, DataObject>, Co
 		return query_id(whereClause, whereValues, null).length;
 	}
 	
-	//
+	
 	// Get from key names operations (to optimize on specific implementation)
+	//
+	// @TODO : REMOVAL
 	//--------------------------------------------------------------------------
 	
 	/**

@@ -7,6 +7,8 @@ import picoded.dstack.module.account.*;
 import picoded.servlet.api.module.account.*;
 import picoded.dstack.*;
 
+import picoded.servlet.api.ApiBuilder;
+
 /**
  * Extends DStackPage and cater the initialization of the AccountTable
  */
@@ -20,7 +22,7 @@ public class BasePage extends DStackPage {
 	
 	/**
 	 * Servlet logging interface
-	 * 
+	 *
 	 * This is not a static class, so that the this object inherits
 	 * any extensions if needed
 	 **/
@@ -56,8 +58,14 @@ public class BasePage extends DStackPage {
 	@Override
 	public void doSharedSetup() throws Exception {
 		super.doSharedSetup();
+		this.apiBuilder();
+	}
+	
+	@Override
+	public void apiSetup(ApiBuilder api) {
+		super.apiSetup(api);
 		AccountTableApi ata = new AccountTableApi(getAccountTable());
-		ata.apiSetup(this.apiBuilder(), "");
+		ata.apiSetup(api, "");
 	}
 	
 	@Override
@@ -158,7 +166,6 @@ public class BasePage extends DStackPage {
 		AccountTable at = getAccountTable();
 		DConfig dc = DConfig();
 		// Configure account table
-		at.setSuperUserGroupName(getSuperUserGroupName());
 		at.isHttpOnly = dc.getBoolean("sys.account.session.isHttpOnly", false /*default as false*/);
 		at.isSecureOnly = dc
 			.getBoolean("sys.account.session.isSecureOnly", false /*default as false*/);
@@ -182,8 +189,6 @@ public class BasePage extends DStackPage {
 		boolean resetPass = dc.getBoolean("sys.account.superUsers.rootPasswordReset", false);
 		Map<String, Object> meta = dc.getStringMap("sys.account.superUsers.data", "{}");
 		boolean resetMeta = dc.getBoolean("sys.account.superUsers.resetData", false);
-		List<String> superGrpMemberRoles = dc.getList("sys.account.superUsers.memberRoles",
-			at.defaultMembershipRoles());
 		
 		// Set up super user
 		AccountObject superUser = at.getFromLoginName(adminUser);
@@ -202,23 +207,8 @@ public class BasePage extends DStackPage {
 			superUser.putAll(meta);
 		}
 		
-		// Set up super user group if does not exist (condition is to have an user
-		// to be inside)
-		AccountObject superGrp = at.getFromLoginName(getSuperUserGroupName());
-		if (superGrp == null) {
-			log().info("Missing superuser group (possibly a first time setup)");
-			log().info("Creating superuser group : " + getSuperUserGroupName());
-			
-			superGrp = at.newEntry(getSuperUserGroupName());
-			superGrp.setGroupStatus(true);
-			superGrp.setMembershipRoles(superGrpMemberRoles);
-			// Put superUser as the first admin of this group
-			superGrp.addMember(superUser, "admin");
-		}
-		
 		// Apply changes
 		superUser.saveDelta();
-		superGrp.saveDelta();
 	}
 	
 }

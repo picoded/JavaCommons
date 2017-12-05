@@ -112,32 +112,6 @@ public class AccountTable extends ModuleStructure implements
 	protected DataTable accountPrivateDataTable = null;
 	
 	//
-	// Group hirachy, and membership information
-	//
-	//--------------------------------------------------------------------------
-	
-	/**
-	 * Handles the storage of the group role mapping
-	 *
-	 * DataTable<Group_guid, DataObject<Member_guid, "[role1, role2, ...]">
-	 **/
-	protected DataTable memberRolesTable = null;
-	
-	/**
-	 * Handles the storage of the group child meta information
-	 *
-	 * DataTable<GroupOID-AccountOID, DataObject>
-	 **/
-	protected DataTable memberDataTable = null;
-	
-	/**
-	 * Handles the storage of the group child private meta information
-	 *
-	 * DataTable<GroupOID-AccountOID, DataObject>
-	 **/
-	protected DataTable memberPrivateDataTable = null;
-	
-	//
 	// Login throttling information
 	//
 	//--------------------------------------------------------------------------
@@ -288,11 +262,6 @@ public class AccountTable extends ModuleStructure implements
 		accountDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_META);
 		accountPrivateDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_PRIVATE_META);
 		
-		// Group hirachy, and membership information
-		memberRolesTable = stack.getDataTable(name + SUFFIX_MEMBER_ROLE);
-		memberDataTable = stack.getDataTable(name + SUFFIX_MEMBER_META);
-		memberPrivateDataTable = stack.getDataTable(name + SUFFIX_MEMBER_PRIVATE_META);
-		
 		// Login throttling information
 		loginThrottlingAttemptMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
 		loginThrottlingExpiryMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
@@ -310,8 +279,8 @@ public class AccountTable extends ModuleStructure implements
 		// Return it as a list
 		return Arrays.asList(accountLoginNameMap, accountAuthMap, sessionLinkMap, sessionInfoMap,
 			sessionTokenMap, sessionNextTokenMap, accountDataTable, accountPrivateDataTable,
-			memberRolesTable, memberDataTable, memberPrivateDataTable, loginThrottlingAttemptMap,
-			loginThrottlingExpiryMap, accountVerificationMap, accountPasswordTokenMap);
+			loginThrottlingAttemptMap, loginThrottlingExpiryMap, accountVerificationMap,
+			accountPasswordTokenMap);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -411,30 +380,6 @@ public class AccountTable extends ModuleStructure implements
 			String oid = inOid.toString();
 			AccountObject ao = this.get(oid);
 			
-			// Remove account member's information
-			if (ao != null) {
-				if (ao.isGroup()) {
-					// Remove all members from the group
-					// Eradicate the member - role maps
-					String[] memberIDs = ao.getMembers_id();
-					for (String memberID : memberIDs) {
-						AccountObject member = this.get(memberID);
-						if (member != null) {
-							ao.removeMember(member);
-						}
-					}
-					memberRolesTable.remove(ao._oid()); // Destroy the group's user to role map
-				}
-				// Remove itself from all the group it has associated
-				String[] groupIDs = ao.getGroups_id();
-				for (String groupID : groupIDs) {
-					AccountObject parentGroup = this.get(groupID);
-					if (parentGroup != null) {
-						parentGroup.removeMember(ao);
-					}
-				}
-				// @TODO - remove existence of itself to other tables if necessary
-			}
 			// Remove login ID's AKA nice names
 			Set<String> loginIdMapNames = accountLoginNameMap.keySet(oid);
 			if (loginIdMapNames != null) {
@@ -611,19 +556,6 @@ public class AccountTable extends ModuleStructure implements
 			mList[a] = get(_oidList[a]);
 		}
 		return mList;
-	}
-	
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Utility functions
-	//
-	///////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * @return  Internally used groupID and accountID pair string fromat
-	 **/
-	protected static String getGroupChildMetaKey(String groupOID, String AccountOID) {
-		return groupOID + "-" + AccountOID;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -1064,178 +996,5 @@ public class AccountTable extends ModuleStructure implements
 		javax.servlet.http.HttpServletResponse response, String nicename, String rawPassword,
 		boolean rememberMe) {
 		return loginAccount(request, response, getFromLoginName(nicename), rawPassword, rememberMe);
-	}
-	
-	///////////////////////////////////////////////////////////////////////////
-	///
-	/// Group Membership roles managment
-	///
-	///////////////////////////////////////////////////////////////////////////
-	protected List<String> defaultMembershipRoles = new ArrayList<String>(
-		Arrays.asList(new String[] { "member", "admin" }));
-	
-	/**
-	 * Returns the internal default membership role list
-	 **/
-	public List<String> defaultMembershipRoles() {
-		return defaultMembershipRoles;
-	}
-	
-	/**
-	 * Checks if membership role exists
-	 **/
-	protected boolean hasMembershipRole(String group_oid, String role) {
-		// Sanatize the role
-		role = role.toLowerCase();
-		
-		// Returns if it exists
-		DataObject groupObject = accountPrivateDataTable.get(group_oid);
-		if (groupObject == null) {
-			return false;
-		}
-		List<String> groupRoles = groupObject.getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
-		return groupRoles.contains(role);
-	}
-	
-	// /// Add membership role if it does not exists
-	// public void addMembershipRole(String role) {
-	// 	// Sanatize the role
-	// 	role = role.toLowerCase();
-	//
-	// 	// Already exists terminate
-	// 	if (hasMembershipRole(role)) {
-	// 		return;
-	// 	}
-	//
-	// 	// Add the role
-	// 	membershipRoles.add(role);
-	// }
-	
-	/**
-	 * Checks and validates the membership role, throws if invalid
-	 **/
-	protected String validateMembershipRole(String group_oid, String role) {
-		role = role.toLowerCase();
-		if (!hasMembershipRole(group_oid, role)) {
-			// throw new RuntimeException("Membership role does not exists: " + role);
-			return null;
-		}
-		return role;
-	}
-	
-	//
-	// Super Users group managment
-	//--------------------------------------------------------------------------
-	
-	/**
-	 * Default super user group
-	 **/
-	protected String _superUserGroup = "SuperUsers";
-	
-	/**
-	 * Gets the super user group
-	 **/
-	public String getSuperUserGroupName() {
-		return _superUserGroup;
-	}
-	
-	/**
-	 * Change the super user group
-	 **/
-	public String setSuperUserGroupName(String userGroup) {
-		String old = _superUserGroup;
-		_superUserGroup = userGroup;
-		return old;
-	}
-	
-	/// Returns the super user group
-	public AccountObject superUserGroup() {
-		return getFromLoginName(getSuperUserGroupName());
-	}
-	
-	//
-	// Getting users based on filters
-	// TODO: To optimise because Sam is dumb
-	// --------------------------------------------------------------------------
-	
-	/**
-	 * Get a list of account objects, given the group any / role filter
-	 * 
-	 * @param insideGroupAny  validate that the account objects return belong to filter out the results
-	 * @param hasRoleAny      filter to memebers with atleast the given roles
-	 * 
-	 * @return filtered list of account objects
-	 */
-	public AccountObject[] getUsersByGroupAndRole(String[] insideGroupAny, String[] hasRoleAny) {
-		return filterUsersByGroupAndRole( accountDataTable.keySet().toArray(new String[] {}), insideGroupAny, hasRoleAny );
-	}
-
-	/**
-	 * Get a list of account objects, given the group any / role filter
-	 * 
-	 * @param accountList     list of account account id's to filter
-	 * @param insideGroupAny  validate that the account objects return belong to filter out the results
-	 * @param hasRoleAny      filter to memebers with atleast the given roles
-	 * 
-	 * @return filtered list of account objects
-	 */
-	public AccountObject[] filterUsersByGroupAndRole(String[] accountIDArray, String[] insideGroupAny, String[] hasRoleAny) {
-		if (accountIDArray == null) {
-			return null;
-		}
-		
-		// The return array
-		ArrayList<AccountObject> ret = new ArrayList<AccountObject>();
-
-		// the group / role check flag
-		boolean doGroupCheck = (insideGroupAny != null && insideGroupAny.length > 0);
-		boolean doRoleCheck = (hasRoleAny != null && hasRoleAny.length > 0);
-		
-		for (String accountID : accountIDArray) {
-			AccountObject ao = get(accountID);
-			
-			if (ao == null) {
-				continue;
-			}
-			
-			// Possible Error found: returns null in one of the array
-			AccountObject[] userGroups = ao.getGroups();
-			
-			if (userGroups == null) {
-				continue;
-			}
-			
-			for (AccountObject userGroup : userGroups) {
-				
-				// To avoid null error in the array
-				if (userGroup == null) {
-					continue;
-				}
-				
-				if (doGroupCheck) {
-					if (ArrayUtils.contains(insideGroupAny, userGroup._oid())) {
-						if (doRoleCheck) {
-							String memberRole = userGroup.getMemberRole(ao);
-							if (ArrayUtils.contains(hasRoleAny, memberRole)) {
-								ret.add(ao);
-							}
-						} else {
-							ret.add(ao);
-						}
-					}
-				} else {
-					if (doRoleCheck) {
-						String memberRole = userGroup.getMemberRole(ao);
-						if (ArrayUtils.contains(hasRoleAny, memberRole)) {
-							ret.add(ao);
-						}
-					} else {
-						ret.add(ao);
-					}
-				}
-			}
-		}
-		
-		return ret.toArray(new AccountObject[ret.size()]);
 	}
 }

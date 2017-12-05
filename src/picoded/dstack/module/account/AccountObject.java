@@ -21,7 +21,7 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region constructor and setup
-
+	
 	/**
 	 * The original account table
 	 **/
@@ -46,7 +46,7 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region login id handling
-
+	
 	/**
 	 * Checks if the current account has the provided LoginName
 	 *
@@ -153,19 +153,19 @@ public class AccountObject extends Core_DataObject {
 		
 		return true;
 	}
-
+	
 	//#endregion login id handling
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// Syncronysing data from authentication related tables to 
+	// Syncronysing data from authentication related tables to
 	// queryable data table objects.
 	//
-	// NOTE: This is not actually used for authentication, 
+	// NOTE: This is not actually used for authentication,
 	//       but for convienience in places such as admin tables
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region auth tables data sync
-
+	
 	/**
 	 * Syncs the current user name list, with its metaobject
 	 * This is mainly for data table listing "convinence"
@@ -184,7 +184,7 @@ public class AccountObject extends Core_DataObject {
 		// Save the changes
 		this.saveDelta();
 	}
-
+	
 	//#endregion auth tables data sync
 	///////////////////////////////////////////////////////////////////////////
 	//
@@ -192,7 +192,7 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region password management
-
+	
 	/**
 	 * Gets and returns the stored password hash,
 	 * Intentionally made protected to avoid accidental use externally
@@ -277,10 +277,10 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region login throttling (for passwrod api)
-
+	
 	/**
 	 * Returns the unix timestamp (in seconds) in which the account will unlock
-	 * 
+	 *
 	 * @return if > 0, linux timestamp (seconds) when login is permitted. 0 means the account is not locked
 	 **/
 	public long getUnlockTimestamp() {
@@ -289,7 +289,7 @@ public class AccountObject extends Core_DataObject {
 	
 	/**
 	 * Returns the number of failed login attempts performed
-	 * 
+	 *
 	 * @return Number of login attempts performed since last succesful login
 	 **/
 	public long getFailedLoginAttempts() {
@@ -300,14 +300,15 @@ public class AccountObject extends Core_DataObject {
 	 * Reset the entries for the user (should only be called after successful login)
 	 **/
 	public void resetLoginThrottle() {
-		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getFailedLoginAttempts(), 0l);
+		mainTable.loginThrottlingAttemptMap.weakCompareAndSet(this._oid(), getFailedLoginAttempts(),
+			0l);
 		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getUnlockTimestamp(), 0l);
 	}
 	
 	/**
 	 * Returns time left in seconds before next permitted login attempt for the user based on User ID
-	 * 
-	 * @return if > 0, linux timestamp (seconds) when login is permitted. 
+	 *
+	 * @return if > 0, linux timestamp (seconds) when login is permitted.
 	 **/
 	public int getLockTimeLeft() {
 		long val = getUnlockTimestamp();
@@ -337,13 +338,13 @@ public class AccountObject extends Core_DataObject {
 	// ----------------------
 	//
 	// Session : represents a sucessful login attempt,
-	// which does not change and can only be extended. 
-	// 
-	// Token : is issued through a session, and gets replaced with newer 
+	// which does not change and can only be extended.
+	//
+	// Token : is issued through a session, and gets replaced with newer
 	// tokens over time, extending the session in the process.
 	//
-	// Tokens's are issued in a chain, where the next token is issued in 
-	// advance and linked to the previous token (and session). 
+	// Tokens's are issued in a chain, where the next token is issued in
+	// advance and linked to the previous token (and session).
 	//
 	// This ensure that in event of a race condition  of multiple HTTP calls,
 	// and a token upgrade occurs. All HTTP calls would be upgraded to the
@@ -351,7 +352,7 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region login session management
-
+	
 	/**
 	 * Checks if the current session is associated with the account
 	 *
@@ -397,8 +398,8 @@ public class AccountObject extends Core_DataObject {
 	 *
 	 * Subseqently session expirary will be tag to
 	 * the most recently generated token.
-	 * 
-	 * The intended use case in the API, is for a token to be 
+	 *
+	 * The intended use case in the API, is for a token to be
 	 * immediately issued after session via the API.
 	 *
 	 * Additionally info object is INTENTIONALLY NOT stored as a
@@ -467,7 +468,7 @@ public class AccountObject extends Core_DataObject {
 			revokeSession(oneSession);
 		}
 	}
-
+	
 	//#endregion login session management
 	///////////////////////////////////////////////////////////////////////////
 	//
@@ -475,7 +476,7 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region login session.token management
-
+	
 	/**
 	 * Checks if the current session token is associated with the account
 	 *
@@ -697,262 +698,50 @@ public class AccountObject extends Core_DataObject {
 		return nextToken;
 	}
 	
-	//#endregion login session.token management
-	///////////////////////////////////////////////////////////////////////////
-	//
-	// Group Configuration and Management
-	//
-	///////////////////////////////////////////////////////////////////////////
-	
-	// Group Status and Management
-	// -------------------------------------------------------------------------
-	
-	// Group Management of Users
-	//-------------------------------------------------------------------------
+	// /**
+	//  * This method logs the details about login faailure for the user based on User ID
+	//  **/
+	// private void initializeLoginFailureAttempt() {
+	// 	mainTable.loginThrottlingAttemptMap.put(this._oid(), 1);
+	// 	int elapsedTime = ((int) (System.currentTimeMillis() / 1000)) + 2;
+	// 	mainTable.loginThrottlingExpiryMap.put(this._oid(), elapsedTime);
+	// }
 	
 	/**
-	 * Gets the cached child map
+	 * This method returns time left before next permitted login attempt for the user based on User ID
 	 **/
-	protected DataObject _group_userToRoleMap = null;
+	public int getNextLoginTimeAllowed() {
+		long val = getExpiryTime();
+		int allowedTime = (int) val - (int) (System.currentTimeMillis() / 1000);
+		return allowedTime > 0 ? allowedTime : 0;
+	}
+	
+	// /**
+	//  * This method would be added in on next login failure for the user based on User ID
+	//  **/
+	// public long getTimeElapsedNextLogin() {
+	// 	long elapsedValue = getExpiryTime();
+	// 	return elapsedValue;
+	// }
 	
 	/**
-	 * Gets the child map (cached?)
+	 * This method would be increment the attempt counter and update the delay for the user
+	 * to log in next
 	 **/
-	protected DataObject group_userToRoleMap() {
-		if (_group_userToRoleMap != null) {
-			return _group_userToRoleMap;
-		}
-		// true = uncheckedGet
-		return (_group_userToRoleMap = mainTable.memberRolesTable.get(this._oid(), true));
+	public void incrementNextAllowedLoginTime() {
+		long attemptValue = mainTable.loginThrottlingAttemptMap.getAndIncrement(this._oid());
+		int elapsedValue = (int) (System.currentTimeMillis() / 1000);
+		elapsedValue += mainTable.calculateDelay.apply(this, attemptValue);
+		mainTable.loginThrottlingExpiryMap.weakCompareAndSet(this._oid(), getExpiryTime(),
+			(long) elapsedValue);
 	}
 	
-	/**
-	 * Gets and returns the member role, if it exists
-	 **/
-	public String getMemberRole(AccountObject memberObject) {
-		return group_userToRoleMap().getString(memberObject._oid());
+	private long getAttempts() {
+		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
 	}
 	
-	/**
-	 * Gets and returns the member meta map, if it exists
-	 * Only returns if member exists, else null
-	 **/
-	public DataObject getMember(AccountObject memberObject) {
-		String memberOID = memberObject._oid();
-		String level = group_userToRoleMap().getString(memberOID);
-		if (level == null || level.length() <= 0) {
-			return null;
-		}
-		// true = uncheckedGet
-		return mainTable.memberDataTable.get(
-			AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-	}
-	
-	/**
-	 * Gets and returns the member meta map, if it exists
-	 * Only returns if member exists and matches role, else null
-	 **/
-	public DataObject getMember(AccountObject memberObject, String role) {
-		role = mainTable.validateMembershipRole(this._oid(), role);
-		String memberOID = memberObject._oid();
-		String level = group_userToRoleMap().getString(memberOID);
-		if (level == null || !level.equals(role)) {
-			return null;
-		}
-		// true = uncheckedGet
-		return mainTable.memberDataTable.get(
-			AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-	}
-	
-	/**
-	 * Adds the member to the group with the given role, if it was not previously added
-	 *
-	 * Returns the group-member unique meta object, null if previously exists
-	 **/
-	public DataObject addMember(AccountObject memberObject, String role) {
-		// Gets the existing object, if exists terminates
-		if (getMember(memberObject) != null) {
-			return null;
-		}
-		// Set and return a new member object
-		return setMember(memberObject, role);
-	}
-	
-	/**
-	 * Adds the member to the group with the given role, or update the role if already added
-	 *
-	 * Returns the group-member unique meta object
-	 **/
-	public DataObject setMember(AccountObject memberObject, String role) {
-		role = mainTable.validateMembershipRole(this._oid(), role);
-		if (role == null) {
-			return null;
-		}
-		String memberOID = memberObject._oid();
-		String level = group_userToRoleMap().getString(memberOID);
-		DataObject childMeta = null;
-		
-		if (level == null || !level.equals(role)) {
-			
-			memberObject.saveDelta();
-			setGroupStatus(true);
-			
-			group_userToRoleMap().put(memberOID, role);
-			group_userToRoleMap().saveDelta();
-			
-			// true = uncheckedGet
-			childMeta = mainTable.memberDataTable.get(
-				AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-			childMeta.put(PROPERTIES_ROLE, role);
-			childMeta.saveDelta();
-		} else {
-			// true = uncheckedGet
-			childMeta = mainTable.memberDataTable.get(
-				AccountTable.getGroupChildMetaKey(this._oid(), memberOID), true);
-		}
-		return childMeta;
-	}
-	
-	public DataObject removeMember(AccountObject memberObject) {
-		if (!this.isGroup()) {
-			return this;
-		}
-		
-		String memberOID = memberObject._oid();
-		String userRoleInGroup = group_userToRoleMap().getString(memberOID);
-		if (userRoleInGroup == null) {
-			return null;
-		}
-		group_userToRoleMap().remove(memberOID);
-		group_userToRoleMap().saveAll();
-		
-		mainTable.memberDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(), memberOID));
-		mainTable.memberPrivateDataTable.remove(AccountTable.getGroupChildMetaKey(this._oid(),
-			memberOID));
-		System.out.println("Remove member called successfully");
-		
-		return memberObject;
-	}
-	
-	// Group Status Check
-	//-------------------------------------------------------------------------
-	
-	/**
-	 * Returns if set as group
-	 **/
-	public boolean isGroup() {
-		Object status = this.get(PROPERTIES_IS_GROUP);
-		if (status instanceof Number && //
-			((Number) status).intValue() >= 1) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * Sets if the account is a group
-	 **/
-	public void setGroupStatus(boolean enabled) {
-		if (enabled) {
-			this.put(PROPERTIES_IS_GROUP, new Integer(1));
-		} else {
-			this.put(PROPERTIES_IS_GROUP, new Integer(0));
-		}
-		this.saveDelta();
-	}
-	
-	// Group Configuration
-	// -------------------------------------------------------------------------
-	protected DataObject _group_membershipRoles = null;
-	
-	public DataObject group_membershipRoles() {
-		if (_group_membershipRoles != null) {
-			return _group_membershipRoles;
-		}
-		return (_group_membershipRoles = mainTable.accountPrivateDataTable.get(this._oid(), true));
-	}
-	
-	public DataObject addNewMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
-		if (currentRoles.contains(role)) {
-			return group_membershipRoles();
-		}
-		currentRoles.add(role);
-		return setMembershipRoles(currentRoles);
-	}
-	
-	public DataObject setMembershipRoles(List<String> roles) {
-		this.setGroupStatus(true);
-		_group_membershipRoles = null;
-		if (!roles.contains("admin"))
-			roles.add("admin");
-		group_membershipRoles().put(PROPERTIES_MEMBERSHIP_ROLE, roles);
-		group_membershipRoles().saveDelta();
-		return group_membershipRoles();
-	}
-	
-	public DataObject removeMembershipRole(String role) {
-		List<String> currentRoles = group_membershipRoles().getList(PROPERTIES_MEMBERSHIP_ROLE, "[]");
-		if (!currentRoles.contains(role)) {
-			return null;
-		}
-		currentRoles.remove(role);
-		return setMembershipRoles(currentRoles);
-	}
-	
-	/// Returns the list of members in the group
-	///
-	public String[] getMembers_id() {
-		List<String> retList = new ArrayList<String>();
-		for (String key : group_userToRoleMap().keySet()) {
-			if (key.equals("_oid")) {
-				continue;
-			}
-			retList.add(key);
-		}
-		return retList.toArray(new String[retList.size()]);
-	}
-	
-	/// Returns the list of groups the member is in
-	///
-	public String[] getGroups_id() {
-		return mainTable.memberRolesTable.getFromKeyName_id(_oid());
-	}
-	
-	/// Gets all the members object related to the group
-	///
-	public AccountObject[] getMembersAccountObject() {
-		String[] idList = getMembers_id();
-		AccountObject[] objList = new AccountObject[idList.length];
-		for (int a = 0; a < idList.length; ++a) {
-			objList[a] = mainTable.get(idList[a]);
-		}
-		return objList;
-	}
-	
-	/// Gets all the groups object the user is in
-	///
-	public AccountObject[] getGroups() {
-		return mainTable.getFromArray(getGroups_id());
-	}
-	
-	// Group management of users
-	//-------------------------------------------------------------------------
-	
-	// Is super user group handling
-	//-------------------------------------------------------------------------
-	
-	/// Returns if its a super user
-	///
-	public boolean isSuperUser() {
-		AccountObject superUserGrp = mainTable.superUserGroup();
-		if (superUserGrp == null) {
-			return false;
-		}
-		
-		String superUserGroupRole = superUserGrp.getMemberRole(this);
-		return (superUserGroupRole != null && superUserGroupRole.equalsIgnoreCase("admin"));
+	private long getExpiryTime() {
+		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -961,15 +750,15 @@ public class AccountObject extends Core_DataObject {
 	//
 	///////////////////////////////////////////////////////////////////////////
 	//#region user private data managment
-
+	
 	// Internal private data object
 	// memoizer for privateDataObject()
 	protected DataObject privateDataObject = null;
 	
 	/**
-	 * Private data object, this object is not meant to be exposed 
+	 * Private data object, this object is not meant to be exposed
 	 * via any public API for security reasons.
-	 * 
+	 *
 	 * @return  DataObject representing the user private information
 	 **/
 	public DataObject privateDataObject() {
@@ -981,7 +770,7 @@ public class AccountObject extends Core_DataObject {
 		// The private data table to use
 		DataTable pDataTable = mainTable.accountPrivateDataTable;
 		
-		// Initialize / get existing private data object 
+		// Initialize / get existing private data object
 		if (pDataTable.get(this._oid()) == null) {
 			privateDataObject = pDataTable.get(this._oid(), true);
 		} else {

@@ -43,7 +43,6 @@ public class DStackPage extends CoreApiPage {
 		if (DConfigObj != null) {
 			return DConfigObj;
 		}
-		
 		if ((new File(getConfigPath())).exists()) {
 			DConfigObj = new DConfig(getConfigPath());
 		} else {
@@ -82,7 +81,7 @@ public class DStackPage extends CoreApiPage {
 	/**
 	 * Auto initialize the DStack database setup
 	 * on project load.
-	 * 
+	 *
 	 * Note that this step is skipped if DConfig : sys.Dstack.skipSystemSetup is false
 	 */
 	@Override

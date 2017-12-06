@@ -2,6 +2,7 @@ package picoded.servlet.api.module.account;
 
 import java.util.*;
 
+import picoded.servlet.CommonsPage;
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.*;
 import picoded.dstack.module.account.*;
@@ -179,6 +180,10 @@ public class AccountLoginApi extends CommonApiModule {
 			
 			// Return common information for the user
 			extractCommonInfoFromAccountObject(currentUser, res);
+			// Get isSuperUser
+			String superName = ((CommonsPage) req.getCorePage()).DConfig().getString(
+				"sys.account.superUsers.rootUsername");
+			res.put("isSuperUser", (currentUser.getLoginNameSet().contains(superName)));
 			return res;
 		}
 		

@@ -27,4 +27,7 @@ public class ApiModuleConstantStrings {
 	//
 	//--------------------------------------------------------------------
 	
+	// Error code for known/expected errors that will be handled by the consumer
+	public static final String ERROR_CODE = "ERROR_CODE";
+	
 }

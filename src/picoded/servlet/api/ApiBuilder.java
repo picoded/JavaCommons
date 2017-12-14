@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.*;
 
+import picoded.core.exception.ExceptionUtils;
 import picoded.servlet.*;
 import picoded.servlet.api.internal.HaltException;
 import picoded.servlet.api.internal.ApiBuilderJS;
@@ -852,13 +853,23 @@ public class ApiBuilder implements
 			// The actual execution
 			return execute(jointPath, req, res);
 		} catch (Exception e) {
-			// Suppress and print out the error info
-			String errorMsg = e.getMessage();
-			if (errorMsg == null || errorMsg.trim().isEmpty()) {
-				errorMsg = "Fatal Error";
+			
+			if (e instanceof ApiException) {
+
+				throw e; // pass it to `CorePage` to handle it using the `outputRequestException`  or `outputJSONException` methods, which can be overwritten by the application specific global api runner
+				
+			} else {
+				
+				// Suppress and print out the error info
+				String errorMsg = e.getMessage();
+				if (errorMsg == null || errorMsg.trim().isEmpty()) {
+					errorMsg = "Fatal Error";
+				}
+				res.put("ERROR", errorMsg.trim());
+				res.put("INFO", picoded.core.exception.ExceptionUtils.getStackTrace(e));
+				
 			}
-			res.put("ERROR", errorMsg.trim());
-			res.put("INFO", picoded.core.exception.ExceptionUtils.getStackTrace(e));
+			
 		}
 		return res;
 	}

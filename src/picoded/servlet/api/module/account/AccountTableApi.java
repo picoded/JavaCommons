@@ -777,7 +777,8 @@ public class AccountTableApi extends CommonApiModule {
 		// Account info get, set, list
 		builder.put(path + "account/info/get", info_get);
 		builder.put(path + "account/info/set", info_set);
-		builder.put(path + "account/info/list", info_list);
+//		builder.put(path + "account/info/list", info_list); // duplicate
+		builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
 		builder.put(path + "account/info/list/datatables", info_list_datatables);
 		
 		// builder.put(path + API_ACCOUNT_LOCKTIME, lockTime); // Tested
@@ -786,8 +787,7 @@ public class AccountTableApi extends CommonApiModule {
 		// builder.put(path + API_ACCOUNT_INFO, account_info); // Tested
 		// builder.put(path + API_ACCOUNT_INFO_ID, account_info_by_ID); // Tested
 		builder.put(path + "account/admin/remove", delete_user_account); // Tested
-		builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
-		//
+
 		// //Group functionalities
 		builder.put(path + API_GROUP_GRP_ROLES, groupRoles); // Tested
 		builder.put(path + API_GROUP_GET_MEM_ROLE, getMemberRoleFromGroup); // Tested

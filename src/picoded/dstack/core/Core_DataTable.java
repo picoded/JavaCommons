@@ -271,6 +271,22 @@ abstract public class Core_DataTable extends Core_DataStructure<String, DataObje
 		// Actual return
 		return ret;
 	}
+
+	/**
+	 * Generates a new blank object, with custom GUID passed in
+	 *
+	 * @return the DataObject
+	 **/
+	public DataObject newEntry(String inOid) {
+		// Generating a new object
+		DataObject ret = new Core_DataObject(this, inOid, null, false);
+		
+		// Baking in _createTime stamp
+		ret.put("_createTime", currentSystemTimeInSeconds());
+		
+		// Actual return
+		return ret;
+	}
 	
 	/**
 	 * Get a DataObject, and returns it. Skips existance checks if required

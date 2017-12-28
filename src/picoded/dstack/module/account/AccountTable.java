@@ -850,15 +850,6 @@ public class AccountTable extends ModuleStructure implements
 			return null;
 		}
 		
-		// Do not set cookies if it is logout request
-		// This is to prevent session renewal and revoking from happening simultainously
-		// creating unexpected behaviour
-		//
-		// @TODO : Consider a more fixed pattern?
-		if (request.getPathInfo() != null && request.getPathInfo().indexOf("logout") != -1) {
-			return null;
-		}
-		
 		javax.servlet.http.Cookie[] cookieJar = request.getCookies();
 		if (cookieJar == null) {
 			return null;
@@ -914,6 +905,16 @@ public class AccountTable extends ModuleStructure implements
 		// From this point onwards, the session is valid. Now it performs checks for the renewal process
 		// Does nothing if response object is not given
 		//---------------------------------------------------------------------------------------------------
+
+		// Do not set cookies if it is logout request, and return the result.
+		// This is to prevent session renewal and revoking from happening simultainously
+		// creating unexpected behaviour
+		//
+		// @TODO : Consider a more fixed pattern?
+		if (request.getPathInfo() != null && request.getPathInfo().indexOf("logout") > 0) {
+			return ret;
+		}
+		
 		if (response != null) {
 			
 			// Renewal checking

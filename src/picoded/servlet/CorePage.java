@@ -841,7 +841,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	private boolean processChainRequest() throws Exception {
 		try {
 			// PathEnding enforcement
-			if (!enforceProperRequestPathEnding()) {
+			// https://stackoverflow.com/questions/4836858/is-response-redirect-always-an-http-get-response
+			// To explain why its only used for GET requests
+			if(requestType == HttpRequestType.GET && !enforceProperRequestPathEnding()){
 				return false;
 			}
 			

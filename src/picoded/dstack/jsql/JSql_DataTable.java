@@ -399,62 +399,39 @@ public class JSql_DataTable extends Core_DataTable {
 	//--------------------------------------------------------------------------
 	
 	/**
-	 * Performs a search query, and returns the respective DataObjects
+	 * Performs a search query, and returns the respective DataObject keys.
 	 *
-	 * CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
-	 * @TODO: Performs the search pattern using the respective type map
+	 * This is the GUID key varient of query, this is critical for stack lookup
 	 *
 	 * @param   where query statement
 	 * @param   where clause values array
 	 * @param   query string to sort the order by, use null to ignore
 	 * @param   offset of the result to display, use -1 to ignore
-	 * @param   number of objects to return max
+	 * @param   number of objects to return max, use -1 to ignore
 	 *
-	 * @return  The DataObject[] array
+	 * @return  The String[] array
 	 **/
 	@Override
-	public DataObject[] query(String whereClause, Object[] whereValues, String orderByStr,
-		int offset, int limit) {
-		return JSql_DataTableUtils.DataTableQuery(this, sqlObj, dataTableName, whereClause,
+	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr, int offset,
+	int limit) {
+		return JSql_DataTableUtils.DataTableQuery_id(this, sqlObj, dataTableName, whereClause,
 			whereValues, orderByStr, offset, limit);
-		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
-	}
-	
-	/*
-
-	 * Performs a search query, and returns the respective DataObjects keys
-	 *
-	 * CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
-	 * @TODO: Performs the search pattern using the respective type map
-	 *
-	 * @param   where query statement
-	 * @param   where clause values array
-	 * @param   query string to sort the order by, use null to ignore
-	 * @param   offset of the result to display, use -1 to ignore
-	 * @param   number of objects to return max
-	 *
-	 * @returns  The String[] array
-	@Override
-	public String[] queryKeys(String whereClause, Object[] whereValues, String orderByStr,
-		int offset, int limit) {
-		return JSql_DataTableUtils.DataTableQueryKey(this, sqlObj, dataTableName, whereClause,
-			whereValues, orderByStr, offset, limit);
-		//return super.query( whereClause, whereValues, orderByStr, offset, limit );
 	}
 
+	/**
 	 * Performs a search query, and returns the respective DataObjects
 	 *
 	 * @param   where query statement
 	 * @param   where clause values array
 	 *
 	 * @returns  The total count for the query
+	 */
 	@Override
 	public long queryCount(String whereClause, Object[] whereValues) {
 		return JSql_DataTableUtils.DataTableCount(this, sqlObj, dataTableName, whereClause,
 			whereValues, null, -1, -1);
 	}
 
-	 */
 	
 	//--------------------------------------------------------------------------
 	//

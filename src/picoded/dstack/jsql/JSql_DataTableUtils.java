@@ -1018,7 +1018,7 @@ public class JSql_DataTableUtils {
 	 *
 	 * @return  The String[] array
 	 **/
-	public static String[] DataTableQueryKey( //
+	public static String[] DataTableQuery_id( //
 		// The meta table / sql configs
 		DataTable DataTableObj, JSql sql, String tablename, //
 		// The actual query
@@ -1037,33 +1037,33 @@ public class JSql_DataTableUtils {
 		return new String[0];
 	}
 	
-	/**
-	 * Performs a search query, and returns the respective DataObjects
-	 *
-	 * CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
-	 * @TODO: Performs the search pattern using the respective type map
-	 *
-	 * @param   DataTable object to refrence from
-	 * @param   JSql connection to use
-	 * @param   JSql table name to use
-	 * @param   where query statement
-	 * @param   where clause values array
-	 * @param   query string to sort the order by, use null to ignore
-	 * @param   offset of the result to display, use -1 to ignore
-	 * @param   number of objects to return max
-	 *
-	 * @return  The DataObject[] array
-	 **/
-	public static DataObject[] DataTableQuery( //
-		// The meta table / sql configs
-		DataTable DataTableObj, JSql sql, String tablename, //
-		// The actual query
-		String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
-	) { //
-		return DataTableObj.getArrayFromID(
-			DataTableQueryKey(DataTableObj, sql, tablename, whereClause, whereValues, orderByStr,
-				offset, limit), true);
-	}
+	// /**
+	//  * Performs a search query, and returns the respective DataObjects
+	//  *
+	//  * CURRENTLY: It is entirely dependent on the whereValues object type to perform the relevent search criteria
+	//  * @TODO: Performs the search pattern using the respective type map
+	//  *
+	//  * @param   DataTable object to refrence from
+	//  * @param   JSql connection to use
+	//  * @param   JSql table name to use
+	//  * @param   where query statement
+	//  * @param   where clause values array
+	//  * @param   query string to sort the order by, use null to ignore
+	//  * @param   offset of the result to display, use -1 to ignore
+	//  * @param   number of objects to return max
+	//  *
+	//  * @return  The DataObject[] array
+	//  **/
+	// public static DataObject[] DataTableQuery( //
+	// 	// The meta table / sql configs
+	// 	DataTable DataTableObj, JSql sql, String tablename, //
+	// 	// The actual query
+	// 	String whereClause, Object[] whereValues, String orderByStr, int offset, int limit //
+	// ) { //
+	// 	return DataTableObj.getArrayFromID(
+	// 		DataTableQuery_id(DataTableObj, sql, tablename, whereClause, whereValues, orderByStr,
+	// 			offset, limit), true);
+	// }
 	
 	/**
 	 * Performs a search query, and returns the respective DataObjects

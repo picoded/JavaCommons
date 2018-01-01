@@ -32,7 +32,7 @@ abstract public class CommonApiModule extends AbstractApiModule {
 	 */
 	protected void apiSetup(ApiBuilder api, String prefixPath,
 		GenericConvertMap<String, Object> config) {
-		if (config.getBoolean(STRING_ESCAPE_AFTER_FILTER, true)) {
+		if (config == null || config.getBoolean(STRING_ESCAPE_AFTER_FILTER, true)) {
 			api.after(prefixPath + "/*", stringEscapeAfterFilter);
 		}
 	}

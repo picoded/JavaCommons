@@ -73,7 +73,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * |                 |                    | This is used mainly to tune the generated SQL performance, against use case.  |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
-	 * | length          | int (optional)     | Default 50: The number of records to return                                   |
+	 * | length          | int (optional)     | Default -1: The number of records to return                                   |
 	 * | orderBy         | String (optional)  | Default : order by _oid                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | rowMode         | String (optional)  | Default "object", the result array row format, use either "array" or "object" |
@@ -139,7 +139,7 @@ public class DataTableAggregationApi extends DataTableApi {
 		
 		// Start, Length, and ordering limiting of data
 		int start = req.getInt(START, 0);
-		int length = req.getInt(LENGTH, 50);
+		int length = req.getInt(LENGTH, -1);
 		String orderBy = req.getString(ORDER_BY, "oID");
 		
 		// The result data row mode
@@ -194,15 +194,12 @@ public class DataTableAggregationApi extends DataTableApi {
 				Arrays.asList(dataObjs));
 			Map<String, Object> aggResult = picoded.core.struct.aggregation.Aggregation.aggregation(
 				aggTermsAndArgs, dataObjList);
-			res.put("aggregationResult", aggResult);
+			res.put(RESULT, aggResult);
 		}
 		
 		// Process the result for output
 		res.put(FIELD_LIST, fieldList);
 		res.put(TOTAL_COUNT, dataCount);
-		res.put(RESULT, formatDataObjectList(dataObjs, fieldList, rowMode));
-		
-		res.put("req_data", req.getStringArray("req_data", ""));
 		
 		// End and return result
 		return res;

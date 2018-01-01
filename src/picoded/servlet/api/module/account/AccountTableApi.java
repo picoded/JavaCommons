@@ -756,7 +756,6 @@ public class AccountTableApi extends CommonApiModule {
 	protected void apiSetup(ApiBuilder api, String prefixPath,
 		GenericConvertMap<String, Object> config) {
 		apiSetup(api, prefixPath);
-		accountLoginApi.apiSetup(api, prefixPath, config);
 	}
 	
 	/**
@@ -768,6 +767,9 @@ public class AccountTableApi extends CommonApiModule {
 	 **/
 	public void apiSetup(ApiBuilder builder, String path) {
 		
+		// Loadup super filters
+		super.apiSetup(builder,path,null);
+
 		accountLoginApi.apiSetup(builder, path, null);
 		// Basic new account, login, and logout
 		// builder.put(path + API_ACCOUNT_LOGIN, login); // Tested

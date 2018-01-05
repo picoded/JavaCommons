@@ -122,11 +122,11 @@ public class FileUtil extends FileUtilBase {
 	/**
 	 * Reads a file content into a string
 	 *
-	 * Encoding assumes US-ASCII by default
+	 * Encoding assumes UTF-8 by default
 	 *
 	 * @param File to read
 	 *
-	 * @return File string value (US-ASCII encoding)
+	 * @return File string value (UTF-8 encoding)
 	 **/
 	public static String readFileToString(File inFile) {
 		return FileUtil.readFileToString(inFile, (String) null);
@@ -136,14 +136,14 @@ public class FileUtil extends FileUtilBase {
 	 * Reads a file content into a string, with encoding
 	 *
 	 * @param File to read
-	 * @param Encoding string value to use - Null value assumes encoding with US-ASCII
+	 * @param Encoding string value to use - Null value assumes encoding with UTF-8
 	 *
 	 * @return File string value with given encoding
 	 **/
 	public static String readFileToString(File inFile, String encoding) {
 		try {
 			if (encoding == null || encoding.isEmpty()) {
-				encoding = "US-ASCII";
+				encoding = "UTF-8";
 			}
 			return org.apache.commons.io.FileUtils.readFileToString(inFile, encoding);
 		} catch (IOException e) {
@@ -154,7 +154,7 @@ public class FileUtil extends FileUtilBase {
 	/**
 	 * Write a string content into a file
 	 *
-	 * Encoding assumes US-ASCII by default
+	 * Encoding assumes UTF-8 by default
 	 *
 	 * @param File to read
 	 * @param String data to write
@@ -168,12 +168,12 @@ public class FileUtil extends FileUtilBase {
 	 *
 	 * @param File to read
 	 * @param String data to write
-	 * @param Encoding string value to use - Null value assumes encoding with US-ASCII
+	 * @param Encoding string value to use - Null value assumes encoding with UTF-8
 	 **/
 	public static void writeStringToFile(File inFile, String data, String encoding) {
 		try {
 			if (encoding == null || encoding.isEmpty()) {
-				encoding = "US-ASCII";
+				encoding = "UTF-8";
 			}
 			org.apache.commons.io.FileUtils.writeStringToFile(inFile, data, encoding);
 		} catch (IOException e) {
@@ -218,7 +218,7 @@ public class FileUtil extends FileUtilBase {
 	/**
 	 * Write to file only if it differs
 	 *
-	 * Encoding assumes US-ASCII by default
+	 * Encoding assumes UTF-8 by default
 	 *
 	 * @param file to write
 	 * @param value to write

@@ -843,7 +843,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 			// PathEnding enforcement
 			// https://stackoverflow.com/questions/4836858/is-response-redirect-always-an-http-get-response
 			// To explain why its only used for GET requests
-			if(requestType == HttpRequestType.GET && !enforceProperRequestPathEnding()){
+			if (requestType == HttpRequestType.GET && !enforceProperRequestPathEnding()) {
 				return false;
 			}
 			

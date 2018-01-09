@@ -905,7 +905,7 @@ public class AccountTable extends ModuleStructure implements
 		// From this point onwards, the session is valid. Now it performs checks for the renewal process
 		// Does nothing if response object is not given
 		//---------------------------------------------------------------------------------------------------
-
+		
 		// Do not set cookies if it is logout request, and return the result.
 		// This is to prevent session renewal and revoking from happening simultainously
 		// creating unexpected behaviour

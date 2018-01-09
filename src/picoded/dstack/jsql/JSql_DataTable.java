@@ -412,12 +412,12 @@ public class JSql_DataTable extends Core_DataTable {
 	 * @return  The String[] array
 	 **/
 	@Override
-	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr, int offset,
-	int limit) {
+	public String[] query_id(String whereClause, Object[] whereValues, String orderByStr,
+		int offset, int limit) {
 		return JSql_DataTableUtils.DataTableQuery_id(this, sqlObj, dataTableName, whereClause,
 			whereValues, orderByStr, offset, limit);
 	}
-
+	
 	/**
 	 * Performs a search query, and returns the respective DataObjects
 	 *
@@ -431,7 +431,6 @@ public class JSql_DataTable extends Core_DataTable {
 		return JSql_DataTableUtils.DataTableCount(this, sqlObj, dataTableName, whereClause,
 			whereValues, null, -1, -1);
 	}
-
 	
 	//--------------------------------------------------------------------------
 	//

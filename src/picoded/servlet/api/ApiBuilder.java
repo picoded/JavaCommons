@@ -855,7 +855,7 @@ public class ApiBuilder implements
 		} catch (Exception e) {
 			
 			if (e instanceof ApiException) {
-
+				
 				throw e; // pass it to `CorePage` to handle it using the `outputRequestException`  or `outputJSONException` methods, which can be overwritten by the application specific global api runner
 				
 			} else {

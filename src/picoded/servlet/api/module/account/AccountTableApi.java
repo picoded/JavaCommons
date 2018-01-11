@@ -21,21 +21,21 @@ import picoded.core.common.SystemSetupInterface;
  * Account table API builder
  **/
 public class AccountTableApi extends CommonApiModule {
-
+	
 	/**
 	 * The AccountTable reference
 	 **/
 	protected AccountTable table = null;
-
+	
 	/**
 	 * Static ERROR MESSAGES
 	 **/
 	public static final String MISSING_REQUEST_PAGE = "Unexpected Exception: Missing requestPage()";
-
+	
 	public boolean isTesting = false;
 	protected DataTableApi dataTableApi = null;
 	protected AccountLoginApi accountLoginApi = null;
-
+	
 	/**
 	 * Setup the account table api class
 	 *
@@ -47,17 +47,17 @@ public class AccountTableApi extends CommonApiModule {
 		dataTableApi = new DataTableApi(inTable.accountDataTable());
 		accountLoginApi = new AccountLoginApi(table);
 	}
-
+	
 	protected SystemSetupInterface[] internalSubsystemArray() {
 		return new SystemSetupInterface[] {};
 	}
-
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//   Basic login, logout, and account creation
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * # $prefix/new
 	 *
@@ -114,7 +114,7 @@ public class AccountTableApi extends CommonApiModule {
 				givenMetaObj = ConvertJSON.toMap(jsonMetaString);
 			}
 		}
-
+		
 		AccountObject newAccount = table.newEntry(loginName);
 		// Create new account
 		if (newAccount != null) {
@@ -131,7 +131,7 @@ public class AccountTableApi extends CommonApiModule {
 			newAccount.setPassword(password);
 			newAccount.putAll(givenMetaObj);
 			newAccount.saveAll();
-
+			
 			res.put(DATA, newAccount);
 			res.put(RESULT, newAccount._oid());
 		} else {
@@ -139,13 +139,13 @@ public class AccountTableApi extends CommonApiModule {
 		}
 		return res;
 	};
-
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//   DataTable info proxy
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	/**
 	 * Utility function used to set the current account as _oid, for the api request
 	 * IF _oid is not set
@@ -155,18 +155,18 @@ public class AccountTableApi extends CommonApiModule {
 		if (req.getString("_oid") == null) {
 			// Get the current user
 			AccountObject currentUser = table.getRequestUser(req.getHttpServletRequest(), null);
-
+			
 			// If current user is null, halt and throw an error
 			if (currentUser == null) {
 				res.put(ERROR, ERROR_NO_USER);
 				return;
 			}
-
+			
 			// Put user._oid as _oid
 			req.put("_oid", currentUser._oid());
 		}
 	}
-
+	
 	/**
 	 * # $prefix/info/get
 	 *
@@ -194,17 +194,17 @@ public class AccountTableApi extends CommonApiModule {
 	 **/
 	protected ApiFunction info_get = (req, res) -> {
 		defaultsCurrentAccountAsOID(req, res);
-
+		
 		// Return a list of login names of the user if exists
 		String oid = req.getString(OID, null);
 		AccountObject ao = table.get(oid);
 		if (ao != null) {
 			res.put(LOGINNAMELIST, ao.getLoginNameSet());
 		}
-
+		
 		return dataTableApi.get.apply(req, res);
 	};
-
+	
 	/**
 	 * # $prefix/info/set
 	 *
@@ -236,7 +236,7 @@ public class AccountTableApi extends CommonApiModule {
 		defaultsCurrentAccountAsOID(req, res);
 		return dataTableApi.set.apply(req, res);
 	};
-
+	
 	/**
 	 * # $prefix/info/list
 	 * See: DataTableApi.list
@@ -244,7 +244,7 @@ public class AccountTableApi extends CommonApiModule {
 	protected ApiFunction info_list = (req, res) -> {
 		return dataTableApi.list.apply(req, res);
 	};
-
+	
 	/**
 	 * # $prefix/info/datatables
 	 * See: DataTableApi.list.datatables
@@ -252,13 +252,13 @@ public class AccountTableApi extends CommonApiModule {
 	protected ApiFunction info_list_datatables = (req, res) -> {
 		return dataTableApi.datatables.apply(req, res);
 	};
-
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//   Other stuff (to review)
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	//
 	/**
 	 * # account/changePassword
@@ -287,54 +287,54 @@ public class AccountTableApi extends CommonApiModule {
 	 * +-----------------+-----------------------+----------------------------------------------------------------------------+
 	 **/
 	protected ApiFunction changePassword = (req, res) -> {
-
+		
 		// Get accountID to update
 		String accountID = req.getString(ACCOUNT_ID, "");
-
+		
 		// Get the current user ID
 		AccountObject cu = table.getRequestUser(req.getHttpServletRequest(), null);
 		AccountObject ao = table.get(accountID);
-
+		
 		// Validate that account object is given
 		if (ao == null) {
 			res.put(ERROR, ERROR_NO_USER);
 			return res;
 		}
-
+		
 		// Validate if the required params exists
 		String[] paramsToCheck = new String[] { NEW_PASSWORD };
 		res = check_parameters(paramsToCheck, req, res);
 		if (res.get(ERROR) != null) {
 			return res;
 		}
-
+		
 		// Get the old, and new password
 		String oldPassword = req.getString(OLD_PASSWORD);
 		String newPassword = req.getString(NEW_PASSWORD);
-
+		
 		// @TODO:If current account is super user,
 		// and is not modifying himself
-
+		
 		// Ensure from here user logged in and changing password is the same
 		if (ao._oid().equals(cu._oid()) == false) {
 			res.put(ERROR, "Change password, requires the respective user login permission");
 			return res;
 		}
-
+		
 		// Else require a proper setPassword with validation
 		if (!ao.setPassword(newPassword, oldPassword)) {
 			res.put(ERROR, ERROR_PASS_INCORRECT);
 			return res;
 		}
-
+		
 		// Return successful password reset
 		res.put(RESULT, true);
 		res.put(ACCOUNT_ID, ao._oid());
-
+		
 		// return result
 		return res;
 	};
-
+	
 	/**
 	 * # delete_user_account
 	 *
@@ -376,7 +376,7 @@ public class AccountTableApi extends CommonApiModule {
 		res.put(OID, userID);
 		return res;
 	};
-
+	
 	/**
 	 * # set_login_name
 	 *
@@ -434,12 +434,12 @@ public class AccountTableApi extends CommonApiModule {
 		res.put(LOGINNAME, loginName);
 		return res;
 	};
-
+	
 	protected void apiSetup(ApiBuilder api, String prefixPath,
 		GenericConvertMap<String, Object> config) {
 		apiSetup(api, prefixPath);
 	}
-
+	
 	/**
 	 * Does the actual setup for the API
 	 * Given the API Builder, and the namespace prefix
@@ -448,10 +448,10 @@ public class AccountTableApi extends CommonApiModule {
 	 * @param  Path to assume
 	 **/
 	public void apiSetup(ApiBuilder builder, String path) {
-
+		
 		// Loadup super filters
 		super.apiSetup(builder, path, null);
-
+		
 		accountLoginApi.apiSetup(builder, path, null);
 		// Basic new account, login, and logout
 		builder.put(path + API_ACCOUNT_NEW, new_account); // Tested
@@ -461,14 +461,14 @@ public class AccountTableApi extends CommonApiModule {
 		builder.put(path + "account/info/set", info_set);
 		builder.put(path + API_ACCOUNT_LIST, dataTableApi.list);
 		builder.put(path + "account/info/list/datatables", info_list_datatables);
-
+		
 		builder.put(path + "account/changePassword", changePassword); // Tested
-
+		
 		builder.put(path + "account/admin/remove", delete_user_account); // Tested
 	}
-
+	
 	// Private Methods
-
+	
 	private static Map<String, Object> extractCommonInfoFromAccountObject(AccountObject account,
 		boolean sanitiseOutput) {
 		//sanitise accountNames, groupNames,
@@ -480,7 +480,7 @@ public class AccountTableApi extends CommonApiModule {
 		commonInfo.put("isGroup", null);
 		commonInfo.put("groups", null);
 		commonInfo.put("isAnyGroupAdmin", false);
-
+		
 		if (account != null) {
 			commonInfo.put(ACCOUNT_ID, account._oid());
 			Set<String> accNameSet = account.getLoginNameSet();
@@ -506,40 +506,40 @@ public class AccountTableApi extends CommonApiModule {
 		}
 		return commonInfo;
 	}
-
+	
 	private static String generateQueryStringForSearchValue(String inSearchString,
 		String[] queryColumns) {
 		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
-
+			
 			for (int i = 0; i < searchStringSplit.length; ++i) {
 				querySB.append("(");
 				for (int queryCol = 0; queryCol < queryColumns.length; ++queryCol) {
 					querySB.append(queryColumns[queryCol] + " LIKE ?");
-
+					
 					if (queryCol < queryColumns.length - 1) {
 						querySB.append(" OR ");
 					}
 				}
 				querySB.append(")");
-
+				
 				if (i < searchStringSplit.length - 1) {
 					querySB.append(" AND ");
 				}
 			}
 			return querySB.toString();
 		}
-
+		
 		return "";
 	}
-
+	
 	private static List<String> generateQueryStringArgsForSearchValue_andAddToList(
 		String inSearchString, String[] queryColumns, String wildcardMode, List<String> ret) {
 		if (inSearchString != null && queryColumns != null) {
 			String[] searchStringSplit = inSearchString.trim().split("\\s+");
 			StringBuilder querySB = new StringBuilder();
-
+			
 			String wildMode = wildcardMode;
 			for (String searchString : searchStringSplit) {
 				for (String queryColumn : queryColumns) {
@@ -548,71 +548,71 @@ public class AccountTableApi extends CommonApiModule {
 				wildMode = "both"; //Second string onwards is both side wildcard
 			}
 		}
-
+		
 		return ret;
 	}
-
+	
 	private static String list_GET_and_POST_inner(AccountTable _DataTableObj, int draw, int start,
 		int length, String[] headers, String query, String[] queryArgs, String orderBy,
 		String[] insideGroup_any, String[] hasGroupRole_any, String groupStatus,
 		boolean sanitiseOutput, boolean asObject) throws RuntimeException {
-
+		
 		List<Object> ret = new ArrayList<Object>();
-
+		
 		if (_DataTableObj == null) {
 			return ConvertJSON.fromObject(ret);
 		}
-
+		
 		try {
 			if (headers != null && headers.length > 0) {
 				DataObject[] metaObjs = null;
 				AccountObject[] fullUserArray = null;
-
+				
 				if ((insideGroup_any == null || insideGroup_any.length == 0)
 					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
 					//do normal query
 					DataTable accountDataTable = _DataTableObj.accountDataTable();
-
+					
 					if (accountDataTable == null) {
 						return ConvertJSON.fromObject(ret);
 					}
-
+					
 					if (query == null || query.isEmpty() || queryArgs == null || queryArgs.length == 0) {
 						metaObjs = accountDataTable.query(null, null, orderBy, start, length);
 					} else {
 						metaObjs = accountDataTable.query(query, queryArgs, orderBy, start, length);
 					}
-
+					
 					List<AccountObject> retUsers = new ArrayList<AccountObject>();
 					for (DataObject metaObj : metaObjs) {
 						AccountObject ao = _DataTableObj.get(metaObj._oid()); //a single account
 						// System.out.println(ao._oid()+" ahwejakwekawej<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 						retUsers.add(ao);
 					}
-
+					
 					fullUserArray = retUsers.toArray(new AccountObject[retUsers.size()]);
 				}
-
+				
 				if (fullUserArray == null || fullUserArray.length == 0) {
 					return ConvertJSON.fromObject(ret);
 				}
-
+				
 				for (AccountObject ao : fullUserArray) {
 					List<Object> rowAsList = new ArrayList<Object>();
 					Map<String, Object> rowAsObject = new HashMap<String, Object>();
 					for (String header : headers) {
-
+						
 						if (header.equalsIgnoreCase("names")) {
 							if (ao != null) {
 								Set<String> aoNames = ao.getLoginNameSet();
-
+								
 								if (sanitiseOutput) {
 									aoNames.clear();
 									for (String name : ao.getLoginNameSet()) {
 										aoNames.add(StringEscape.commonHtmlEscapeCharacters(name));
 									}
 								}
-
+								
 								if (aoNames != null) {
 									List<String> aoNameList = new ArrayList<String>(aoNames);
 									if (asObject)
@@ -637,7 +637,7 @@ public class AccountTableApi extends CommonApiModule {
 								else
 									rowAsList.add(rawVal);
 							}
-
+							
 						}
 					}
 					if (asObject)
@@ -649,10 +649,10 @@ public class AccountTableApi extends CommonApiModule {
 		} catch (Exception e) {
 			throw new RuntimeException("list_GET_and_POST_inner() ", e);
 		}
-
+		
 		return ConvertJSON.fromObject(ret);
 	}
-
+	
 	private static String getStringWithWildcardMode(String searchString, String wildcardMode) {
 		if (wildcardMode.equalsIgnoreCase("prefix")) {
 			return "%" + searchString;
@@ -662,7 +662,7 @@ public class AccountTableApi extends CommonApiModule {
 			return "%" + searchString + "%";
 		}
 	}
-
+	
 	public static ApiResponse check_parameters(String[] listToCheck, ApiRequest req, ApiResponse res) {
 		for (String paramName : listToCheck) {
 			String value = "";

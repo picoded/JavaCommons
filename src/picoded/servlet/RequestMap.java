@@ -139,7 +139,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 			@SuppressWarnings("unchecked")
 			List<FileItem> formItems = upload.parseRequest(request);
 			
-			// Detect request encoding format, by default set to UTF-8 
+			// Detect request encoding format, by default set to UTF-8
 			String encoding = (request.getCharacterEncoding() != null) ? request
 				.getCharacterEncoding() : "UTF-8";
 			

@@ -11,11 +11,13 @@ import java.util.Collection;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 import org.apache.commons.collections4.map.AbstractMapDecorator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.conv.ConvertJSON;
@@ -29,6 +31,11 @@ import picoded.core.conv.ConvertJSON;
  **/
 public class RequestMap extends AbstractMapDecorator<String, Object> implements
 	GenericConvertMap<String, Object> {
+	
+	// Private variables
+	//------------------------------------------------------------------------------
+	// Request body's content
+	private byte[] reqBodyByteArray = null;
 	
 	// Upload settings (for now)
 	//------------------------------------------------------------------------------
@@ -61,9 +68,47 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 	/**
 	 * basic proxy constructor
 	 **/
+	//	public RequestMap(HttpServletRequest req) {
+	//		super(mapConvert(req.getParameterMap()));
+	//		System.out.println(req.getParameterMap() + " awerawer");
+	//		multipartProcessing(req);
+	//
+	//	}
+	
 	public RequestMap(HttpServletRequest req) {
+		// This covers GET request,
+		// and/or form POST request
 		super(mapConvert(req.getParameterMap()));
-		multipartProcessing(req);
+		
+		// Does 'post' request processing
+		if (req.getMethod().equalsIgnoreCase("post")) {
+			// Does specific post type processing
+			if (req.getContentType().contains("application/json")) {
+				// Does processing of JSON request
+				try {
+					// get the request body / input stream
+					setInputStreamToByteArray(req.getInputStream());
+					
+					// get the JSON string from the body
+					String requestJSON = new String(getRequestBodyByteArray());
+					
+					// Convert into jsonMap
+					Map<String, Object> jsonMap = ConvertJSON.toMap(requestJSON);
+					
+					// Store the data
+					this.putAll(jsonMap);
+				} catch (IOException e) {
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			} else {
+				// Multipart processing, this covers file uploads
+				// Used in the other post types
+				multipartProcessing(req);
+			}
+		}
 	}
 	
 	/**
@@ -71,6 +116,28 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 	 **/
 	protected static RequestMap fromStringArrayValueMap(Map<String, String[]> proxy) {
 		return new RequestMap(mapConvert(proxy));
+	}
+	
+	//------------------------------------------------------------------------------
+	// Utility functions (external)
+	//------------------------------------------------------------------------------
+
+	/**
+	 *
+	 * @param input of the request
+	 * @throws IOException
+	 */
+	private void setInputStreamToByteArray(InputStream input) throws IOException {
+		// Save the request body as a byte array
+		this.reqBodyByteArray = IOUtils.toByteArray(input);
+	}
+
+	/**
+	 *
+	 * @return request body in byte array
+	 */
+	public byte[] getRequestBodyByteArray() {
+		return reqBodyByteArray;
 	}
 	
 	//------------------------------------------------------------------------------
@@ -147,6 +214,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 				for (FileItem item : formItems) {
 					// Field name to handle
 					String fieldname = item.getFieldName();
+					System.out.println("item name: " + fieldname);
 					// processes only fields that are not form fields
 					if (item.isFormField()) {
 						

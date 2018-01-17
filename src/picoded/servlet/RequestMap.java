@@ -81,9 +81,9 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 		super(mapConvert(req.getParameterMap()));
 		
 		// Does 'post' request processing
-		if (req.getMethod().equalsIgnoreCase("post")) {
+		if (req.getMethod() != null && req.getMethod().equalsIgnoreCase("post")) {
 			// Does specific post type processing
-			if (req.getContentType().contains("application/json")) {
+			if (req.getContentType() != null && req.getContentType().contains("application/json")) {
 				// Does processing of JSON request
 				try {
 					// get the request body / input stream
@@ -121,7 +121,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 	//------------------------------------------------------------------------------
 	// Utility functions (external)
 	//------------------------------------------------------------------------------
-
+	
 	/**
 	 *
 	 * @param input of the request
@@ -131,7 +131,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 		// Save the request body as a byte array
 		this.reqBodyByteArray = IOUtils.toByteArray(input);
 	}
-
+	
 	/**
 	 *
 	 * @return request body in byte array
@@ -214,7 +214,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 				for (FileItem item : formItems) {
 					// Field name to handle
 					String fieldname = item.getFieldName();
-					System.out.println("item name: " + fieldname);
+
 					// processes only fields that are not form fields
 					if (item.isFormField()) {
 						

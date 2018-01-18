@@ -1,9 +1,13 @@
 package picoded.servlet.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ApiException extends RuntimeException {
 	
 	private int status = 500;
 	private String errorCode = "";
+	private Map<String, Object> metaData = new HashMap<>();
 	
 	public ApiException(int status, String errorCode, String message) {
 		super(message);
@@ -31,4 +35,17 @@ public class ApiException extends RuntimeException {
 	public void setErrorCode(String errorCode) {
 		this.errorCode = errorCode;
 	}
+	
+	public Map<String, Object> getMetaData() {
+		return metaData;
+	}
+	
+	public void setMetaData(Map<String, Object> metaData) {
+		this.metaData = metaData;
+	}
+	
+	public void putMetaData(String key, Object value) {
+		this.metaData.put(key, value);
+	}
+	
 }

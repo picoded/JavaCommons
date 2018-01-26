@@ -174,9 +174,19 @@ public class AccountLoginApi extends CommonApiModule {
 				return res;
 			}
 			
+			// retrieve rememberMe option
+			Map<String, String[]> cookies = req.getCorePage().requestCookieMap();
+			if (cookies != null) {
+				String[] account_rmb = cookies.get("account_rmb");
+				if (account_rmb.length > 0) {
+					if (account_rmb[0].equalsIgnoreCase("1")) {
+						res.put(REMEMBER_ME, true);
+					}
+				}
+			}
+
 			// User is found, return its result
 			res.put(RESULT, true);
-			res.put(REMEMBER_ME, rememberMe);
 			
 			// Return common information for the user
 			extractCommonInfoFromAccountObject(currentUser, res);

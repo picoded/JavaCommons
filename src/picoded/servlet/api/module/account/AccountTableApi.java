@@ -464,7 +464,7 @@ public class AccountTableApi extends CommonApiModule {
 		
 		builder.put(path + "account/changePassword", changePassword); // Tested
 		
-		builder.put(path + "account/admin/remove", delete_user_account); // Tested
+		builder.put(path + "admin/account/remove", delete_user_account); // Tested
 	}
 	
 	// Private Methods

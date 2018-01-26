@@ -265,7 +265,7 @@ public class CommonsPage extends BasePage {
 	
 	/**
 	 * Stadnard broadcast email module support,
-	 * this is based on sys.smtp configuration
+	 * this is based on sys.email.smtp configuration
 	 */
 	public EmailBroadcaster systemEmail() {
 		if (systemEmail != null) {
@@ -273,20 +273,21 @@ public class CommonsPage extends BasePage {
 		}
 		
 		// return null if disabled
-		if (DConfig().getBoolean("sys.smtp.enabled", true) == false) {
+		if (DConfig().getBoolean("sys.email.smtp.enabled", true) == false) {
 			return null;
 		}
 		
 		// Set up the system email settings
 		// Get hostname, user, pass, and from account
-		String hostname = DConfig().getString("sys.smtp.host", "smtp.mailinator.com:25");
-		String username = DConfig().getString("sys.smtp.username", "");
-		String password = DConfig().getString("sys.smtp.password", "");
-		String emailFrom = DConfig().getString("sys.smtp.emailFrom",
+		String hostname = DConfig().getString("sys.email.smtp.host", "smtp.mailinator.com:25");
+		String username = DConfig().getString("sys.email.smtp.username", "");
+		String password = DConfig().getString("sys.email.smtp.password", "");
+		String emailFrom = DConfig().getString("sys.email.smtp.emailFrom",
 			"testingTheEmailSystem@mailinator.com");
-		boolean isSSL = DConfig().getBoolean("sys.smtp.ssl", false);
+		boolean isSSL = DConfig().getBoolean("sys.email.smtp.ssl", false);
 		systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom, isSSL);
-		systemEmail.setAdminEmail(DConfig().getString("sys.smtp.adminEmail", "eugene@uilicious.com"));
+		systemEmail.setAdminEmail(DConfig().getString("sys.email.smtp.adminEmail",
+			"eugene@uilicious.com"));
 		return systemEmail;
 	}
 }

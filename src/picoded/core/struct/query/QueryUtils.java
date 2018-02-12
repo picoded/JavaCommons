@@ -1,6 +1,6 @@
 package picoded.core.struct.query;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Utility of query functions, used to query a collection and sort its results
@@ -66,6 +66,6 @@ public class QueryUtils {
 	 * @return  list of result
 	 */
 	public static <V> List<V> sort(List<V> inList, String orderBy) {
-		
+		return null;
 	}
 }

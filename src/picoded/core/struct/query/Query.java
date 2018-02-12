@@ -311,6 +311,29 @@ public interface Query extends Predicate<Object> {
 	//--------------------------------------------------------------------
 	// Map based search
 	//--------------------------------------------------------------------
+
+	/**
+	 * Searches using the query, and returns the resulting set
+	 **/
+	default <V> List<V> search(List<V> list) {
+		List<V> ret = new ArrayList<V>();
+		for (V val :list) {
+			if (test(val)) {
+				ret.add(val);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * Searches using the query, and sorted by the comparator
+	 **/
+	default <V> List<V> search(List<V> list, Comparator<V> compareFunc) {
+		List<V> ret = search(list);
+		Collections.sort(ret, compareFunc);
+		return ret;
+	}
+	
 	/**
 	 * Searches using the query, and returns the resulting set
 	 **/

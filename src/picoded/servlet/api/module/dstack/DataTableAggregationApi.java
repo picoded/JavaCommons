@@ -350,5 +350,6 @@ public class DataTableAggregationApi extends DataTableApi {
 		GenericConvertMap<String, Object> config) {
 		super.apiSetup(api, prefixPath, config);
 		api.endpoint(prefixPath + "/aggregatedlist", aggregatedList);
+		api.endpoint(prefixPath + "/aggregate", aggregatedList);
 	}
 }

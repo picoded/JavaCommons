@@ -34,6 +34,13 @@ public abstract class ModuleStructure {
 	protected List<CommonStructure> internalStructureList = null;
 	
 	/**
+	 * Blank constructor, used for more custom extensions
+	 **/
+	public ModuleStructure() {
+		// Intentionally left blank
+	}
+
+	/**
 	 * Setup a module structure given a stack, and its name
 	 *
 	 * @param  CommonStack / DStack system to use

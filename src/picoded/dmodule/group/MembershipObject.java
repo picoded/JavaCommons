@@ -1,4 +1,4 @@
-package picoded.dstack.module.group;
+package picoded.dmodule.group;
 
 import java.util.*;
 

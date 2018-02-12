@@ -1,4 +1,4 @@
-package picoded.dstack.module.vfs;
+package picoded.dmodule.vfs;
 
 // Target test class
 import static org.junit.Assert.*;
@@ -7,7 +7,7 @@ import org.junit.*;
 // Test depends
 import java.util.*;
 import picoded.dstack.*;
-import picoded.dstack.module.vfs.*;
+import picoded.dmodule.vfs.*;
 import picoded.dstack.struct.simple.*;
 
 public class VirtualFileSystem_test {

@@ -1,4 +1,4 @@
-package picoded.dstack.module.account;
+package picoded.dmodule.account;
 
 // Target test class
 import static org.junit.Assert.*;

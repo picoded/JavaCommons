@@ -5,7 +5,7 @@ import picoded.dstack.CommonStructure;
 import picoded.util.security.NxtCrypt;
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.struct.GenericConvertHashMap;
-import picoded.dstack.module.account.AccountTable;
+import picoded.dmodule.account.AccountTable;
 
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;

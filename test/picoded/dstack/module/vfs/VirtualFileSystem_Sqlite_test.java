@@ -1,4 +1,4 @@
-package picoded.dstack.module.vfs;
+package picoded.dmodule.vfs;
 
 // Target test class
 import static org.junit.Assert.*;
@@ -10,7 +10,7 @@ import picoded.dstack.*;
 import picoded.dstack.jsql.*;
 import picoded.dstack.jsql.connector.*;
 import picoded.dstack.jsql.connector.db.*;
-import picoded.dstack.module.vfs.*;
+import picoded.dmodule.vfs.*;
 import picoded.dstack.struct.simple.*;
 import picoded.TestConfig;
 

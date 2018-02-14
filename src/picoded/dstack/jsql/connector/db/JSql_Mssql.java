@@ -725,4 +725,229 @@ public class JSql_Mssql extends JSql_Base {
 			null, null, null);
 	}
 	
+		/**
+	 * Does multiple UPSERT continously. Use this command when doing,
+	 * a large number of UPSERT's to the same table with the same format.
+	 *
+	 * In certain SQL deployments, this larger multi-UPSERT would be optimized as a
+	 * single transaction call. However this behaviour is not guranteed across all platforms.
+	 *
+	 * This is incredibily useful for large meta-table object updates.
+	 *
+	 * @param  Table name to query
+	 * @param  Unique column names
+	 * @param  Unique column values, as a list. Each item in a list represents the respecitve row record
+	 * @param  Upsert column names
+	 * @param  Upsert column values, as a list. Each item in a list represents the respecitve row record
+	 * @param  Default column to use existing values if exists
+	 * @param  Default column values to use if not exists, as a list. Each item in a list represents the respecitve row record
+	 * @param  All other column names to maintain existing value
+	 *
+	 * @return  true, if UPSERT statement executed succesfuly
+	 **/
+	public boolean multiUpsert( //
+		String tableName, // Table name to upsert on
+		//
+		String[] uniqueColumns, // The unique column names
+		List<Object[]> uniqueValuesList, // The row unique identifier values
+		//
+		String[] insertColumns, // Columns names to update
+		List<Object[]> insertValuesList, // Values to update
+		// Columns names to apply default value, if not exists
+		// Values to insert, that is not updated. Note that this is ignored if pre-existing values exists
+		String[] defaultColumns, //
+		List<Object[]> defaultValuesList, //
+		// Various column names where its existing value needs to be maintained (if any),
+		// this is important as some SQL implementation will fallback to default table values, if not properly handled
+		String[] miscColumns //
+	) {
+		
+		/// Checks that unique column and values length are not null
+		if (uniqueColumns == null || uniqueValuesList == null) {
+			throw new JSqlException("Upsert query requires unique columns and values");
+		}
+		
+		if(uniqueValuesList.size() != insertValuesList.size() && uniqueValuesList.size() != defaultValuesList.size()){
+			throw new JSqlException("Upsert query requires unique all values list to be of same size");
+		}
+		
+		String equalSign = "=";
+		String targetTableAlias = "target";
+		String sourceTableAlias = "source";
+		String statementTerminator = ";";
+		
+		/// Building the query for INSERT OR REPLACE
+		StringBuilder queryBuilder = new StringBuilder();
+		ArrayList<Object> queryArgs = new ArrayList<Object>();
+		
+		// MERGE section
+		queryBuilder.append("MERGE INTO `");
+		queryBuilder.append(tableName);
+		queryBuilder.append("` AS ");
+		queryBuilder.append(targetTableAlias);
+		queryBuilder.append(" ");
+		
+		// USING VALUES section
+		queryBuilder.append("USING ( VALUES ");
+		
+		// dynamically append the rows in the VALUES section
+		int rows = uniqueValuesList.size();
+		for(int i = 0; i < rows; ++i){
+			queryBuilder.append("(");
+			
+			for(int x = 0; x < uniqueColumns.length; ++x){
+				queryBuilder.append("?,");
+			}
+			
+			for(int x = 0; x < insertColumns.length; ++x){
+				queryBuilder.append("?,");
+			}
+			
+			for(int x = 0; x < defaultColumns.length; ++x){
+				queryBuilder.append("?");
+				if(x < (defaultColumns.length - 1)){
+					queryBuilder.append(",");
+				}
+			}
+			
+			queryBuilder.append(")");
+			if(i < (rows-1)){
+				queryBuilder.append(",");
+			}
+		}
+		queryBuilder.append(")");
+		
+		// AS
+		queryBuilder.append(" AS ");
+		queryBuilder.append(sourceTableAlias);
+		queryBuilder.append("(");
+		for(int x = 0; x < uniqueColumns.length; ++x){
+			queryBuilder.append(uniqueColumns[x]);
+			queryBuilder.append(",");
+		}
+		
+		for(int x = 0; x < insertColumns.length; ++x){
+			queryBuilder.append(insertColumns[x]);
+			queryBuilder.append(",");
+		}
+		
+		for(int x = 0; x < defaultColumns.length; ++x){
+			queryBuilder.append(defaultColumns[x]);
+			if(x < (defaultColumns.length - 1)){
+				queryBuilder.append(",");
+			}
+		}
+		queryBuilder.append(")");
+		
+		//ON
+		queryBuilder.append(" ON (");
+		for(int x = 0; x < uniqueColumns.length; ++x){
+			queryBuilder.append(sourceTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(uniqueColumns[x]);
+			
+			queryBuilder.append("=");
+			
+			queryBuilder.append(targetTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(uniqueColumns[x]);
+			
+			if(x < (uniqueColumns.length-1)){
+				queryBuilder.append(" AND ");
+			}
+		}
+		queryBuilder.append(")");
+		
+		// WHEN MATCHED THEN
+		queryBuilder.append(" WHEN MATCHED THEN UPDATE SET ");
+		for(int x = 0; x < insertColumns.length; ++x){
+			queryBuilder.append(targetTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(insertColumns[x]);
+			
+			queryBuilder.append("=");
+			
+			queryBuilder.append(sourceTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(insertColumns[x]);
+			
+			queryBuilder.append(",");
+		}
+		for(int x = 0; x < defaultColumns.length; ++x){
+			queryBuilder.append(targetTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(defaultColumns[x]);
+			
+			queryBuilder.append("=");
+			
+			queryBuilder.append(sourceTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(defaultColumns[x]);
+			
+			if(x < (defaultColumns.length-1)){
+				queryBuilder.append(",");
+			}
+		}
+		
+		// WHEN NOT MATCHED THEN INSERT
+		queryBuilder.append(" WHEN NOT MATCHED THEN INSERT ");
+		queryBuilder.append("(");
+		for(int x = 0; x < uniqueColumns.length; ++x){
+			queryBuilder.append(uniqueColumns[x]);
+			queryBuilder.append(",");
+		}
+		
+		for(int x = 0; x < insertColumns.length; ++x){
+			queryBuilder.append(insertColumns[x]);
+			queryBuilder.append(",");
+		}
+		
+		for(int x = 0; x < defaultColumns.length; ++x){
+			queryBuilder.append(defaultColumns[x]);
+			if(x < (defaultColumns.length - 1)){
+				queryBuilder.append(",");
+			}
+		}
+		queryBuilder.append(")");
+		
+		// VALUES
+		queryBuilder.append(" VALUES ");
+		queryBuilder.append("(");
+		for(int x = 0; x < uniqueColumns.length; ++x){
+			queryBuilder.append(sourceTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(uniqueColumns[x]);
+			queryBuilder.append(",");
+		}
+		
+		for(int x = 0; x < insertColumns.length; ++x){
+			queryBuilder.append(sourceTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(insertColumns[x]);
+			queryBuilder.append(",");
+		}
+		
+		for(int x = 0; x < defaultColumns.length; ++x){
+			queryBuilder.append(sourceTableAlias);
+			queryBuilder.append(".");
+			queryBuilder.append(defaultColumns[x]);
+			if(x < (defaultColumns.length - 1)){
+				queryBuilder.append(",");
+			}
+		}
+		queryBuilder.append(")");
+		
+		// ;
+		queryBuilder.append(statementTerminator);
+		
+		// Append the args
+		for(int i = 0; i < rows; ++i){
+			queryArgs.addAll(java.util.Arrays.asList(uniqueValuesList.get(i)));
+			queryArgs.addAll(java.util.Arrays.asList(insertValuesList.get(i)));
+			queryArgs.addAll(java.util.Arrays.asList(defaultValuesList.get(i)));
+		}
+		
+		JSqlPreparedStatement statement = new JSqlPreparedStatement(queryBuilder.toString(), queryArgs.toArray(), this);
+		return statement.update() >= 1;
+	}
 }

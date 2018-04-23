@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * json simplification helpers. When you do not need custom object / array structures.
@@ -207,6 +208,7 @@ public class ConvertJSON {
 		 * With pretty print
 		 **/
 		try {
+			cachedMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 			return cachedMapper().writer(prettyPrinter).writeValueAsString(input);
 		} catch (IOException e) {
 			// Any exception is recasted as InvalidFormatJSON

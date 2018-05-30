@@ -103,6 +103,11 @@ public class ConvertJSON {
 		cm.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		
 		/**
+		 * Allow fail on empty beans, for stripe -.-
+		 */
+		cm.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		
+		/**
 		 * Actual map builder
 		 **/
 		return cachedMapper = cm;

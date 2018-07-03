@@ -21,7 +21,7 @@ public class DStackApiConstantStrings {
 	public static final String QUERY = "query";
 	public static final String QUERY_ARGS = "queryArgs";
 	
-	public static final String SEARCH_MODE = "suffix";
+	public static final String SEARCH_MODE = "searchMode";
 	public static final String SEARCH_STRING = "searchString";
 	public static final String SEARCH_FIELDLIST = "searchFieldList";
 	

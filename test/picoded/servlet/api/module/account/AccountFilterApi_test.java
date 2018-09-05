@@ -22,6 +22,7 @@ import picoded.core.struct.GenericConvertMap;
 import static picoded.servlet.api.module.account.AccountConstantStrings.*;
 import static picoded.servlet.api.module.ApiModuleConstantStrings.*;
 
+/*
 /// Test the AccountTable API specifically
 public class AccountFilterApi_test extends ApiModule_test {
 	
@@ -1734,3 +1735,5 @@ public class AccountFilterApi_test extends ApiModule_test {
 	// 	assertTrue(res.getList(LIST).size() == 0);
 	// }
 }
+
+*/

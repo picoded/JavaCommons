@@ -85,7 +85,7 @@ public class ApiModule_test {
 		/// @return  The DStack.CommonStack implementation, used for module setup
 		public CommonStack stackSetup() {
 			if (sharedCommonStack == null) {
-				sharedCommonStack = new StructSimpleStack();
+				sharedCommonStack = new StructSimpleStack(null);
 			}
 			return sharedCommonStack;
 		}

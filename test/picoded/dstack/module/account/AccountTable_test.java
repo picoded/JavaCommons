@@ -23,7 +23,7 @@ public class AccountTable_test {
 	/// is to be overriden for the various backend
 	/// specific test cases
 	public CommonStack stackProvider() {
-		return new StructSimpleStack();
+		return new StructSimpleStack(null);
 	}
 	
 	// Setup and sanity test

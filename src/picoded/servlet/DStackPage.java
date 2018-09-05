@@ -10,10 +10,6 @@ import picoded.dstack.*;
 // import picoded.JStruct.*;
 // import picoded.JSql.*;
 
-import picoded.dstack.jsql.connector.JSql;
-import picoded.dstack.DStack;
-import picoded.dstack.stack.DStackConfigLoader;
-
 /**
  * Extends the corePage functionality, and implements file directory listing, DStack usage, and config files
  *
@@ -73,8 +69,8 @@ public class DStackPage extends CoreApiPage {
 		if (DStackObj != null) {
 			return DStackObj;
 		}
-		List<Object> stackConfig = DConfig().getObjectList("sys.DStack.stack", null);
-		DStackObj = DStackConfigLoader.generateDStack(stackConfig);
+		Map<String,Object> stackConfig = DConfig().getStringMap("sys.DStack", null);
+		DStackObj = new Dstack(stackConfig);
 		return DStackObj;
 	}
 	

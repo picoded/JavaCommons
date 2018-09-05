@@ -35,7 +35,7 @@ public class AccountObject extends Core_DataObject {
 	 **/
 	protected AccountObject(AccountTable accTable, String inOID) {
 		// Inherit all the default data table methods
-		super((Core_DataTable) (accTable.accountDataTable), inOID);
+		super((Core_DataObjectMap) (accTable.accountDataTable), inOID);
 		mainTable = accTable;
 	}
 	
@@ -200,7 +200,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return  Password salted hash, as per NxtCrypt usage
 	 **/
 	protected String getPasswordHash() {
-		return mainTable.accountAuthMap.get(_oid);
+		return mainTable.accountAuthMap.getValue(_oid);
 	}
 	
 	/**
@@ -284,7 +284,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return if > 0, linux timestamp (seconds) when login is permitted. 0 means the account is not locked
 	 **/
 	public long getUnlockTimestamp() {
-		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
+		return mainTable.loginThrottlingExpiryMap.getLong(this._oid(), 0l);
 	}
 	
 	/**
@@ -293,7 +293,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return Number of login attempts performed since last succesful login
 	 **/
 	public long getFailedLoginAttempts() {
-		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
+		return mainTable.loginThrottlingAttemptMap.getLong(this._oid(), 0l);
 	}
 	
 	/**
@@ -653,7 +653,7 @@ public class AccountObject extends Core_DataObject {
 	 **/
 	protected String getUncheckedNextToken(String sessionID, String tokenID) {
 		if (hasToken(sessionID, tokenID)) {
-			return mainTable.sessionNextTokenMap.get(tokenID);
+			return mainTable.sessionNextTokenMap.getValue(tokenID);
 		}
 		return null;
 	}
@@ -737,11 +737,11 @@ public class AccountObject extends Core_DataObject {
 	}
 	
 	private long getAttempts() {
-		return mainTable.loginThrottlingAttemptMap.get(this._oid(), 0l);
+		return mainTable.loginThrottlingAttemptMap.getLong(this._oid(), 0l);
 	}
 	
 	private long getExpiryTime() {
-		return mainTable.loginThrottlingExpiryMap.get(this._oid(), 0l);
+		return mainTable.loginThrottlingExpiryMap.getLong(this._oid(), 0l);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

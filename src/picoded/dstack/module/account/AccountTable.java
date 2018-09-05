@@ -249,14 +249,14 @@ public class AccountTable extends ModuleStructure implements
 	protected List<CommonStructure> setupInternalStructureList() {
 		
 		// Login auth information
-		accountLoginNameMap = stack.getKeyValueMap(name + SUFFIX_ACCOUNT_LOGIN_ID);
-		accountAuthMap = stack.getKeyValueMap(name + SUFFIX_ACCOUNT_HASH);
+		accountLoginNameMap = stack.keyValueMap(name + SUFFIX_ACCOUNT_LOGIN_ID);
+		accountAuthMap = stack.keyValueMap(name + SUFFIX_ACCOUNT_HASH);
 		
 		// Login session infromation
-		sessionLinkMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION);
-		sessionInfoMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_SESSION_INFO);
-		sessionTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_TOKEN);
-		sessionNextTokenMap = stack.getKeyValueMap(name + SUFFIX_LOGIN_NEXT_TOKEN);
+		sessionLinkMap = stack.keyValueMap(name + SUFFIX_LOGIN_SESSION);
+		sessionInfoMap = stack.keyValueMap(name + SUFFIX_LOGIN_SESSION_INFO);
+		sessionTokenMap = stack.keyValueMap(name + SUFFIX_LOGIN_TOKEN);
+		sessionNextTokenMap = stack.keyValueMap(name + SUFFIX_LOGIN_NEXT_TOKEN);
 		
 		// Account meta information
 		accountDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_META);
@@ -267,10 +267,10 @@ public class AccountTable extends ModuleStructure implements
 		loginThrottlingExpiryMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
 		
 		// Account Verification information
-		accountVerificationMap = stack.getKeyValueMap(name + ACCOUNT_VERIFICATION);
+		accountVerificationMap = stack.keyValueMap(name + ACCOUNT_VERIFICATION);
 		
 		// Account Password Token information
-		accountPasswordTokenMap = stack.getKeyValueMap(name + ACCOUNT_PASSWORD_TOKEN);
+		accountPasswordTokenMap = stack.keyValueMap(name + ACCOUNT_PASSWORD_TOKEN);
 		
 		// Side note: For new table, edit here and add into the return List
 		

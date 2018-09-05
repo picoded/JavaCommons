@@ -1,0 +1,1 @@
+This is based on the JavaCommons v3 rebuild on gradle - https://github.com/picoded/JavaCommons-gradle/

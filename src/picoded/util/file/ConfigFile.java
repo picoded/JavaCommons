@@ -104,7 +104,7 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 	public Object get(Object key) {
 		String keyString = key.toString();
 		if (jsonMap != null) {
-			return jsonMap.getNestedObject(keyString);
+			return jsonMap.fetchObject(keyString);
 		} else {
 			// read from ini
 			String[] splitKeyString = keyString.split("\\.");

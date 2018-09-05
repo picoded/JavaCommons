@@ -1,6 +1,26 @@
 package picoded.dstack.jsql;
 
+// Java imports
 import java.util.*;
+import java.util.logging.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.SQLException;
+
+// Picoded imports
+import picoded.core.conv.*;
+import picoded.core.common.*;
+import picoded.dstack.*;
+import picoded.dstack.core.*;
+import picoded.dstack.jsql.*;
+import picoded.dstack.jsql.connector.*;
+import picoded.core.struct.*;
+import picoded.core.struct.query.*;
+import picoded.core.struct.query.condition.*;
+import picoded.core.struct.query.internal.*;
 
 /// Utility function used to format JSQL rows
 public class JSql_Rows {
@@ -66,7 +86,7 @@ public class JSql_Rows {
 		}
 		
 		// Curent timestamp
-		long now = getCurrentTimestamp();
+		long now = JSql_DataObjectMapUtil.getCurrentTimestamp();
 		
 		//
 		// Iterate and store ONLY values inside the keyList
@@ -103,7 +123,7 @@ public class JSql_Rows {
 				}
 			} else {
 				// Converts it into a type set, and store it
-				Object[] typSet = valueToValueTypeSet(v);
+				Object[] typSet = JSql_DataObjectMapUtil.valueToValueTypeSet(v);
 				
 				// Setup the multiUpsert
 				uniqueValuesList.add(new Object[] { _oid, k, 0 });

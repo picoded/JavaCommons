@@ -1,2 +1,0 @@
-https://github.com/mrniko/redisson/wiki/Config-examples
-https://github.com/mrniko/redisson/wiki/Usage-examples

@@ -4,8 +4,6 @@ import java.util.Calendar;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.mysql.jdbc.StringUtils;
-
 /**
  * Convenience class to convert between date types.
  *
@@ -75,7 +73,7 @@ public class ISODateConv {
 	 **/
 	public static String toMillisecondsFormat(String inDate, ISODateFormat currentDateFormat,
 		String separator) {
-		if (StringUtils.isNullOrEmpty(inDate)) {
+		if (inDate == null || inDate.length() == 0) {
 			return null;
 		}
 		

@@ -130,7 +130,7 @@ Provides a standardised interface for large object storage. This is meant to wor
 
 As such functionality is extremely limited. Nor is in-memory performance designed as a priority.
 
-## AtomicLongMap
+## KeyLongMap
 
 Provides atomic numeric support, which is considered to many the "fatal flaw" of NO-SQL. In general this is used mainly for money related tracking, or optimizing aggregation where MetaTable with aggregation is insufficent.
 

@@ -119,16 +119,16 @@ public class AccountTable extends ModuleStructure implements
 	/**
 	 * Handles the Login Throttling Attempt Key (AccountID) Value (Attempt) field mapping
 	 *
-	 * AtomicLongMap<UserOID, attempts>
+	 * KeyLongMap<UserOID, attempts>
 	 **/
-	protected AtomicLongMap loginThrottlingAttemptMap = null;
+	protected KeyLongMap loginThrottlingAttemptMap = null;
 	
 	/**
 	 * Handles the Login Throttling Attempt Key (AccountID) Value (Timeout) field mapping
 	 *
-	 * AtomicLongMap<UserOID, expireTimestamp>
+	 * KeyLongMap<UserOID, expireTimestamp>
 	 **/
-	protected AtomicLongMap loginThrottlingExpiryMap = null;
+	protected KeyLongMap loginThrottlingExpiryMap = null;
 	
 	//
 	// Account Related Token Maps

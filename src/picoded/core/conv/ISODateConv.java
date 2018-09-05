@@ -12,12 +12,12 @@ import com.mysql.jdbc.StringUtils;
  * Month is 1-indexed.
  * Default dateformat is DD-MM-YYYY.
  **/
-public class DateConv {
+public class ISODateConv {
 	
 	/**
 	 * Invalid constructor (throws exception)
 	 **/
-	protected DateConv() {
+	protected ISODateConv() {
 		throw new IllegalAccessError("Utility class");
 	}
 	

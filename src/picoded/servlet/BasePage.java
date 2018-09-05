@@ -112,7 +112,7 @@ public class BasePage extends DStackPage {
 		if (_accountTable != null) {
 			return _accountTable;
 		}
-		_accountTable = DStack().getAccountTable(getAccountTablePrefix());
+		_accountTable = new AccountTable(DStack(), getAccountTablePrefix());
 		_accountTable.cookieDomain = DConfig().getString("sys.account.session.cookieDomain", null);
 		return _accountTable;
 	}

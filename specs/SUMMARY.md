@@ -14,7 +14,7 @@
 	* [\[Concept\] Data persistence levels](dstack/CONCEPT-data-levels.md)
 	* [The Data Stack](dstack/the-stack.md)
 	* [Core Stack Interface](dstack/stack-interface.md)
-		* [DataTable / DataObject](dstack/core/datatable.md)
+		* [DataObjectMap / DataObject](dstack/core/datatable.md)
 * [Servlet & API Builder](servlet/the-servlet.md)
 	* [\[Concept\] Instance thread isolation](servlet/CONCEPT-instance-thread-isolation.md)
 	* [Core Servlets](servlet/core-servlet.md)

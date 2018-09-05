@@ -98,18 +98,18 @@ public class AccountTable extends ModuleStructure implements
 	 *
 	 * Note: Consider this the "PRIMARY TABLE"
 	 *
-	 * DataTable<AccountOID, DataObject>
+	 * DataObjectMap<AccountOID, DataObject>
 	 **/
-	protected DataTable accountDataTable = null;
+	protected DataObjectMap accountDataTable = null;
 	
 	/**
 	 * Account private infromation
 	 * which by default, is not retrivable by the API
 	 * used more for internal variables
 	 *
-	 * DataTable<AccountOID, DataObject>
+	 * DataObjectMap<AccountOID, DataObject>
 	 **/
-	protected DataTable accountPrivateDataTable = null;
+	protected DataObjectMap accountPrivateDataTable = null;
 	
 	//
 	// Login throttling information
@@ -516,7 +516,7 @@ public class AccountTable extends ModuleStructure implements
 	 *
 	 * @return accountDataTable
 	 **/
-	public DataTable accountDataTable() {
+	public DataObjectMap accountDataTable() {
 		return accountDataTable;
 	}
 	

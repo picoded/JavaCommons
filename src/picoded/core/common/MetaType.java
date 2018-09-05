@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * MetaType enums represents the various data types,
- * that the struct/JSql/JCache/JStack varients of DataTable can support.
+ * that the struct/JSql/JCache/JStack varients of DataObjectMap can support.
  **/
 public enum MetaType {
 	
@@ -30,10 +30,10 @@ public enum MetaType {
 	 **/
 	UUID(11),
 	/**
-	 * Another DataTable identifier. This is used for linked DataTable's
+	 * Another DataObjectMap identifier. This is used for linked DataObjectMap's
 	 * via a commonly agreeded on UUID
 	 **/
-	DataTable(12),
+	DataObjectMap(12),
 	
 	//
 	// Standard based

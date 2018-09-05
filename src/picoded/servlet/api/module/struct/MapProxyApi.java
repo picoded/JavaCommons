@@ -35,14 +35,14 @@ public class MapProxyApi extends CommonApiModule {
 	/**
 	 * Constructor for DataTableApi
 	 *
-	 * @param  DataTable  the data table object for the API to build on
+	 * @param  DataObjectMap  the data table object for the API to build on
 	 */
 	public MapProxyApi(Map<String, Object> inMap) {
 		dataMap = inMap;
 	}
 	
 	/**
-	 * Array of internal subsystems : Currently only DataTable dstack module
+	 * Array of internal subsystems : Currently only DataObjectMap dstack module
 	 *
 	 * @return  Array of internal subsystems
 	 */

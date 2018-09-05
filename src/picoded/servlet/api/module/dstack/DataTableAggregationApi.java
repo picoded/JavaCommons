@@ -22,20 +22,20 @@ public class DataTableAggregationApi extends DataTableApi {
 	/////////////////////////////////////////////
 	
 	// Internal data table object, set by constructor
-	protected DataTable dataTable = null;
+	protected DataObjectMap dataTable = null;
 	
 	/**
 	 * Constructor for DataTableApi
 	 *
-	 * @param  DataTable  the data table object for the API to build on
+	 * @param  DataObjectMap  the data table object for the API to build on
 	 */
-	public DataTableAggregationApi(DataTable inTable) {
+	public DataTableAggregationApi(DataObjectMap inTable) {
 		super(inTable);
 		dataTable = inTable;
 	}
 	
 	/**
-	 * Array of internal subsystems : Currently only DataTable dstack module
+	 * Array of internal subsystems : Currently only DataObjectMap dstack module
 	 *
 	 * @return  Array of internal subsystems
 	 */
@@ -127,7 +127,7 @@ public class DataTableAggregationApi extends DataTableApi {
 		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
 		String searchMode = req.getString(SEARCH_MODE, "prefix");
 		
-		// Fix a specific issue in DataTable, where searchString is
+		// Fix a specific issue in DataObjectMap, where searchString is
 		// sent with beginning and ending quotes, remove it accordingly
 		if (searchString.length() >= 2) {
 			if ( //

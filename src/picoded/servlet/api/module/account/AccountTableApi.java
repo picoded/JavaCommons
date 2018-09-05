@@ -142,7 +142,7 @@ public class AccountTableApi extends CommonApiModule {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
-	//   DataTable info proxy
+	//   DataObjectMap info proxy
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -571,7 +571,7 @@ public class AccountTableApi extends CommonApiModule {
 				if ((insideGroup_any == null || insideGroup_any.length == 0)
 					&& (hasGroupRole_any == null || hasGroupRole_any.length == 0)) {
 					//do normal query
-					DataTable accountDataTable = _DataTableObj.accountDataTable();
+					DataObjectMap accountDataTable = _DataTableObj.accountDataTable();
 					
 					if (accountDataTable == null) {
 						return ConvertJSON.fromObject(ret);

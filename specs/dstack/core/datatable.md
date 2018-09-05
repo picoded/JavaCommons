@@ -1,4 +1,4 @@
-# DataTable / DataObject
+# DataObjectMap / DataObject
 
 Represent the core backend data structure in the JavaCommons stack. In its simplist sense, it represents a database backend storage of map objects, each with its own unique GUID. 
 

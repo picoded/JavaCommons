@@ -8,7 +8,7 @@ import picoded.util.file.FileUtil;
 import picoded.core.conv.*;
 
 /**
- * VirtualFileObject using DataTable implmentation
+ * VirtualFileObject using DataObjectMap implmentation
  * This replicates most of the file system requirements of Uilicious workspace
  *
  * This represents a single file / folder

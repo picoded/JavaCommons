@@ -26,19 +26,19 @@ public class DataTableApi extends CommonApiModule {
 	/////////////////////////////////////////////
 	
 	// Internal data table object, set by constructor
-	protected DataTable dataTable = null;
+	protected DataObjectMap dataTable = null;
 	
 	/**
 	 * Constructor for DataTableApi
 	 *
-	 * @param  DataTable  the data table object for the API to build on
+	 * @param  DataObjectMap  the data table object for the API to build on
 	 */
-	public DataTableApi(DataTable inTable) {
+	public DataTableApi(DataObjectMap inTable) {
 		dataTable = inTable;
 	}
 	
 	/**
-	 * Array of internal subsystems : Currently only DataTable dstack module
+	 * Array of internal subsystems : Currently only DataObjectMap dstack module
 	 *
 	 * @return  Array of internal subsystems
 	 */
@@ -378,7 +378,7 @@ public class DataTableApi extends CommonApiModule {
 		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
 		String searchMode = req.getString(SEARCH_MODE, "prefix");
 		
-		// Fix a specific issue in DataTable, where searchString is
+		// Fix a specific issue in DataObjectMap, where searchString is
 		// sent with beginning and ending quotes, remove it accordingly
 		if (searchString.length() >= 2) {
 			if ( //
@@ -586,7 +586,7 @@ public class DataTableApi extends CommonApiModule {
 	 *
 	 * Varient of the list function : Used specifically for datatable integration.
 	 *
-	 * This supports the list field parameters, unless overwritten by a DataTable field (as listed below), such as rowMode='array';
+	 * This supports the list field parameters, unless overwritten by a DataObjectMap field (as listed below), such as rowMode='array';
 	 *
 	 * ## DataTables specific parameters
 	 *

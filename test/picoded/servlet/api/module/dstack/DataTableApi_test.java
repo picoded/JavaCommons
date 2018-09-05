@@ -35,7 +35,7 @@ public class DataTableApi_test extends ApiModule_test {
 		@Override
 		public ApiModule moduleSetup(CommonStack stack) {
 			// Setup the test table and api
-			DataTable table = stack.getDataTable("test-data");
+			DataObjectMap table = stack.getDataTable("test-data");
 			DataTableApi tableApi = new DataTableApi(table);
 			apiTestPath = "data";
 			

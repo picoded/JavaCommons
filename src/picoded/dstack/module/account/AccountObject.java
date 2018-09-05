@@ -768,7 +768,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		
 		// The private data table to use
-		DataTable pDataTable = mainTable.accountPrivateDataTable;
+		DataObjectMap pDataTable = mainTable.accountPrivateDataTable;
 		
 		// Initialize / get existing private data object
 		if (pDataTable.get(this._oid()) == null) {

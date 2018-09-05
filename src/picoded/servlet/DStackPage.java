@@ -1,9 +1,12 @@
 package picoded.servlet;
 
 import java.util.List;
+import java.util.Map;
 import java.io.File;
 
 import picoded.core.conv.ConvertJSON;
+import picoded.core.struct.*;
+
 //
 // // Sub modules useds
 import picoded.dstack.*;
@@ -69,8 +72,8 @@ public class DStackPage extends CoreApiPage {
 		if (DStackObj != null) {
 			return DStackObj;
 		}
-		Map<String,Object> stackConfig = DConfig().getStringMap("sys.DStack", null);
-		DStackObj = new Dstack(stackConfig);
+		GenericConvertMap<String,Object> stackConfig = DConfig().getGenericConvertStringMap("sys.DStack", null);
+		DStackObj = new DStack(stackConfig);
 		return DStackObj;
 	}
 	

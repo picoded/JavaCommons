@@ -259,12 +259,12 @@ public class AccountTable extends ModuleStructure implements
 		sessionNextTokenMap = stack.keyValueMap(name + SUFFIX_LOGIN_NEXT_TOKEN);
 		
 		// Account meta information
-		accountDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_META);
-		accountPrivateDataTable = stack.getDataTable(name + SUFFIX_ACCOUNT_PRIVATE_META);
+		accountDataTable = stack.dataObjectMap(name + SUFFIX_ACCOUNT_META);
+		accountPrivateDataTable = stack.dataObjectMap(name + SUFFIX_ACCOUNT_PRIVATE_META);
 		
 		// Login throttling information
-		loginThrottlingAttemptMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
-		loginThrottlingExpiryMap = stack.getAtomicLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
+		loginThrottlingAttemptMap = stack.keyLongMap(name + ACCOUNT_LOGIN_THROTTLING_ATTEMPT);
+		loginThrottlingExpiryMap = stack.keyLongMap(name + ACCOUNT_LOGIN_THROTTLING_EXPIRY);
 		
 		// Account Verification information
 		accountVerificationMap = stack.keyValueMap(name + ACCOUNT_VERIFICATION);
@@ -437,7 +437,7 @@ public class AccountTable extends ModuleStructure implements
 	 * @return  Account ID associated, if any
 	 **/
 	public String loginNameToAccountID(String name) {
-		return accountLoginNameMap.get(name);
+		return accountLoginNameMap.getValue(name);
 	}
 	
 	/**
@@ -463,7 +463,7 @@ public class AccountTable extends ModuleStructure implements
 	 * @return  AccountObject representing the account ID if found
 	 **/
 	public AccountObject getFromSessionID(String sessionID) {
-		String _oid = sessionLinkMap.get(sessionID);
+		String _oid = sessionLinkMap.getValue(sessionID);
 		if (_oid != null) {
 			return get(_oid);
 		}

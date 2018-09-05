@@ -47,7 +47,7 @@ public class DStackPage extends CoreApiPage {
 		} else {
 			DConfigObj = new DConfig();
 		}
-		
+
 		return DConfigObj;
 	}
 	

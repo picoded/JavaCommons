@@ -297,7 +297,7 @@ public class AccountTable extends ModuleStructure implements
 	 * @return TRUE if email exists
 	 */
 	public boolean isEmailExist(String email) {
-		return (accountLoginNameMap.get(email) == null) ? false : true;
+		return (accountLoginNameMap.getValue(email) == null) ? false : true;
 	}
 	
 	/**

@@ -55,7 +55,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return TRUE if login ID belongs to this account
 	 **/
 	public boolean hasLoginName(String name) {
-		return _oid.equals(mainTable.accountLoginNameMap.get(name));
+		return _oid.equals(mainTable.accountLoginNameMap.getValue(name));
 	}
 	
 	/**
@@ -79,6 +79,12 @@ public class AccountObject extends Core_DataObject {
 			throw new RuntimeException("AccountObject loding ID cannot be blank");
 		}
 		
+		// Check if this AccoutnObject OWNS the name
+		if (hasLoginName(name)) {
+			return true;
+		}
+		
+		// Check if the name already exists in the system
 		if (mainTable.hasLoginName(name)) {
 			return false;
 		}
@@ -361,7 +367,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return TRUE if login ID belongs to this account
 	 **/
 	public boolean hasSession(String sessionID) {
-		return sessionID != null && _oid.equals(mainTable.sessionLinkMap.get(sessionID));
+		return sessionID != null && _oid.equals(mainTable.sessionLinkMap.getValue(sessionID));
 	}
 	
 	/**
@@ -425,7 +431,7 @@ public class AccountObject extends Core_DataObject {
 		
 		// As unlikely as it is, on GUID collision,
 		// we do not want any session swarp EVER
-		if (mainTable.sessionLinkMap.get(sessionID) != null) {
+		if (mainTable.sessionLinkMap.getValue(sessionID) != null) {
 			throw new RuntimeException("GUID collision for sessionID : " + sessionID);
 		}
 		
@@ -486,7 +492,7 @@ public class AccountObject extends Core_DataObject {
 	 * @return TRUE if login ID belongs to this account
 	 **/
 	public boolean hasToken(String sessionID, String tokenID) {
-		return hasSession(sessionID) && sessionID.equals(mainTable.sessionTokenMap.get(tokenID));
+		return hasSession(sessionID) && sessionID.equals(mainTable.sessionTokenMap.getValue(tokenID));
 	}
 	
 	/**

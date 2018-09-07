@@ -287,7 +287,7 @@ public class CommonsPage extends BasePage {
 		boolean isSSL = DConfig().getBoolean("sys.email.smtp.ssl", false);
 		systemEmail = new EmailBroadcaster(hostname, username, password, emailFrom, isSSL);
 		systemEmail.setAdminEmail(DConfig().getString("sys.email.smtp.adminEmail",
-			"eugene@uilicious.com"));
+			"eugene@wenconsulting.com"));
 		return systemEmail;
 	}
 }

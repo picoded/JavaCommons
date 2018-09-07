@@ -789,7 +789,7 @@ public class AccountTable extends ModuleStructure implements
 		
 		// Detirmine the login lifetime
 		int lifeTime = getLifeTime(rememberMe);
-		long expireTime = (System.currentTimeMillis()) / 1000L + lifeTime;
+		long expireTime = ((System.currentTimeMillis()) / 1000L + lifeTime) * 1000L;
 		
 		// Session info handling
 		//-----------------------------------------------------
@@ -951,7 +951,7 @@ public class AccountTable extends ModuleStructure implements
 				
 				// Setup the next token
 				storeCookiesInsideTheCookieJar(request, response, sessionID, nextTokenID, rememberMe,
-					(int) lifespan, expireTime);
+					(int) lifespan, expireTime); // lifespan in seconds
 			}
 		}
 		

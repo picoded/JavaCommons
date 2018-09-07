@@ -424,7 +424,7 @@ public class AccountObject extends Core_DataObject {
 		}
 		
 		// Set the session expirary time : 30 seconds (before tokens)
-		long expireTime = (System.currentTimeMillis()) / 1000L + AccountTable.SESSION_NEW_LIFESPAN;
+		long expireTime = ((System.currentTimeMillis()) / 1000L + AccountTable.SESSION_NEW_LIFESPAN) * 1000L;
 		
 		// Generate a base58 guid for session key
 		String sessionID = GUID.base58();
@@ -615,11 +615,11 @@ public class AccountObject extends Core_DataObject {
 	 * @param  Session ID to validate
 	 * @param  Token ID to check
 	 *
-	 * @return  The token expiry timestamp
+	 * @return  The token expiry timestamp IN SECONDS
 	 **/
 	public long getTokenExpiry(String sessionID, String tokenID) {
 		if (hasToken(sessionID, tokenID)) {
-			return mainTable.sessionTokenMap.getExpiry(tokenID);
+			return mainTable.sessionTokenMap.getExpiry(tokenID) / 1000L;
 		}
 		return -1;
 	}

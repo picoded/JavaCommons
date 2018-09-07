@@ -11,6 +11,8 @@ import java.io.IOException;
 // Objects used
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Enumeration;
 import java.io.PrintWriter;
 import java.io.OutputStream;
@@ -96,6 +98,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	
 	private static final long serialVersionUID = 1L;
 	
+	// Logger
+	private static final Logger LOGGER = Logger.getLogger( CorePage.class.getName() );
+
 	///////////////////////////////////////////////////////
 	//
 	// Instance variables
@@ -899,6 +904,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		try {
 			// Does authentication check
 			if (!doAuth(templateDataObj)) {
+				outputJSON(ConvertJSON.toMap("{ \"ERROR\" : \"doAuth - Unauthorized\" }"), new HashMap<String,Object>(){}, getWriter());
 				return false;
 			}
 			
@@ -1166,6 +1172,9 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 	 **/
 	public boolean outputJSONException(Map<String, Object> outputData,
 		Map<String, Object> templateData, PrintWriter output, Exception e) throws Exception {
+		// Log the exception
+		LOGGER.log( Level.SEVERE, e.toString(), e );
+
 		// Converts the stack trace to a string
 		String stackTrace = picoded.core.exception.ExceptionUtils.getStackTrace(e);
 		

@@ -215,17 +215,18 @@ public class CoreApiPage extends CorePage {
 	}
 	
 	/**
-	 * Does the actual final json object to json string output, with contentType "application/javascript"
+	 * Does the JSON request processing, and update its outputData object
 	 **/
-	@Override
-	public boolean outputJSON(Map<String, Object> outputData, Map<String, Object> templateData,
-		PrintWriter output) throws Exception {
+	public boolean doJSON(Map<String, Object> outputData, Map<String, Object> templateData)
+		throws Exception {
+
 		// Gets the wildcard URI
 		String[] wildcardUri = requestWildcardUriArray();
 		
+		// Get the ApiResponse after execution
 		ApiResponse ret = null;
-		// null apiNamespace bypass
 		if (apiNamespace == null || apiNamespace.isEmpty()) {
+			// null apiNamespace bypass
 			ret = apiBuilder().servletExecute(this, wildcardUri, null);
 		} else if (wildcardUri.length >= 1 && (wildcardUri[0].equalsIgnoreCase(apiNamespace))) {
 			// Standard apiNamespace call
@@ -235,15 +236,11 @@ public class CoreApiPage extends CorePage {
 			ret = apiBuilder().servletExecute(this,
 				Arrays.copyOfRange(wildcardUri, 1, wildcardUri.length), null);
 		}
+
+		// Update the outputData with the result
+		outputData.putAll(ret);
 		
-		// There is valid return data
-		if (ret != null) {
-			outputData.putAll(ret);
-			return super.outputJSON(outputData, templateData, output);
-		}
-		
-		// Terminates the processing once reaches to this point.
-		return false;
+		return true;
 	}
 	
 }

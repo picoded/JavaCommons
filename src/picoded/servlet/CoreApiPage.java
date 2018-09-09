@@ -238,8 +238,9 @@ public class CoreApiPage extends CorePage {
 		}
 
 		// Update the outputData with the result
-		outputData.putAll(ret);
-		
+		if( ret != null ) {
+			outputData.putAll(ret);
+		}
 		return true;
 	}
 	

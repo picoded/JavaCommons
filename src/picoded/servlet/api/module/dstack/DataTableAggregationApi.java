@@ -50,7 +50,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	/////////////////////////////////////////////
 	
 	/**
-	 * # $prefix/list
+	 * # $prefix/aggregatedList
 	 *
 	 * List various data for the frontend
 	 *
@@ -61,12 +61,11 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type	   | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | fieldList       | String[] (optional)| Default ["_oid"], the fields to return                                        |
 	 * | query           | String   (optional)| Requested Query filter, default matches all                                   |
 	 * | queryArgs       | Object[] (optional)| Requested Query filter arguments                                              |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | searchString    | String   (optional)| Search string passed                                                          |
-	 * | searchFieldList | String[] (optional)| Fields used for searching, defaults to headers                                |
+	 * | searchFieldList | String[] (optional)| Fields used for searching, defaults to ['_oid']                               |
 	 * | searchMode      | String   (optional)| Default PREFIX. Determines SQL query wildcard position, for the first word.   |
 	 * |                 |                    | (Either prefix, suffix, or both), second word onwards always uses both.       |
 	 * |                 |                    | For example: PREFIX mode, with search string hello, will query with "hello%". |
@@ -86,8 +85,6 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | totalCount      | int                | Total amount of records, matching the query, and search filter, without offset|
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
-	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | result          | Array[Obj/Array]   | Array of row records, each row is represented as an array                     |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | error           | String (Optional)  | Errors encounted if any                                                       |
@@ -100,13 +97,6 @@ public class DataTableAggregationApi extends DataTableApi {
 
 		// Arguments handling
 		//-------------------------------------------------------------------------------
-		
-		// Get fieldList arguments
-		String[] fieldList = req.getStringArray(FIELD_LIST, "['_oid']");
-		if (fieldList.length <= 0) {
-			res.put(ERROR, "fieldList, requested cannot be an empty array");
-			res.halt();
-		}
 		
 		// The query to use
 		String query = req.getString(QUERY, "").trim();
@@ -126,7 +116,7 @@ public class DataTableAggregationApi extends DataTableApi {
 		
 		// Search value to filter the result by
 		String searchString = req.getString(SEARCH_STRING, "").trim();
-		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, fieldList);
+		String[] searchFieldList = req.getStringArray(SEARCH_FIELDLIST, "['_oid']");
 		String searchMode = req.getString(SEARCH_MODE, "prefix");
 		
 		// Fix a specific issue in DataObjectMap, where searchString is
@@ -217,7 +207,6 @@ public class DataTableAggregationApi extends DataTableApi {
 		long timestamp_04_aggregation = System.currentTimeMillis();
 		
 		// Process the result for output
-		res.put(FIELD_LIST, fieldList);
 		res.put(TOTAL_COUNT, dataCount);
 		
 		// Aggregration timestamp calculations

@@ -74,7 +74,6 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | start           | int (optional)     | Default 0: Record start listing, 0-indexed                                    |
 	 * | length          | int (optional)     | Default -1: The number of records to return                                   |
-	 * | orderBy         | String (optional)  | Default : order by _oid                                                       |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | rowMode         | String (optional)  | Default "object", the result array row format, use either "array" or "object" |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -85,7 +84,7 @@ public class DataTableAggregationApi extends DataTableApi {
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | Parameter Name  | Variable Type      | Description                                                                   |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
-	 * | totalCount      | int                | Total amount of records, matching the query, and search filter                |
+	 * | totalCount      | int                | Total amount of records, matching the query, and search filter, without offset|
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
 	 * | fieldList       | String[]           | Default ["_oid"], the collumns to return                                      |
 	 * +-----------------+--------------------+-------------------------------------------------------------------------------+
@@ -143,7 +142,6 @@ public class DataTableAggregationApi extends DataTableApi {
 		// Start, Length, and ordering limiting of data
 		int start = req.getInt(START, 0);
 		int length = req.getInt(LENGTH, -1);
-		String orderBy = req.getString(ORDER_BY, "oID");
 		
 		// The result data row mode
 		String rowMode = req.getString(ROW_MODE, "object");
@@ -190,13 +188,17 @@ public class DataTableAggregationApi extends DataTableApi {
 		long timestamp_01_prep = System.currentTimeMillis();
 		
 		// Fetching the objects and count
-		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
+		dataObjs = dataTable.query(jointQuery, jointQueryArgs, null, start, length);
 
 		// Timestamp after performing the query
 		long timestamp_02_query = System.currentTimeMillis();
 		
-		// Fetching the count
-		dataCount = dataTable.queryCount(jointQuery, jointQueryArgs);
+		// Fetching the count, with optimized query count if aggregating against "all"
+		if( start == 0 && length <= -1 ) {
+			dataCount = dataObjs.length;
+		} else {
+			dataCount = dataTable.queryCount(jointQuery, jointQueryArgs);
+		}
 		
 		// Timestamp after performing the count
 		long timestamp_03_count = System.currentTimeMillis();

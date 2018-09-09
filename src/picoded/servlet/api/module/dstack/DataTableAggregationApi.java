@@ -96,6 +96,9 @@ public class DataTableAggregationApi extends DataTableApi {
 	 */
 	public ApiFunction aggregatedList = (req, res) -> {
 		
+		// Starting timestamp
+		long timestamp_00_start = System.currentTimeMillis();
+
 		// Arguments handling
 		//-------------------------------------------------------------------------------
 		
@@ -183,9 +186,20 @@ public class DataTableAggregationApi extends DataTableApi {
 			jointQueryArgs = null;
 		}
 		
+		// Timestamp after preparing the query
+		long timestamp_01_prep = System.currentTimeMillis();
+		
 		// Fetching the objects and count
 		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
+
+		// Timestamp after performing the query
+		long timestamp_02_query = System.currentTimeMillis();
+		
+		// Fetching the count
 		dataCount = dataTable.queryCount(jointQuery, jointQueryArgs);
+		
+		// Timestamp after performing the count
+		long timestamp_03_count = System.currentTimeMillis();
 		
 		//aggregation
 		String[] aggTermsAndArgs = req.getStringArray("aggregations", null);
@@ -197,9 +211,22 @@ public class DataTableAggregationApi extends DataTableApi {
 			res.put(RESULT, aggResult);
 		}
 		
+		// Timestamp after performing the count
+		long timestamp_04_aggregation = System.currentTimeMillis();
+		
 		// Process the result for output
 		res.put(FIELD_LIST, fieldList);
 		res.put(TOTAL_COUNT, dataCount);
+		
+		// Aggregration timestamp calculations
+		//-------------------------------------------------------------------------------
+		Map<String,Object> timing = new HashMap<String,Object>();
+		timing.put("00-setup", timestamp_01_prep  - timestamp_00_start);
+		timing.put("01-query", timestamp_02_query - timestamp_01_prep);
+		timing.put("02-count", timestamp_03_count - timestamp_02_query);
+		timing.put("03-aggregation", timestamp_04_aggregation - timestamp_03_count);
+		timing.put("total", timestamp_04_aggregation - timestamp_00_start);
+		res.put("benchmark", timing);
 		
 		// End and return result
 		return res;

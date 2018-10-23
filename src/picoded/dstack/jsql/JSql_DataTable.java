@@ -221,9 +221,9 @@ public class JSql_DataTable extends Core_DataTable {
 		try {
 			sqlObj.update_raw( //
 				"ALTER TABLE " + dataTableName + //
-					"ADD CONSTRAINT " + dataTableName + "_fk" + //
-					"FOREIGN KEY (oID) REFERENCES " + baseTableName + "(oID)" + //
-					"ON DELETE CASCADE" // NOTE : This slows performance down
+					" ADD CONSTRAINT " + dataTableName + "_fk" + //
+					" FOREIGN KEY (oID) REFERENCES " + baseTableName + "(oID)" + //
+					" ON DELETE CASCADE" // NOTE : This slows performance down
 				);
 		} catch (Exception e) {
 			// Silence exception

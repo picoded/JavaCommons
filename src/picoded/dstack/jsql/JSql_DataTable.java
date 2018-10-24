@@ -329,11 +329,11 @@ public class JSql_DataTable extends Core_DataTable {
 	 * @return  nothing
 	 **/
 	protected void DataObjectRemoteDataMap_remove(String oid) {
-		// Delete the data
-//		sqlObj.delete(dataTableName, "oID = ?", new Object[] { oid });
-
 		// Delete the parent key
 		sqlObj.delete(baseTableName, "oID = ?", new Object[] { oid });
+
+		// Delete the data
+		sqlObj.delete(dataTableName, "oID = ?", new Object[] { oid });
 	}
 
 	/**

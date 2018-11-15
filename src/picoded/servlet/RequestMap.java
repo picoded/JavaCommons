@@ -90,7 +90,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 					setInputStreamToByteArray(req.getInputStream());
 					
 					// get the JSON string from the body
-					String requestJSON = new String(getRequestBodyByteArray());
+					String requestJSON = new String(getRequestBodyByteArray(), "UTF-8");
 					
 					// Convert into jsonMap
 					Map<String, Object> jsonMap = ConvertJSON.toMap(requestJSON);
@@ -214,7 +214,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 				for (FileItem item : formItems) {
 					// Field name to handle
 					String fieldname = item.getFieldName();
-
+					
 					// processes only fields that are not form fields
 					if (item.isFormField()) {
 						

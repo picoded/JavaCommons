@@ -185,7 +185,7 @@ public class BasePage extends DStackPage {
 		// Gets the superuser and group information
 		String superGroup = getSuperUserGroupName();
 		String adminUser = dc.getString("sys.account.superUsers.rootUsername", "admin");
-		String adminPass = dc.getString("sys.account.superUsers.rootPassword", "P@ssw0rd!");
+		String adminPass = dc.getString("sys.account.superUsers.rootPassword", "Password123");
 		boolean resetPass = dc.getBoolean("sys.account.superUsers.rootPasswordReset", false);
 		Map<String, Object> meta = dc.getStringMap("sys.account.superUsers.data", "{}");
 		boolean resetMeta = dc.getBoolean("sys.account.superUsers.resetData", false);
@@ -197,6 +197,10 @@ public class BasePage extends DStackPage {
 			log().info("Creating superuser : " + adminUser);
 			
 			superUser = at.newEntry(adminUser);
+
+			if(superUser == null)
+				System.out.println("SuperUser object is null");
+
 			superUser.setPassword(adminPass);
 		} else if (resetPass) {
 			superUser.setPassword(adminPass);

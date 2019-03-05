@@ -2,6 +2,7 @@ package picoded.servlet.api.module.account;
 
 import java.util.*;
 
+import picoded.servlet.CommonsPage;
 import picoded.servlet.api.*;
 import picoded.servlet.api.module.*;
 import picoded.dstack.module.account.*;
@@ -314,15 +315,28 @@ public class AccountTableApi extends CommonApiModule {
 		
 		// @TODO:If current account is super user,
 		// and is not modifying himself
+		String[] configuredSuperUsers = ((CommonsPage) req.getCorePage()).DConfig().getStringArray("sys.account.superUsers.list", new String[]{});
+		boolean isSuperUser = false;
+		for(String user : configuredSuperUsers){
+			if(cu.hasLoginName(user) ){
+				System.out.println("Current user is a superuser");
+				isSuperUser = true;
+				break;
+			}
+		}
 		
 		// Ensure from here user logged in and changing password is the same
-		if (ao._oid().equals(cu._oid()) == false) {
+		if (!isSuperUser &&  ao._oid().equals(cu._oid()) == false) {
 			res.put(ERROR, "Change password, requires the respective user login permission");
 			return res;
 		}
 		
+		// superuser does not need old password to change password
+		if(isSuperUser){
+			ao.setPassword(newPassword);
+		}
 		// Else require a proper setPassword with validation
-		if (!ao.setPassword(newPassword, oldPassword)) {
+		else if (!ao.setPassword(newPassword, oldPassword)) {
 			res.put(ERROR, ERROR_PASS_INCORRECT);
 			return res;
 		}

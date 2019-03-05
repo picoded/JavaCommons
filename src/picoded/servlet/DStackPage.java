@@ -35,7 +35,7 @@ public class DStackPage extends CoreApiPage {
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	protected DConfig DConfigObj = null;
+	protected static volatile DConfig DConfigObj = null;
 	
 	/// @TODO, the actual DConfig integration with the DB. Currently its purely via the file system
 	public DConfig DConfig() {
@@ -57,7 +57,7 @@ public class DStackPage extends CoreApiPage {
 	//
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	protected DStack DStackObj = null;
+	protected static volatile DStack DStackObj = null;
 	
 	////////////////////////////////////////////////////
 	// tableSetup calls for various jSql based modules

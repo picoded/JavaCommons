@@ -904,7 +904,7 @@ public class CorePage extends javax.servlet.http.HttpServlet implements ServletC
 		try {
 			// Does authentication check
 			if (!doAuth(templateDataObj)) {
-				outputJSON(ConvertJSON.toMap("{ \"ERROR\" : \"doAuth - Unauthorized\" }"), new HashMap<String,Object>(){}, getWriter());
+				outputJSON(ConvertJSON.toMap("{ \"ERROR\" : \"Session timed out / Unauthorized\" }"), new HashMap<String,Object>(){}, getWriter());
 				return false;
 			}
 			

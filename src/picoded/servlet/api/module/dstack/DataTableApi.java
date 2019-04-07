@@ -349,6 +349,9 @@ public class DataTableApi extends CommonApiModule {
 	 */
 	public ApiFunction list = (req, res) -> {
 		
+		// Timing measurement
+		long startTime = System.currentTimeMillis();
+
 		// Arguments handling
 		//-------------------------------------------------------------------------------
 		
@@ -433,15 +436,34 @@ public class DataTableApi extends CommonApiModule {
 			jointQueryArgs = null;
 		}
 		
-		// Fetching the objects and count
-		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
+		// Arugments formatting timing
+		long argumentsProcessingTime = System.currentTimeMillis();
+
+		// Doing the datatable count
 		dataCount = dataTable.queryCount(jointQuery, jointQueryArgs);
+		long countProcessingTime = System.currentTimeMillis();
+
+		// Fetching the datatable
+		dataObjs = dataTable.query(jointQuery, jointQueryArgs, orderBy, start, length);
+		long queryProcessingTime = System.currentTimeMillis();
 		
 		// Process the result for output
 		res.put(FIELD_LIST, fieldList);
 		res.put(TOTAL_COUNT, dataCount);
 		res.put(RESULT, formatDataObjectList(dataObjs, fieldList, rowMode));
 		
+		// Does the timing processing
+		long resultFromattingTime = System.currentTimeMillis();
+		Map<String,Object> perfTimings = new HashMap<>();
+
+		// The timing output
+		perfTimings.put("0-arguments-processing", argumentsProcessingTime - startTime);
+		perfTimings.put("1-query-count", countProcessingTime - argumentsProcessingTime);
+		perfTimings.put("2-query-oid", queryProcessingTime - countProcessingTime);
+		perfTimings.put("3-query-fetch", resultFromattingTime - queryProcessingTime);
+		perfTimings.put("total-time", resultFromattingTime - argumentsProcessingTime);
+		res.put("_perf", perfTimings);
+
 		// End and return result
 		return res;
 	};

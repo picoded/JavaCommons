@@ -50,8 +50,7 @@ public class FileEncrypt {
 			 **/
 			stamper = new PdfStamper(reader, baos);
 			stamper.setEncryption(pdfPassword.getBytes(), pdfPassword.getBytes(),
-				PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128
-					| PdfWriter.DO_NOT_ENCRYPT_METADATA);
+				PdfWriter.ALLOW_PRINTING, PdfWriter.DO_NOT_ENCRYPT_METADATA);
 			
 			/**
 			 * Stream close

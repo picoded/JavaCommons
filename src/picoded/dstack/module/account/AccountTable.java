@@ -933,12 +933,13 @@ public class AccountTable extends ModuleStructure implements
 			if (needRenewal) {
 				// Detirmine the renewed login lifetime and expirary to set (if new issued token)
 				long expireTime = (System.currentTimeMillis()) / 1000L + getLifeTime(rememberMe);
-				
+				expireTime *= 1000L;	// change to miliseconds
+
 				// Issue the next token
 				String nextTokenID = ret.issueNextToken(sessionID, tokenID, expireTime);
 				
 				// Get the actual expiry of the next token (if it was previously issued)
-				expireTime = ret.getTokenExpiry(sessionID, nextTokenID);
+				expireTime = ret.getTokenExpiry(sessionID, nextTokenID);				
 				
 				// If nextTokenID and expireTime fails, assume login failure
 				if (nextTokenID == null || expireTime < 0) {
@@ -959,7 +960,12 @@ public class AccountTable extends ModuleStructure implements
 		//---------------------------------------------------------------------------------------------------
 		return ret;
 	}
-	
+
+	public void setLoginLifetimeValue(int inLoginLifetime){
+		loginLifetime = inLoginLifetime;
+		loginRenewal = loginLifetime / 2;
+	}
+
 	/**
 	 * Login the user if the given values are valid, and return its account object
 	 *

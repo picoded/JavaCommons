@@ -114,6 +114,12 @@ public class BasePage extends DStackPage {
 		}
 		_accountTable = new AccountTable(DStack(), getAccountTablePrefix());
 		_accountTable.cookieDomain = DConfig().getString("sys.account.session.cookieDomain", null);
+		
+		// Configure login life time from config
+		int loginLifetime = DConfig().getInt("sys.account.session.loginlifetime", 3600);
+		if (loginLifetime > -1) {
+			_accountTable.setLoginLifetimeValue(loginLifetime);
+		}
 		return _accountTable;
 	}
 	
@@ -168,13 +174,8 @@ public class BasePage extends DStackPage {
 		// Configure account table
 		at.isHttpOnly = dc.getBoolean("sys.account.session.isHttpOnly", false /*default as false*/);
 		at.isSecureOnly = dc
-			.getBoolean("sys.account.session.isSecureOnly", false /*default as false*/);
+			.getBoolean("sys.account.session.isSecureOnly", false /*default as false*/);		
 		
-		// Configure login life time from config
-		int loginLifetime = dc.getInt("sys.account.session.loginlifetime", 3600);
-		if (loginLifetime > -1) {
-			at.loginLifetime = loginLifetime;
-		}
 		// Set up account table
 		boolean skipAccountAuthTableSetup = dc.getBoolean("sys.account.skipAccountAuthTableSetup",
 			false);

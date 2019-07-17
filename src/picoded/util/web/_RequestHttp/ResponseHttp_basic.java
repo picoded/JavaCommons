@@ -50,7 +50,7 @@ public class ResponseHttp_basic implements ResponseHttp {
 		 * Stores and return
 		 **/
 		try {
-			return (_toString = IOUtils.toString(inputStream())); //, encoding
+			return (_toString = IOUtils.toString(inputStream(), (String)null)); //, encoding
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

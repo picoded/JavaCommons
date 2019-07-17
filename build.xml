@@ -470,4 +470,9 @@ te>]]></replacetoken>
 		<antcall target="build-src"></antcall>
 	</target>
 
+	<target name="cs">
+		<antcall target="clean"/>
+		<antcall target="source"/>
+	</target>
+
 </project>

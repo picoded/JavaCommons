@@ -77,13 +77,13 @@ public class ConfigFile implements GenericConvertMap<String, Object> {
 		try {
 			fileName = inFile.getName();
 			if (fileName.endsWith(".js") || fileName.endsWith(".json")) {
-				String jsString = FileUtils.readFileToString(inFile);
+				String jsString = FileUtils.readFileToString(inFile, (String)null);
 				jsonMap = GenericConvert.toGenericConvertStringMap(jsString,
 					new HashMap<String, Object>());
 			} else if (fileName.endsWith(".ini")) {
 				iniMap = new Ini(inFile);
 			} else if (fileName.endsWith(".html")) {
-				String jsString = FileUtils.readFileToString(inFile);
+				String jsString = FileUtils.readFileToString(inFile, (String)null);
 				jsonMap = new GenericConvertHashMap<String, Object>();
 				jsonMap.put("html", jsString);
 			} else {

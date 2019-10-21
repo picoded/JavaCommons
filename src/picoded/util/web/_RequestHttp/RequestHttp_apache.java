@@ -280,8 +280,8 @@ public class RequestHttp_apache {
 					for (Map.Entry<String, File[]> part : filesMap.entrySet()) {
 						String filePath = part.getKey();
 						for (File fileObj : part.getValue()) {
-							builder.addBinaryBody(filePath, new FileInputStream(fileObj),
-								ContentType.APPLICATION_OCTET_STREAM, fileObj.getName());
+							builder.addBinaryBody(filePath, fileObj, ContentType.APPLICATION_OCTET_STREAM,
+								fileObj.getName());
 						}
 					}
 					;

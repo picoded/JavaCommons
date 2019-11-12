@@ -1,5 +1,6 @@
 package picoded.web._RequestHttp;
 
+import java.nio.charset.StandardCharsets;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.List;
@@ -275,6 +276,7 @@ public class RequestHttp_apache {
 				} else if (filesMap != null) {
 					// does a multipart encoding request
 					MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+					builder.setCharset(StandardCharsets.UTF_8);
 					
 					// Process the file map, not using lambda as it does not auto rethrow the IOException
 					for (Map.Entry<String, File[]> part : filesMap.entrySet()) {
@@ -290,7 +292,8 @@ public class RequestHttp_apache {
 					if (parametersMap != null) {
 						parametersMap.forEach((key, valArr) -> {
 							for (String val : valArr) {
-								builder.addTextBody(key, val, ContentType.TEXT_PLAIN);
+								builder.addTextBody(key, val,
+									ContentType.TEXT_PLAIN.withCharset(StandardCharsets.UTF_8));
 							}
 						});
 					}

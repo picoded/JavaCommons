@@ -12,12 +12,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 
 import org.apache.commons.collections4.map.AbstractMapDecorator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.ContentType;
+import org.springframework.util.StringUtils;
 
 import picoded.core.struct.GenericConvertMap;
 import picoded.core.conv.ConvertJSON;
@@ -219,7 +222,9 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 					if (item.isFormField()) {
 						
 						// Field value to populate OR append
-						String fieldvalue = item.getString(encoding);
+						String fieldvalue = item.getString(determineEncoding(item.getContentType(),
+							encoding));
+						
 						// Get the cache
 						Object cache = get(fieldname);
 						
@@ -243,6 +248,7 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 							// Put the modified the list
 							put(fieldname, listCache);
 						}
+						
 					} else {
 						
 						//
@@ -274,6 +280,24 @@ public class RequestMap extends AbstractMapDecorator<String, Object> implements
 		
 		// Finish processing
 		return true;
+	}
+	
+	/**
+	 * Base on the String given, find out the encoding String of that 
+	 * Content-Type header
+	 * 
+	 * @param contentTypeHeader e.g. Content-Type: text/plain; charset=UTF-8
+	 * @parma defaultEncoding the default encoding to fall back
+	 */
+	private String determineEncoding(String contentTypeHeader, String defaultEncoding) {
+		if (!StringUtils.hasText(contentTypeHeader)) {
+			return defaultEncoding;
+		}
+		
+		ContentType c = ContentType.parse(contentTypeHeader);
+		Charset charset = c.getCharset();
+		
+		return (charset != null ? charset.name() : defaultEncoding);
 	}
 	
 }

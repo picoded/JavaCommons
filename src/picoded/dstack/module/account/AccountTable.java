@@ -384,7 +384,7 @@ public class AccountTable extends ModuleStructure implements
 			Set<String> loginIdMapNames = accountLoginNameMap.keySet(oid);
 			if (loginIdMapNames != null) {
 				for (String name : loginIdMapNames) {
-					accountLoginNameMap.remove(name, oid);
+					accountLoginNameMap.remove(name);
 				}
 			}
 			// Remove account meta information

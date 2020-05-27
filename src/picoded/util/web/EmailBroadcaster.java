@@ -267,9 +267,18 @@ public class EmailBroadcaster {
 		
 		// Apply message content
 		message.setContent(multipart);
-		
+				
+		long startEpoch = System.currentTimeMillis();
+
 		//Sends the message
 		Transport.send(message);
+
+		long endEpoch = System.currentTimeMillis();
+		long diffEpoc = (endEpoch - startEpoch);
+
+		if(diffEpoc > 10000){
+			System.err.println("# [EMAIL] [WARNING] Email took longer than 10 seconds: " + diffEpoc + "ms");
+		}		
 		
 		return true;
 	}

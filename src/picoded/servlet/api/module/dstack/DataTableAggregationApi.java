@@ -209,6 +209,8 @@ public class DataTableAggregationApi extends DataTableApi {
 		// Process the result for output
 		res.put(TOTAL_COUNT, dataCount);
 		
+		long totalTime = timestamp_04_aggregation - timestamp_00_start;
+
 		// Aggregration timestamp calculations
 		//-------------------------------------------------------------------------------
 		Map<String,Object> timing = new HashMap<String,Object>();
@@ -216,7 +218,12 @@ public class DataTableAggregationApi extends DataTableApi {
 		timing.put("01-query", timestamp_02_query - timestamp_01_prep);
 		timing.put("02-count", timestamp_03_count - timestamp_02_query);
 		timing.put("03-aggregation", timestamp_04_aggregation - timestamp_03_count);
-		timing.put("total", timestamp_04_aggregation - timestamp_00_start);
+		timing.put("total", totalTime);
+		
+		if(totalTime > 10000){
+			System.err.println("# [AGGREGATION] [WARNING] Data aggregation API took longer than 10 seconds: " + totalTime + "ms");
+		}
+		
 		res.put("benchmark", timing);
 		
 		// End and return result
